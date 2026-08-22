@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subjects | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Subjects</h2>
+              <span class="navbar-subtitle">Course syllabus and assigned staff advisors</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search anything..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="5 Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">5</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">HOD</span>
+                <span class="nav-profile-role" id="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL -->
+        <div class="workspace-scroll-content">
+          <div class="workspace-column-card">
+            <!-- Top Toolbar Controls -->
+            <div class="table-toolbar-row">
+              <div class="toolbar-left-search">
+                <input type="text" placeholder="Search subjects by code or name..." id="subject-search-input">
+              </div>
+              <div class="toolbar-right-actions">
+                <select id="subject-filter-semester" class="toolbar-select" aria-label="Filter by Semester">
+                  <option value="Semester 1" selected>Semester 1</option>
+                  <option value="Semester 2">Semester 2</option>
+                  <option value="Semester 3">Semester 3</option>
+                  <option value="Semester 4">Semester 4</option>
+                  <option value="Semester 5">Semester 5</option>
+                  <option value="Semester 6">Semester 6</option>
+                  <option value="Semester 7">Semester 7</option>
+                  <option value="Semester 8">Semester 8</option>
+                  <option value="all">All Semesters</option>
+                </select>
+                <button class="btn btn-primary" id="btn-add-subject-trigger">+ Add New Subject</button>
+              </div>
+            </div>
+
+            <!-- Subject catalog table -->
+            <div class="sms-table-responsive">
+              <table class="sms-data-table" id="subject-table-elem">
+                <thead>
+                  <tr>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Credits</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Assigned Faculty</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="subject-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Add / Edit Subject Modal -->
+    <div id="subject-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 540px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color, #e2e8f0);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 id="modal-title" style="font-size: 18px; font-weight: 600; color: var(--text-primary, #1e293b); margin: 0;">Add New Subject</h3>
+          <button id="btn-close-modal" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1;">&times;</button>
+        </div>
+        <form id="subject-form">
+          <input type="hidden" id="subject-pk-id">
+          
+          <div style="margin-bottom: 16px;">
+            <label for="modal-sub-code" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Subject Code</label>
+            <input type="text" id="modal-sub-code" required placeholder="e.g. CS6501" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label for="modal-sub-name" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Subject Name</label>
+            <input type="text" id="modal-sub-name" required placeholder="e.g. Database Management Systems" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+              <label for="modal-credits" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Credits</label>
+              <select id="modal-credits" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="1">1 Credit</option>
+                <option value="2">2 Credits</option>
+                <option value="3" selected>3 Credits</option>
+                <option value="4">4 Credits</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="modal-semester" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Semester</label>
+              <input type="text" id="modal-semester" required placeholder="e.g. V" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+              <label for="modal-year" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Year</label>
+              <select id="modal-year" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="I-Year">1st Year (I-Year)</option>
+                <option value="II-Year">2nd Year (II-Year)</option>
+                <option value="III-Year" selected>3rd Year (III-Year)</option>
+                <option value="IV-Year">4th Year (IV-Year)</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="modal-section" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Section</label>
+              <select id="modal-section" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="A" selected>Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+                <option value="ALL">All Sections</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+              <label for="modal-department" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Department *</label>
+              <select id="modal-department" disabled required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #f1f5f9); color: var(--text-primary); cursor: not-allowed; outline: none;">
+                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+                <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="modal-faculty-id" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Assigned Faculty Advisor</label>
+              <select id="modal-faculty-id" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="">-- Unassigned --</option>
+                <!-- Populated dynamically from approved faculty list -->
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" id="btn-cancel-modal" class="btn btn-secondary" style="padding: 8px 16px;">Cancel</button>
+            <button type="submit" id="save-subject-btn" class="btn btn-primary" style="padding: 8px 16px;">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Alert toast container -->
+    <div id="toast-message-banner" style="position: fixed; bottom: 24px; right: 24px; z-index: 1100; padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none;"></div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', () => {
+        let subjectsList = [];
+        let facultyList = [];
+        let currentHodDept = 'Computer Science & Engineering';
+
+        function showToast(message, success = true) {
+          const toast = document.getElementById('toast-message-banner');
+          if (!toast) return;
+          toast.textContent = message;
+          toast.style.backgroundColor = success ? '#10B981' : '#EF4444';
+          toast.style.transform = 'translateY(0)';
+          toast.style.opacity = '1';
+          setTimeout(() => {
+            toast.style.transform = 'translateY(100px)';
+            toast.style.opacity = '0';
+          }, 3500);
+        }
+
+        // Load HOD Profile to set read-only department
+        async function fetchHodProfile() {
+          const token = localStorage.getItem('accessToken');
+          if (!token) return;
+          try {
+            const res = await fetch('/api/auth/profile', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const p = await res.json();
+              if (p.department) {
+                currentHodDept = p.department;
+                const deptSelect = document.getElementById('modal-department');
+                if (deptSelect) {
+                  deptSelect.value = currentHodDept;
+                }
+              }
+            }
+          } catch (e) {
+            console.error('Error fetching HOD profile:', e);
+          }
+        }
+
+        // Fetch subjects
+        async function fetchSubjects() {
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            window.location.href = '/login.html?role=hod';
+            return;
+          }
+
+          try {
+            const res = await fetch('/api/subjects', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+              if (res.status === 401 || res.status === 403) {
+                window.location.href = '/login.html?role=hod';
+                return;
+              }
+              throw new Error('Failed to fetch subjects from DB.');
+            }
+
+            subjectsList = await res.json();
+            applyFilters();
+
+          } catch (error) {
+            console.error('Error fetching subjects:', error);
+            showToast(error.message, false);
+          }
+        }
+
+        // Semester Normalization Function
+        function normalizeSemester(val) {
+          if (!val) return '';
+          const str = String(val).toLowerCase().trim();
+          if (/^(semester\s*8|sem\s*8|8|8th(\s*semester)?|viii)$/i.test(str)) return 'Semester 8';
+          if (/^(semester\s*7|sem\s*7|7|7th(\s*semester)?|vii)$/i.test(str)) return 'Semester 7';
+          if (/^(semester\s*6|sem\s*6|6|6th(\s*semester)?|vi)$/i.test(str)) return 'Semester 6';
+          if (/^(semester\s*5|sem\s*5|5|5th(\s*semester)?|v)$/i.test(str)) return 'Semester 5';
+          if (/^(semester\s*4|sem\s*4|4|4th(\s*semester)?|iv)$/i.test(str)) return 'Semester 4';
+          if (/^(semester\s*3|sem\s*3|3|3rd(\s*semester)?|iii)$/i.test(str)) return 'Semester 3';
+          if (/^(semester\s*2|sem\s*2|2|2nd(\s*semester)?|ii)$/i.test(str)) return 'Semester 2';
+          if (/^(semester\s*1|sem\s*1|1|1st(\s*semester)?|i)$/i.test(str)) return 'Semester 1';
+          return String(val).trim();
+        }
+
+        // Fetch faculty for the select dropdown
+        async function fetchFacultyOptions() {
+          const token = localStorage.getItem('accessToken');
+          try {
+            const res = await fetch('/api/faculty', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              facultyList = await res.json();
+              populateFacultyDropdown(facultyList);
+            }
+          } catch (e) {
+            console.error('Error loading faculty dropdown options:', e);
+          }
+        }
+
+        function populateFacultyDropdown(list) {
+          const dropdown = document.getElementById('modal-faculty-id');
+          if (!dropdown) return;
+          dropdown.innerHTML = '<option value="">-- Unassigned --</option>';
+          list.forEach(fac => {
+            const opt = document.createElement('option');
+            opt.value = fac.id;
+            opt.textContent = `${fac.name} (${fac.designation})`;
+            dropdown.appendChild(opt);
+          });
+        }
+
+        // Render catalog table
+        function renderSubjectsTable(list, activeSemesterFilter) {
+          const tbody = document.getElementById('subject-table-body');
+          if (!tbody) return;
+          tbody.innerHTML = '';
+
+          if (list.length === 0) {
+            const semMsg = activeSemesterFilter && activeSemesterFilter !== 'all' ? ` for ${activeSemesterFilter}` : '';
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 0.92rem;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.35rem;">📚</div>
+                  <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">No subjects found${semMsg}</div>
+                  <div>Select another semester or adjust your search query.</div>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          list.forEach(sub => {
+            const tr = document.createElement('tr');
+
+            let facultyColumnMarkup = '<span class="badge-pill bg-red-light">Unassigned</span>';
+            if (sub.facultyId && sub.facultyName !== 'Not Assigned') {
+              const facName = sub.facultyName || 'Faculty';
+              const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230056D2'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E"));
+
+              const matchedFac = facultyList.find(f => f.id === sub.facultyId || f.userId === sub.facultyId);
+              const avatarUrl = getAvatar(facName, matchedFac ? matchedFac.photoPath : null);
+
+              facultyColumnMarkup = `
+                <div class="table-faculty-badge">
+                  <img src="${avatarUrl}" alt="${facName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
+                  <span>${facName}</span>
+                </div>
+              `;
+            }
+
+            tr.innerHTML = `
+              <td><strong>${sub.code}</strong></td>
+              <td>${sub.name}</td>
+              <td>${sub.credits} Credits</td>
+              <td>${sub.department || currentHodDept}</td>
+              <td>${normalizeSemester(sub.semester)}</td>
+              <td>${facultyColumnMarkup}</td>
+              <td class="text-right">
+                <button class="action-tbl-btn bg-green-light btn-edit-subject" style="padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-weight: 500;">Edit</button>
+                <button class="action-tbl-btn bg-red-light btn-delete-subject" style="padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-weight: 500;">Delete</button>
+              </td>
+            `;
+
+            // Edit Action
+            tr.querySelector('.btn-edit-subject').addEventListener('click', () => {
+              openModal(sub);
+            });
+
+            // Delete Action
+            tr.querySelector('.btn-delete-subject').addEventListener('click', async () => {
+              if (confirm(`Are you sure you want to delete subject ${sub.code}?`)) {
+                await deleteSubject(sub.id);
+              }
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Delete subject
+        async function deleteSubject(id) {
+          const token = localStorage.getItem('accessToken');
+          try {
+            const res = await fetch(`/api/subjects/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+              const errData = await res.json();
+              throw new Error(errData.message || 'Failed to delete subject.');
+            }
+
+            showToast('Subject deleted successfully!', true);
+            fetchSubjects();
+
+          } catch (error) {
+            showToast(error.message, false);
+          }
+        }
+
+        // Modal triggers
+        const modal = document.getElementById('subject-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const subjectForm = document.getElementById('subject-form');
+        const pkInput = document.getElementById('subject-pk-id');
+        const codeInput = document.getElementById('modal-sub-code');
+        const nameInput = document.getElementById('modal-sub-name');
+        const creditsInput = document.getElementById('modal-credits');
+        const semInput = document.getElementById('modal-semester');
+        const yearSelect = document.getElementById('modal-year');
+        const sectionSelect = document.getElementById('modal-section');
+        const deptSelect = document.getElementById('modal-department');
+        const facDropdown = document.getElementById('modal-faculty-id');
+        const saveSubjectBtn = document.getElementById('save-subject-btn');
+
+        function openModal(sub = null) {
+          if (!modal || !subjectForm) return;
+          modal.style.display = 'flex';
+          subjectForm.reset();
+
+          // Set read-only department
+          if (deptSelect) {
+            deptSelect.value = (sub && sub.department) ? sub.department : currentHodDept;
+            deptSelect.disabled = true;
+          }
+
+          if (sub) {
+            modalTitle.textContent = 'Edit Subject';
+            pkInput.value = sub.id;
+            codeInput.value = sub.code;
+            codeInput.disabled = true;
+            nameInput.value = sub.name;
+            creditsInput.value = sub.credits;
+            semInput.value = sub.semester;
+            if (yearSelect) yearSelect.value = sub.year || 'III-Year';
+            if (sectionSelect) sectionSelect.value = sub.section || 'A';
+            facDropdown.value = sub.facultyId || '';
+          } else {
+            modalTitle.textContent = 'Add New Subject';
+            pkInput.value = '';
+            codeInput.disabled = false;
+            if (yearSelect) yearSelect.value = 'III-Year';
+            if (sectionSelect) sectionSelect.value = 'A';
+            facDropdown.value = '';
+          }
+        }
+
+        function closeModal() {
+          if (modal) modal.style.display = 'none';
+        }
+
+        const closeBtn = document.getElementById('btn-close-modal');
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        const cancelBtn = document.getElementById('btn-cancel-modal');
+        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+        const addBtn = document.getElementById('btn-add-subject-trigger');
+        if (addBtn) {
+          addBtn.addEventListener('click', () => openModal(null));
+        }
+
+        // Form submit listener
+        if (subjectForm) {
+          subjectForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const token = localStorage.getItem('accessToken');
+            const id = pkInput.value;
+            const code = codeInput ? codeInput.value.trim() : '';
+            const name = nameInput ? nameInput.value.trim() : '';
+            const credits = creditsInput ? parseInt(creditsInput.value, 10) : 3;
+            const semester = semInput ? semInput.value.trim() : '';
+            const year = yearSelect ? yearSelect.value : 'III-Year';
+            const section = sectionSelect ? sectionSelect.value : 'A';
+            const facultyId = (facDropdown && facDropdown.value) ? parseInt(facDropdown.value, 10) : null;
+
+            const payload = { code, name, credits, semester, year, section, facultyId };
+
+            console.log('[Frontend subjects.html] Submitting subject form with payload:', payload);
+
+            if (saveSubjectBtn) {
+              saveSubjectBtn.disabled = true;
+              saveSubjectBtn.textContent = 'Saving...';
+            }
+
+            try {
+              let res;
+              if (id) {
+                res = await fetch(`/api/subjects/${id}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify(payload)
+                });
+              } else {
+                res = await fetch('/api/subjects', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify(payload)
+                });
+              }
+
+              const data = await res.json();
+              if (!res.ok) {
+                throw new Error(data.message || 'Operation failed.');
+              }
+
+              showToast(id ? 'Subject updated successfully!' : 'Subject created successfully!', true);
+              closeModal();
+              fetchSubjects();
+
+            } catch (error) {
+              console.error('[Frontend subjects.html] Error submitting form:', error);
+              showToast(error.message, false);
+            } finally {
+              if (saveSubjectBtn) {
+                saveSubjectBtn.disabled = false;
+                saveSubjectBtn.textContent = 'Save Changes';
+              }
+            }
+          });
+        }
+
+        // Unified Multi-Filter System (Search + Semester Filter)
+        function applyFilters() {
+          const searchInput = document.getElementById('subject-search-input');
+          const semSelect = document.getElementById('subject-filter-semester');
+
+          const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+          const selectedSem = semSelect ? semSelect.value : 'Semester 1';
+
+          const filtered = subjectsList.filter(sub => {
+            // 1. Search Query Filter
+            const matchesSearch = !query || (
+              (sub.code && sub.code.toLowerCase().includes(query)) ||
+              (sub.name && sub.name.toLowerCase().includes(query))
+            );
+
+            // 2. Semester Filter
+            const normalizedSubSem = normalizeSemester(sub.semester);
+            const matchesSem = (selectedSem === 'all') || (normalizedSubSem === selectedSem);
+
+            return matchesSearch && matchesSem;
+          });
+
+          renderSubjectsTable(filtered, selectedSem);
+        }
+
+        const searchInput = document.getElementById('subject-search-input');
+        const semSelect = document.getElementById('subject-filter-semester');
+
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (semSelect) semSelect.addEventListener('change', applyFilters);
+
+        // Load initially
+        async function init() {
+          await fetchHodProfile();
+          await fetchFacultyOptions();
+          await fetchSubjects();
+        }
+        init();
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="students.html" class="bottom-nav-item">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📑</span>
+        <span class="nav-label">Leave Requests</span>
+      </a>
+      <a href="reports.html" class="bottom-nav-item">
+        <span class="nav-icon">📄</span>
+        <span class="nav-label">Reports</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

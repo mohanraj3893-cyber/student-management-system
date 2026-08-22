@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Students | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Students Management</h2>
+              <span class="navbar-subtitle">Manage student credentials and academic status</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search anything..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="5 Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">5</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">HOD</span>
+                <span class="nav-profile-role" id="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- WORKSPACE CONTENT -->
+        <div class="workspace-scroll-content">
+          <div class="workspace-column-card">
+            <!-- Top Toolbar Controls -->
+            <div class="table-toolbar-row">
+              <div class="toolbar-left-search">
+                <input type="text" placeholder="Search students by name or Reg No..." id="student-search-input">
+              </div>
+              <div class="toolbar-right-actions">
+                <select id="student-filter-year" class="toolbar-select" aria-label="Filter by Academic Year">
+                  <option value="I-Year" selected>I-Year</option>
+                  <option value="II-Year">II-Year</option>
+                  <option value="III-Year">III-Year</option>
+                  <option value="IV-Year">IV-Year</option>
+                  <option value="all">All Years</option>
+                </select>
+                <select id="student-filter-status" class="toolbar-select">
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending Approval</option>
+                </select>
+                <button class="btn btn-secondary" onclick="alert('Importing spreadsheet logs')">Import Excel</button>
+                <button class="btn btn-secondary" onclick="alert('Exporting spreadsheet logs')">Export Excel</button>
+                <button class="btn btn-primary" id="btn-add-student-trigger">+ Add Student</button>
+              </div>
+            </div>
+
+            <!-- Student Data Table -->
+            <div class="sms-table-responsive">
+              <table class="sms-data-table" id="student-table-elem">
+                <thead>
+                  <tr>
+                    <th>Photo</th>
+                    <th>Register Number</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Attendance</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="student-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Row -->
+            <div class="table-pagination-row">
+              <span class="pagination-info" id="student-pagination-info">Showing 0 to 0 of 0 Students</span>
+              <div class="pagination-buttons" style="display: none;">
+                <button class="btn btn-secondary btn-sm" disabled>Previous</button>
+                <button class="btn btn-secondary btn-sm active">1</button>
+                <button class="btn btn-secondary btn-sm">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Add / Edit Student Modal -->
+    <div id="student-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color, #e2e8f0);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 id="modal-title" style="font-size: 18px; font-weight: 600; color: var(--text-primary, #1e293b); margin: 0;">Add Student</h3>
+          <button id="btn-close-modal" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1;">&times;</button>
+        </div>
+        <form id="student-form">
+          <input type="hidden" id="student-pk-id">
+          
+          <div style="margin-bottom: 16px;">
+            <label for="modal-reg-num" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Register Number</label>
+            <input type="text" id="modal-reg-num" required placeholder="e.g. 22CSE015" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label for="modal-fullname" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Full Name</label>
+            <input type="text" id="modal-fullname" required placeholder="e.g. Sanjay Kumar R" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-email" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Official Email</label>
+            <input type="email" id="modal-email" required placeholder="e.g. sanjay@sms.com" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-phone" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Phone Number</label>
+            <input type="text" id="modal-phone" required placeholder="e.g. +91 97865 12345" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+              <label for="modal-course" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Course</label>
+              <select id="modal-course" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="B.E">B.E</option>
+                <option value="B.Tech">B.Tech</option>
+                <option value="M.E">M.E</option>
+                <option value="M.Tech">M.Tech</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="modal-batch" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Batch</label>
+              <input type="text" id="modal-batch" placeholder="e.g. 2024-2028" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-branch" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Branch</label>
+            <select id="modal-branch" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+              <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+              <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+              <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+              <label for="modal-year" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Year</label>
+              <input type="text" id="modal-year" required placeholder="e.g. 3rd Year" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+            </div>
+            <div style="flex: 1;">
+              <label for="modal-semester" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Semester</label>
+              <input type="text" id="modal-semester" required placeholder="e.g. V" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+              <label for="modal-blood-group" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Blood Group</label>
+              <select id="modal-blood-group" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="Unknown">Unknown</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="modal-dob" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">D.O.B</label>
+              <input type="date" id="modal-dob" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-aadhaar" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Aadhaar No</label>
+            <input type="text" id="modal-aadhaar" maxlength="12" placeholder="12-digit numeric Aadhaar number" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-address" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Address</label>
+            <textarea id="modal-address" rows="2" placeholder="Residential postal address" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+
+          <div id="modal-password-row" style="margin-bottom: 20px;">
+            <label for="modal-password" id="modal-password-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Password</label>
+            <input type="password" id="modal-password" placeholder="Create student password" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" id="btn-cancel-modal" class="btn btn-secondary" style="padding: 8px 16px;">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Alert toast container -->
+    <div id="toast-message-banner" style="position: fixed; bottom: 24px; right: 24px; z-index: 1100; padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none;"></div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', () => {
+        let studentsList = [];
+
+        function showToast(message, success = true) {
+          const toast = document.getElementById('toast-message-banner');
+          toast.textContent = message;
+          toast.style.backgroundColor = success ? '#10B981' : '#EF4444';
+          toast.style.transform = 'translateY(0)';
+          toast.style.opacity = '1';
+          setTimeout(() => {
+            toast.style.transform = 'translateY(100px)';
+            toast.style.opacity = '0';
+          }, 3500);
+        }
+
+        // Fetch students lists
+        async function fetchStudents() {
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            window.location.href = '/login.html?role=hod';
+            return;
+          }
+
+          try {
+            const res = await fetch('/api/students', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+              if (res.status === 401 || res.status === 403) {
+                window.location.href = '/login.html?role=hod';
+                return;
+              }
+              throw new Error('Failed to fetch students from DB.');
+            }
+
+            studentsList = await res.json();
+            applyFilters();
+            updatePendingBadge();
+
+          } catch (error) {
+            console.error('Error fetching students:', error);
+            showToast(error.message, false);
+          }
+        }
+
+        async function updatePendingBadge() {
+          const token = localStorage.getItem('accessToken');
+          try {
+            const res = await fetch('/api/auth/registrations/pending', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const badge = document.querySelector('.approval-badge-count');
+              if (badge) {
+                const totalPending = (data.students?.length || 0) + (data.faculty?.length || 0);
+                badge.textContent = totalPending;
+                badge.style.display = totalPending > 0 ? 'inline-block' : 'none';
+              }
+            }
+          } catch (e) {
+            console.error('Error updating badge count:', e);
+          }
+        }
+
+        // Year Normalization Function
+        function normalizeYear(yearStr) {
+          if (!yearStr) return '';
+          const str = String(yearStr).toLowerCase().trim();
+          if (/^4(th)?(\s*year)?$/i.test(str) || /^iv(-year)?$/i.test(str)) return 'IV-Year';
+          if (/^3(rd)?(\s*year)?$/i.test(str) || /^iii(-year)?$/i.test(str)) return 'III-Year';
+          if (/^2(nd)?(\s*year)?$/i.test(str) || /^ii(-year)?$/i.test(str)) return 'II-Year';
+          if (/^1(st)?(\s*year)?$/i.test(str) || /^i(-year)?$/i.test(str)) return 'I-Year';
+          return yearStr.trim();
+        }
+
+        // Render table
+        function renderStudentsTable(list, activeYearFilter) {
+          const tbody = document.getElementById('student-table-body');
+          const pagInfo = document.getElementById('student-pagination-info');
+          tbody.innerHTML = '';
+
+          const filterLabel = activeYearFilter && activeYearFilter !== 'all' ? ` (${activeYearFilter})` : '';
+          pagInfo.textContent = `Showing ${list.length > 0 ? 1 : 0} to ${list.length} of ${list.length} Students${filterLabel}`;
+
+          if (list.length === 0) {
+            const yearMsg = activeYearFilter && activeYearFilter !== 'all' ? ` for ${activeYearFilter}` : '';
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 0.92rem;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.35rem;">🎓</div>
+                  <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">No students found${yearMsg}</div>
+                  <div>Select another academic year or adjust your search filter.</div>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          list.forEach(student => {
+            const tr = document.createElement('tr');
+            tr.className = 'clickable-row';
+            tr.style.cursor = 'pointer';
+            tr.setAttribute('data-id', student.id);
+
+            const studName = student.name || 'Student';
+            const initials = studName.trim().split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2) || 'ST';
+            const colors = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
+            const color = colors[initials.charCodeAt(0) % colors.length];
+            const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
+            const avatarUrl = getAvatar(studName, student.photoPath);
+
+            tr.innerHTML = `
+              <td>
+                <div class="table-avatar-circle">
+                  <img src="${avatarUrl}" alt="${studName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
+                </div>
+              </td>
+              <td><strong>${student.registerNumber}</strong></td>
+              <td>${student.name}</td>
+              <td>${student.phone || 'N/A'}</td>
+              <td>${student.email}</td>
+              <td>
+                ${student.attendancePercentage !== null ? `
+                  <span class="table-percent-txt">${student.attendancePercentage}%</span>
+                  <div class="table-progress-bar"><div class="progress-fill ${student.attendancePercentage >= 75 ? 'success-bg' : 'danger-bg'}" style="width: ${student.attendancePercentage}%"></div></div>
+                ` : `<span class="table-percent-txt" style="color:#9CA3AF;">N/A</span>`}
+              </td>
+              <td><span class="status-pill active-badge">${student.isActive ? 'Active' : 'Inactive'}</span></td>
+              <td class="text-right" onclick="event.stopPropagation();">
+                <div style="display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end; white-space: nowrap;">
+                  <a href="student_profile.html?id=${student.registerNumber}" class="action-tbl-btn bg-blue-light" style="text-decoration: none; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center;">View</a>
+                  <button class="action-tbl-btn bg-green-light btn-edit-student" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer;">Edit</button>
+                  <button class="action-tbl-btn bg-red-light btn-delete-student" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer;">Delete</button>
+                </div>
+              </td>
+            `;
+
+            // Edit Action
+            tr.querySelector('.btn-edit-student').addEventListener('click', () => {
+              openModal(student);
+            });
+
+            // Delete Action
+            tr.querySelector('.btn-delete-student').addEventListener('click', async () => {
+              if (confirm(`Are you sure you want to delete student ${student.name}?`)) {
+                await deleteStudent(student.id);
+              }
+            });
+
+            // Redirect to Profile
+            tr.addEventListener('click', () => {
+              window.location.href = `student_profile.html?id=${student.registerNumber}`;
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Delete student
+        async function deleteStudent(id) {
+          const token = localStorage.getItem('accessToken');
+          try {
+            const res = await fetch(`/api/students/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+              const errData = await res.json();
+              throw new Error(errData.message || 'Failed to delete student.');
+            }
+
+            showToast('Student deleted successfully!', true);
+            fetchStudents();
+
+          } catch (error) {
+            showToast(error.message, false);
+          }
+        }
+
+        // Modal controls
+        const modal = document.getElementById('student-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const studentForm = document.getElementById('student-form');
+        const pkInput = document.getElementById('student-pk-id');
+        const regInput = document.getElementById('modal-reg-num');
+        const nameInput = document.getElementById('modal-fullname');
+        const emailInput = document.getElementById('modal-email');
+        const phoneInput = document.getElementById('modal-phone');
+        const courseInput = document.getElementById('modal-course');
+        const branchInput = document.getElementById('modal-branch');
+        const batchInput = document.getElementById('modal-batch');
+        const yearInput = document.getElementById('modal-year');
+        const semInput = document.getElementById('modal-semester');
+        const bloodInput = document.getElementById('modal-blood-group');
+        const dobInput = document.getElementById('modal-dob');
+        const aadhaarInput = document.getElementById('modal-aadhaar');
+        const addressInput = document.getElementById('modal-address');
+        const passwordInput = document.getElementById('modal-password');
+        const passwordLabel = document.getElementById('modal-password-label');
+
+        function openModal(student = null) {
+          modal.style.display = 'flex';
+          studentForm.reset();
+
+          if (student) {
+            // Edit mode
+            modalTitle.textContent = 'Edit Student';
+            pkInput.value = student.id;
+            regInput.value = student.registerNumber;
+            regInput.disabled = true; // cannot change register number
+            nameInput.value = student.name;
+            emailInput.value = student.email;
+            phoneInput.value = student.phone || '';
+            if (courseInput) courseInput.value = student.course || 'B.E';
+            if (branchInput) branchInput.value = student.branch || 'Computer Science & Engineering';
+            if (batchInput) batchInput.value = student.batch || '2024-2028';
+            yearInput.value = student.year || '';
+            semInput.value = student.semester || '';
+            if (bloodInput) bloodInput.value = student.bloodGroup || 'Unknown';
+            if (dobInput) dobInput.value = student.dob || '';
+            if (aadhaarInput) aadhaarInput.value = student.aadhaarNo ? student.aadhaarNo.replace(/\s+/g, '') : '';
+            if (addressInput) addressInput.value = student.address || '';
+            passwordInput.required = false;
+            passwordInput.placeholder = 'Leave blank to keep existing password';
+            passwordLabel.textContent = 'Password (optional)';
+          } else {
+            // Add mode
+            modalTitle.textContent = 'Add Student';
+            pkInput.value = '';
+            regInput.disabled = false;
+            passwordInput.required = true;
+            passwordInput.placeholder = 'Create student password';
+            passwordLabel.textContent = 'Password';
+          }
+        }
+
+        function closeModal() {
+          modal.style.display = 'none';
+        }
+
+        document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+        
+        const addBtn = document.getElementById('btn-add-student-trigger');
+        if (addBtn) {
+          addBtn.addEventListener('click', () => openModal(null));
+        }
+
+        // Form Submit
+        studentForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const token = localStorage.getItem('accessToken');
+          const id = pkInput.value;
+          const registerNumber = regInput.value.trim();
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const phone = phoneInput.value.trim();
+          const course = courseInput ? courseInput.value.trim() : 'B.E';
+          const branch = branchInput ? branchInput.value.trim() : 'Computer Science & Engineering';
+          const batch = batchInput ? batchInput.value.trim() : '2024-2028';
+          const year = yearInput.value.trim();
+          const semester = semInput.value.trim();
+          const bloodGroup = bloodInput ? bloodInput.value.trim() : 'Unknown';
+          const dob = dobInput ? dobInput.value.trim() : '';
+          const aadhaarNo = aadhaarInput ? aadhaarInput.value.trim() : '';
+          const address = addressInput ? addressInput.value.trim() : '';
+          const password = passwordInput.value;
+
+          if (aadhaarNo && !/^\d{12}$/.test(aadhaarNo)) {
+            showToast('Aadhaar number must contain exactly 12 digits.', false);
+            return;
+          }
+
+          if (dob && new Date(dob) > new Date()) {
+            showToast('Date of Birth cannot be a future date.', false);
+            return;
+          }
+
+          const payload = { registerNumber, name, email, phone, course, branch, batch, year, semester, bloodGroup, dob, aadhaarNo, address };
+          if (password) payload.password = password;
+
+          try {
+            let res;
+            if (id) {
+              // Edit mode
+              res = await fetch(`/api/students/${id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+            } else {
+              // Add mode
+              res = await fetch('/api/students', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+            }
+
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.message || 'Operation failed.');
+            }
+
+            showToast(id ? 'Student profile updated successfully!' : 'Student created successfully!', true);
+            closeModal();
+            fetchStudents();
+
+          } catch (error) {
+            showToast(error.message, false);
+          }
+        });
+
+        // Unified Multi-Filter System (Search + Year + Status)
+        function applyFilters() {
+          const searchInput = document.getElementById('student-search-input');
+          const yearSelect = document.getElementById('student-filter-year');
+          const statusSelect = document.getElementById('student-filter-status');
+
+          const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+          const selectedYear = yearSelect ? yearSelect.value : 'I-Year';
+          const selectedStatus = statusSelect ? statusSelect.value : 'all';
+
+          const filtered = studentsList.filter(student => {
+            // 1. Search Filter
+            const matchesSearch = !query || (
+              (student.name && student.name.toLowerCase().includes(query)) ||
+              (student.registerNumber && student.registerNumber.toLowerCase().includes(query)) ||
+              (student.email && student.email.toLowerCase().includes(query))
+            );
+
+            // 2. Year Filter
+            const normalizedStudYear = normalizeYear(student.year);
+            const matchesYear = (selectedYear === 'all') || (normalizedStudYear === selectedYear);
+
+            // 3. Status Filter
+            let matchesStatus = true;
+            if (selectedStatus === 'active') {
+              matchesStatus = student.isActive === true;
+            } else if (selectedStatus === 'pending') {
+              matchesStatus = student.isActive === false;
+            }
+
+            return matchesSearch && matchesYear && matchesStatus;
+          });
+
+          renderStudentsTable(filtered, selectedYear);
+        }
+
+        const searchInput = document.getElementById('student-search-input');
+        const yearSelect = document.getElementById('student-filter-year');
+        const statusSelect = document.getElementById('student-filter-status');
+
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (yearSelect) yearSelect.addEventListener('change', applyFilters);
+        if (statusSelect) statusSelect.addEventListener('change', applyFilters);
+
+        // Load initially
+        fetchStudents();
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="students.html" class="bottom-nav-item active">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📑</span>
+        <span class="nav-label">Leave Requests</span>
+      </a>
+      <a href="reports.html" class="bottom-nav-item">
+        <span class="nav-icon">📄</span>
+        <span class="nav-label">Reports</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

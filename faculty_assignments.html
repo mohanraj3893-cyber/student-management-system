@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Assignments | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title" style="font-size: 0.8rem; font-weight: 800;">CSE Portal</h4>
+              <span class="logo-subtitle">Faculty Workspace</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="faculty_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_assignments.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Assignments</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Exams & Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_resources.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📁</span>
+                <span class="menu-item-text">Resources</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_requests.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Manage Assignments</h2>
+              <span class="navbar-subtitle">Publish tasks and review student submissions</span>
+            </div>
+          </div>
+          <div class="navbar-right">
+            <span class="navbar-divider"></span>
+            <div class="nav-profile-block">
+              <div class="profile-block-txt"><span class="nav-profile-name" id="nav-profile-name">--</span></div>
+              <img class="nav-profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace-scroll-content">
+          <div style="max-width: 800px; margin: 0 auto 2rem auto;">
+            <div class="workspace-column-card" style="text-align: left; margin-bottom: 2rem;">
+              <div class="column-card-header">
+                <h3 class="column-card-title">Upload New Assignment</h3>
+              </div>
+
+              <div id="assign-alert-box" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-top: 1rem;"></div>
+
+              <form id="assignment-form" class="login-form-block" style="margin-top: 1.5rem;">
+                <div class="form-group-item">
+                  <label for="assign-sub">Select Course</label>
+                  <select id="assign-sub" class="toolbar-select" required style="width: 100%;">
+                    <option value="">Loading assigned courses...</option>
+                  </select>
+                </div>
+                <div class="form-group-item">
+                  <label for="assign-title">Task Title</label>
+                  <input type="text" id="assign-title" placeholder="e.g., Assignment 3 - Normalization" required style="padding: 0.75rem 1rem;">
+                </div>
+                <div class="form-group-item">
+                  <label for="assign-file">Assignment Document / Reference File (PDF, DOCX, ZIP)</label>
+                  <input type="file" id="assign-file" style="padding: 0.5rem 0;">
+                </div>
+                <button type="submit" id="btn-submit-assignment" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Publish Assignment Task</button>
+              </form>
+            </div>
+
+            <!-- Published Assignments List -->
+            <div class="workspace-column-card" style="text-align: left;">
+              <div class="column-card-header">
+                <h3 class="column-card-title">Published Assignments</h3>
+              </div>
+              <div class="table-responsive-wrapper" style="margin-top: 1rem;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Course</th>
+                      <th>Title</th>
+                      <th>File</th>
+                      <th>Uploaded Date</th>
+                      <th class="text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="assignments-tbody">
+                    <tr><td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">Loading assignments...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Computer Science & Engineering Department Portal • Version 1.0</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams &amp; Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const subSelect = document.getElementById('assign-sub');
+        const alertBox = document.getElementById('assign-alert-box');
+        const form = document.getElementById('assignment-form');
+        const submitBtn = document.getElementById('btn-submit-assignment');
+        const tbody = document.getElementById('assignments-tbody');
+
+        function showAlert(msg, isError = false) {
+          if (!alertBox) return;
+          alertBox.style.display = 'block';
+          alertBox.style.background = isError ? '#fef2f2' : '#f0fdf4';
+          alertBox.style.color = isError ? '#991b1b' : '#166534';
+          alertBox.style.border = isError ? '1px solid #fecaca' : '1px solid #bbf7d0';
+          alertBox.textContent = msg;
+        }
+
+        // Load Assigned Courses
+        try {
+          const subRes = await fetch('/api/attendance/subjects', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (subRes.ok) {
+            const subjects = await subRes.json();
+            subSelect.innerHTML = '<option value="">-- Select Course --</option>';
+            subjects.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.id;
+              opt.textContent = `${s.code} - ${s.name}`;
+              subSelect.appendChild(opt);
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        // Load Published Assignments
+        async function loadAssignments() {
+          try {
+            const res = await fetch('/api/resources/faculty', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load assignments.');
+            const list = await res.json();
+            const assignments = list.filter(r => r.category === 'Assignment');
+
+            tbody.innerHTML = '';
+            if (assignments.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">No published assignments yet.</td></tr>';
+              return;
+            }
+
+            assignments.forEach(item => {
+              const tr = document.createElement('tr');
+              const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: underline;">📄 View File</a>` : 'No file';
+              const dateStr = new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+              
+              tr.innerHTML = `
+                <td><strong>${item.subjectCode || ''}</strong> ${item.subjectName || ''}</td>
+                <td><strong>${item.title}</strong></td>
+                <td>${fileLink}</td>
+                <td>${dateStr}</td>
+                <td class="text-right">
+                  <button class="btn btn-sm btn-danger btn-delete-assign" data-id="${item.id}" style="padding: 4px 10px; font-size: 12px;">Delete</button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+            tbody.querySelectorAll('.btn-delete-assign').forEach(btn => {
+              btn.onclick = async () => {
+                const id = btn.getAttribute('data-id');
+                if (!confirm('Are you sure you want to delete this assignment?')) return;
+                try {
+                  const delRes = await fetch(`/api/resources/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  });
+                  if (!delRes.ok) throw new Error('Failed to delete assignment.');
+                  await loadAssignments();
+                } catch (err) {
+                  showAlert(err.message, true);
+                }
+              };
+            });
+
+          } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 2rem;">Error: ${err.message}</td></tr>`;
+          }
+        }
+
+        await loadAssignments();
+
+        // Handle Assignment Form Upload
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!subSelect.value) {
+            showAlert('Please select an assigned course.', true);
+            return;
+          }
+
+          const fileInput = document.getElementById('assign-file');
+          const formData = new FormData();
+          formData.append('subjectId', subSelect.value);
+          formData.append('title', document.getElementById('assign-title').value);
+          formData.append('category', 'Assignment');
+          if (fileInput.files && fileInput.files[0]) {
+            formData.append('file', fileInput.files[0]);
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Publishing Task...';
+
+          try {
+            const res = await fetch('/api/resources/upload', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to publish assignment.');
+
+            showAlert('Assignment task published successfully!');
+            form.reset();
+            await loadAssignments();
+          } catch (err) {
+            showAlert(err.message, true);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publish Assignment Task';
+          }
+        });
+
+      });
+    </script>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

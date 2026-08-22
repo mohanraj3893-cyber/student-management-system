@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apply Leave | CSE Portal</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Link existing stylesheet first -->
+    <link rel="stylesheet" href="/src/style.css" />
+
+    <!-- Red & White Theme Custom Overrides -->
+    <style>
+      :root {
+        --primary-red: var(--primary-blue, #6A1B9A);
+        --dark-red: var(--dark-blue, #55147C);
+        --light-red: var(--light-blue, #F1E8FB);
+        --white: #FFFFFF;
+        --bg-color: #F8F9FA;
+        --text-color: #212121;
+        --border-color: #E0E0E0;
+      }
+
+      body.dashboard-body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Inter', sans-serif;
+      }
+
+      /* Sidebar Overrides */
+      .sidebar-panel {
+        background: var(--dark-red) !important;
+      }
+      .sidebar-logo-block {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .logo-icon.light {
+        background: var(--primary-red) !important;
+      }
+      .sidebar-menu-item.active {
+        background: var(--primary-red) !important;
+        color: var(--white) !important;
+        border-left: 4px solid var(--white);
+      }
+      .sidebar-menu-item:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: var(--white) !important;
+      }
+      .sidebar-profile-widget {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.15);
+      }
+
+      /* Top Navbar Overrides */
+      .workspace-top-navbar {
+        background: var(--white);
+        border-bottom: 1px solid var(--border-color);
+      }
+      .bell-badge-count {
+        background-color: var(--primary-red) !important;
+      }
+
+      /* Cards & Container */
+      .workspace-column-card {
+        background: var(--white) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02) !important;
+        padding: 1.5rem !important;
+      }
+      .column-card-title {
+        color: var(--dark-red);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        border-bottom: 2px solid var(--light-red);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.25rem;
+      }
+
+      /* Forms styling */
+      .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 768px) {
+        .form-grid-2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .form-group-item {
+        margin-bottom: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .form-group-item label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #455A64;
+      }
+      .form-control-static {
+        background-color: #ECEFF1;
+        border: 1px solid var(--border-color);
+        padding: 0.7rem 0.9rem;
+        border-radius: 6px;
+        font-size: 0.88rem;
+        color: #546E7A;
+        cursor: not-allowed;
+      }
+      .form-group-item input, 
+      .form-group-item select, 
+      .form-group-item textarea {
+        border: 1.5px solid var(--border-color) !important;
+        border-radius: 6px !important;
+        padding: 0.7rem 0.9rem !important;
+        font-size: 0.88rem !important;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+      .form-group-item input:focus, 
+      .form-group-item select:focus, 
+      .form-group-item textarea:focus {
+        border-color: var(--primary-red) !important;
+        box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1) !important;
+      }
+
+      /* Drag-and-drop */
+      #leave-dropzone {
+        border: 2px dashed var(--primary-red) !important;
+        border-radius: 8px;
+        padding: 1.2rem;
+        text-align: center;
+        background-color: var(--white);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      #leave-dropzone:hover {
+        background-color: var(--light-red);
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: var(--primary-red) !important;
+        border-color: var(--primary-red) !important;
+        color: var(--white) !important;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .btn-primary:hover {
+        background: var(--dark-red) !important;
+      }
+      .btn-secondary {
+        background: #ECEFF1 !important;
+        border-color: var(--border-color) !important;
+        color: #37474F !important;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+      }
+      .btn-secondary:hover {
+        background: #CFD8DC !important;
+      }
+      .btn-danger-outline {
+        background: transparent !important;
+        border: 1px solid var(--primary-red) !important;
+        color: var(--primary-red) !important;
+        padding: 0.35rem 0.75rem !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        border-radius: 4px !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-danger-outline:hover {
+        background: var(--primary-red) !important;
+        color: var(--white) !important;
+      }
+
+      /* Table overrides */
+      .data-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .data-grid-table th {
+        background-color: var(--light-red) !important;
+        color: var(--dark-red) !important;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 2px solid var(--border-color);
+      }
+      .data-grid-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.85rem;
+        color: var(--text-color);
+      }
+      .data-grid-table tbody tr:hover {
+        background-color: #FAFAFA;
+      }
+
+      /* Status Badge Pill */
+      .badge-pill {
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        text-align: center;
+      }
+      .badge-pill.bg-orange-light {
+        background-color: #FFF3E0 !important;
+        color: #E65100 !important;
+        border: 1px solid #FFE0B2;
+      }
+      .badge-pill.bg-green-light {
+        background-color: #E8F5E9 !important;
+        color: #1B5E20 !important;
+        border: 1px solid #C8E6C9;
+      }
+      .badge-pill.bg-red-light {
+        background-color: var(--light-red) !important;
+        color: var(--dark-red) !important;
+        border: 1px solid #FFCDD2;
+      }
+
+      /* Dynamic Toasts */
+      .toast-notification {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        padding: 1rem 1.5rem;
+        border-radius: 6px;
+        color: var(--white);
+        font-size: 0.88rem;
+        font-weight: 600;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-20px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 9999;
+      }
+      .toast-notification.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast-notification.success {
+        background: #2E7D32;
+        border: 1px solid rgba(46, 125, 50, 0.2);
+      }
+      .toast-notification.error {
+        background: var(--primary-red);
+        border: 1px solid rgba(198, 40, 40, 0.2);
+      }
+
+      /* Notification dropdown panel */
+      .notif-dropdown-wrapper {
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        width: 320px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        display: none;
+        z-index: 1000;
+        overflow: hidden;
+      }
+      .notif-dropdown-header {
+        background: var(--light-red);
+        color: var(--dark-red);
+        padding: 0.8rem 1rem;
+        font-weight: 700;
+        font-size: 0.88rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .notif-dropdown-list {
+        max-height: 250px;
+        overflow-y: auto;
+      }
+      .notif-dropdown-item {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #ECEFF1;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .notif-dropdown-item:hover {
+        background: var(--light-red);
+      }
+      .notif-dropdown-item.unread {
+        border-left: 3px solid var(--primary-red);
+        font-weight: 600;
+      }
+
+      /* Modal Dialog Styling */
+      .modal-dialog-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        display: none;
+      }
+      .modal-dialog-card {
+        background: var(--white);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+        overflow: hidden;
+        animation: scaleUp 0.2s ease-out;
+      }
+      @keyframes scaleUp {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .modal-dialog-header {
+        background: var(--primary-red);
+        color: var(--white);
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-dialog-close {
+        background: transparent;
+        border: none;
+        color: var(--white);
+        font-size: 1.25rem;
+        cursor: pointer;
+      }
+      .modal-dialog-body {
+        padding: 1.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      .modal-info-section {
+        margin-bottom: 1.25rem;
+      }
+      .modal-info-section h4 {
+        color: var(--primary-red);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.3rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .modal-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+      }
+      .modal-info-item span.label {
+        font-size: 0.78rem;
+        color: #78909C;
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .modal-info-item span.value {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+      
+      /* Stepper styling */
+      .status-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 1rem 0;
+      }
+      .status-stepper .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        flex: 1;
+      }
+      .status-stepper .node {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #CFD8DC;
+        color: #78909C;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+      }
+      .status-stepper .step.done .node {
+        background-color: var(--primary-red);
+        color: var(--white);
+      }
+      .status-stepper .step.done.approved .node {
+        background-color: #2E7D32;
+      }
+      .status-stepper .step.done.rejected .node {
+        background-color: var(--primary-red);
+      }
+      .status-stepper .label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #78909C;
+      }
+      .status-stepper .step.done .label {
+        color: var(--text-color);
+      }
+      .status-stepper .line {
+        height: 2px;
+        background-color: #CFD8DC;
+        flex: 1;
+        margin-top: -15px;
+      }
+      .status-stepper .line.done {
+        background-color: var(--primary-red);
+      }
+    </style>
+    
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <i class="fa-solid fa-graduation-cap" style="color: white; font-size: 1.1rem;"></i>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Student Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="student_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">My Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_leave.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Apply Leave</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Course Materials</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item" id="logout-btn">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img id="sidebar-profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <i class="fa-solid fa-bars" style="font-size: 1.1rem;"></i>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Apply for Leave / OD</h2>
+              <span class="navbar-subtitle">Submit leave applications and track HOD status remarks</span>
+            </div>
+          </div>
+
+          <div class="navbar-right" style="position: relative;">
+            <button class="nav-action-btn notification-bell-btn" id="notif-bell" aria-label="Notifications">
+              <i class="fa-solid fa-bell"></i>
+              <span class="bell-badge-count" id="notif-count">0</span>
+            </button>
+
+            <!-- Notifications Dropdown -->
+            <div class="notif-dropdown-wrapper" id="notif-dropdown">
+              <div class="notif-dropdown-header">
+                <span>Notifications</span>
+                <a href="#" style="font-size: 0.75rem; text-decoration: underline;" id="notif-mark-all">Mark all read</a>
+              </div>
+              <div class="notif-dropdown-list" id="notif-dropdown-list">
+                <div style="text-align: center; color: #78909C; padding: 1.5rem; font-size: 0.8rem;">No new notifications.</div>
+              </div>
+            </div>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-student-name">Loading...</span>
+                <span class="nav-profile-role" id="nav-profile-student-role">Student</span>
+              </div>
+              <div class="nav-profile-avatar">
+                <img id="nav-profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL MATCHING REFERENCE SCREENSHOT DESIGN -->
+        <div class="workspace-scroll-content" style="padding: 1rem 1rem 90px 1rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Top Page Header Title -->
+          <div style="margin-bottom: 1.25rem; padding: 0 0.25rem;">
+            <h2 style="font-size: 1.3rem; font-weight: 800; color: #0F172A; margin: 0;">Apply for Leave / OD</h2>
+            <p style="font-size: 0.78rem; color: #64748B; margin: 0.25rem 0 0 0;">Submit leave applications and track HOD status remarks</p>
+          </div>
+
+          <!-- 2. Leave Request Form Card -->
+          <div style="background: white; border-radius: 20px; padding: 1.25rem 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
+            <div style="border-bottom: 1px solid #F1F5F9; padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #1D4ED8; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                <span>📝</span> Leave Request Form
+              </h3>
+            </div>
+
+            <form class="leave-form-block" id="leave-request-form" style="display: flex; flex-direction: column; gap: 1rem;">
+              
+              <!-- Student Name & Register Number -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                <div class="form-group-item">
+                  <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Student Name</label>
+                  <div class="form-control-static" id="student-name" style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #475569; font-weight: 600;">Student</div>
+                </div>
+                <div class="form-group-item">
+                  <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Register Number</label>
+                  <div class="form-control-static" id="student-reg" style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #475569; font-weight: 600;">512724104002</div>
+                </div>
+              </div>
+
+              <!-- Department -->
+              <div class="form-group-item">
+                <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Department</label>
+                <div class="form-control-static" id="student-dept" style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #475569; font-weight: 600;">Computer Science &amp; Engineering</div>
+              </div>
+
+              <!-- Year & Semester -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                <div class="form-group-item">
+                  <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Year</label>
+                  <div class="form-control-static" id="student-year" style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #475569; font-weight: 600;">3rd</div>
+                </div>
+                <div class="form-group-item">
+                  <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Semester</label>
+                  <div class="form-control-static" id="student-semester" style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #475569; font-weight: 600;">V</div>
+                </div>
+              </div>
+
+              <!-- Leave Type -->
+              <div class="form-group-item">
+                <label for="leave-type" style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Leave Type</label>
+                <select id="leave-type" name="leaveType" required style="width: 100%; background: white; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #0F172A; outline: none;">
+                  <option value="" disabled selected>Select Leave Type</option>
+                  <option value="Sick Leave">Sick Leave</option>
+                  <option value="Medical Leave">Medical Leave</option>
+                  <option value="Personal Leave">Personal Leave</option>
+                  <option value="On-Duty">On-Duty</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- From Date & To Date -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                <div class="form-group-item">
+                  <label for="leave-from-date" style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">From Date</label>
+                  <input type="date" id="leave-from-date" name="fromDate" required style="width: 100%; background: white; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #0F172A; outline: none; box-sizing: border-box;">
+                </div>
+                <div class="form-group-item">
+                  <label for="leave-to-date" style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">To Date</label>
+                  <input type="date" id="leave-to-date" name="toDate" required style="width: 100%; background: white; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #0F172A; outline: none; box-sizing: border-box;">
+                </div>
+              </div>
+
+              <!-- Number of Days -->
+              <div class="form-group-item">
+                <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Number of Days</label>
+                <div class="form-control-static" id="calculated-days" style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; color: #475569; font-weight: 600;">0 Days</div>
+              </div>
+
+              <!-- Supporting Document Drag and Dropzone -->
+              <div class="form-group-item">
+                <label style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Supporting Document (Optional - PDF/JPG/PNG)</label>
+                <div id="leave-dropzone" style="border: 1.5px dashed #3B82F6; background: #F8FAFC; border-radius: 14px; padding: 1.25rem; text-align: center; cursor: pointer; transition: background 0.2s ease;">
+                  <span style="font-size: 1.8rem; display: block; margin-bottom: 0.3rem;">☁️</span>
+                  <span style="font-size: 0.8rem; color: #334155; font-weight: 600;" id="dropzone-text">Click or drag files here to upload certificate</span>
+                  <input type="file" id="supporting-document-file" name="supportingDocument" style="display: none;" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+              </div>
+
+              <!-- Reason for Leave -->
+              <div class="form-group-item">
+                <label for="leave-reason" style="font-size: 0.75rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">Reason for Leave</label>
+                <textarea id="leave-reason" name="reason" placeholder="Explain the specific reason for requesting leave..." required style="width: 100%; min-height: 80px; background: white; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-family: inherit; resize: vertical; outline: none; box-sizing: border-box;"></textarea>
+              </div>
+
+              <!-- Form Buttons -->
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; justify-content: flex-end;">
+                <button type="reset" class="btn btn-secondary" id="reset-form-btn" style="background: #F1F5F9; color: #475569; border: none; font-weight: 600; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">Reset</button>
+                <button type="submit" class="btn btn-primary" style="background: #1D4ED8; color: white; border: none; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>🚀</span> Submit Leave Request
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- 3. My Leave Requests Table Card -->
+          <div style="background: white; border-radius: 20px; border: 1px solid #F1F5F9; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 1.5rem; padding: 1.25rem;">
+            <div style="border-bottom: 1px solid #F1F5F9; padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #1D4ED8; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                <span>📋</span> My Leave Requests
+              </h3>
+            </div>
+            
+            <div class="sms-table-responsive">
+              <table class="sms-data-table min-padding" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: #E0F2FE; border-bottom: 1px solid #BAE6FD; font-size: 0.65rem; color: #0369A1; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <th style="padding: 10px 12px; text-align: left;">LEAVE ID</th>
+                    <th style="padding: 10px 12px; text-align: left;">LEAVE TYPE</th>
+                    <th style="padding: 10px 12px; text-align: left;">FROM DATE</th>
+                    <th style="padding: 10px 12px; text-align: left;">TO DATE</th>
+                    <th style="padding: 10px 12px; text-align: center;">DAYS</th>
+                    <th style="padding: 10px 12px; text-align: left;">SUBMITTED DATE</th>
+                    <th style="padding: 10px 12px; text-align: left;">STATUS</th>
+                    <th style="padding: 10px 12px; text-align: left;">HOD REMARKS</th>
+                    <th style="padding: 10px 12px; text-align: center;">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="my-leaves-history-tbody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; color: #94A3B8; padding: 1.5rem; font-size: 0.8rem;">Loading leave history...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Leave Details Modal Backplate -->
+    <div class="modal-dialog-backdrop" id="details-modal">
+      <div class="modal-dialog-card">
+        <div class="modal-dialog-header">
+          <span><i class="fa-solid fa-circle-info"></i> Leave Request Details</span>
+          <button class="modal-dialog-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-dialog-body">
+          
+          <!-- Stepper indicators -->
+          <div class="modal-info-section">
+            <h4>Processing Progress</h4>
+            <div class="status-stepper" id="modal-status-stepper">
+              <div class="step done" id="step-applied">
+                <div class="node"><i class="fa-solid fa-check"></i></div>
+                <div class="label">Applied</div>
+              </div>
+              <div class="line" id="line-1"></div>
+              <div class="step" id="step-pending">
+                <div class="node"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="label">HOD Review</div>
+              </div>
+              <div class="line" id="line-2"></div>
+              <div class="step" id="step-final">
+                <div class="node" id="step-final-node"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="label" id="step-final-label">Decided</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student details inside modal -->
+          <div class="modal-info-section">
+            <h4>Student Information</h4>
+            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+              <img src="" id="modal-student-img" alt="Student" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-red);" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              <div>
+                <h5 id="modal-student-name" style="font-weight: 700; margin: 0; font-size: 1rem;">Student Name</h5>
+                <span id="modal-student-reg" style="font-size: 0.82rem; color: #78909C;">22CSE015</span>
+              </div>
+            </div>
+            <div class="modal-info-grid">
+              <div class="modal-info-item">
+                <span class="label">Department</span>
+                <span class="value" id="modal-student-dept">Computer Science & Engineering</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Year / Semester</span>
+                <span class="value" id="modal-student-year-sem">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leave details -->
+          <div class="modal-info-section">
+            <h4>Leave Details</h4>
+            <div class="modal-info-grid" style="margin-bottom: 0.8rem;">
+              <div class="modal-info-item">
+                <span class="label">Leave Type</span>
+                <span class="value" id="modal-leave-type">Medical Leave</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Submitted Date</span>
+                <span class="value" id="modal-leave-submitted">Aug 12, 2026</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Leave Duration</span>
+                <span class="value" id="modal-leave-duration">Aug 15 - Aug 16, 2026</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Number of Days</span>
+                <span class="value" id="modal-leave-days">2 Days</span>
+              </div>
+            </div>
+            <div class="modal-info-item" style="margin-bottom: 0.8rem;">
+              <span class="label">Reason</span>
+              <span class="value" id="modal-leave-reason" style="font-weight: normal; line-height: 1.4;">My Reason Details</span>
+            </div>
+            <div class="modal-info-item" id="modal-doc-container">
+              <span class="label">Supporting Document</span>
+              <a href="#" target="_blank" class="value" id="modal-doc-link" style="color: var(--primary-red); text-decoration: underline;"><i class="fa-solid fa-file-pdf"></i> View Document</a>
+            </div>
+          </div>
+
+          <!-- Decision details -->
+          <div class="modal-info-section" id="modal-remarks-section">
+            <h4 id="modal-remarks-title">HOD Processing Feedback</h4>
+            <div style="padding: 1rem; border-radius: 6px;" id="modal-remarks-box">
+              <div class="modal-info-item">
+                <span class="label" id="modal-remarks-label">HOD Remarks</span>
+                <span class="value" id="modal-remarks-value" style="font-weight: normal;">No remarks provided yet.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- UI Logic Scripts -->
+    <script>
+      function showToast(message, isSuccess = true) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${isSuccess ? 'success' : 'error'}`;
+        toast.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Validate Token Role
+        let payload;
+        try {
+          payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.role !== 'student') {
+            window.location.href = '/login.html';
+            return;
+          }
+        } catch (e) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Setup logout action
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+          e.preventDefault();
+          localStorage.removeItem('accessToken');
+          sessionStorage.removeItem('accessToken');
+          window.location.href = '/login.html';
+        });
+
+        // 1. Fetch Student Profile and Populate fields
+        let studentProfile = null;
+        async function fetchStudentProfile() {
+          try {
+            const res = await fetch('/api/auth/profile', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to fetch profile.');
+            const data = await res.json();
+            studentProfile = data;
+
+            // Form static displays
+            document.getElementById('student-name').textContent = data.name || 'N/A';
+            document.getElementById('student-reg').textContent = data.registerNumber || 'N/A';
+            document.getElementById('student-dept').textContent = data.department || 'Computer Science & Engineering';
+            document.getElementById('student-year').textContent = data.year || 'N/A';
+            document.getElementById('student-semester').textContent = data.semester || 'N/A';
+
+            // Sidebar and Navbar displays
+            document.getElementById('sidebar-profile-student-name').textContent = data.name || 'N/A';
+            document.getElementById('sidebar-profile-student-reg').textContent = data.registerNumber || 'N/A';
+            document.getElementById('nav-profile-student-name').textContent = data.name || 'N/A';
+
+            let avatarSrc;
+            if (data.photoPath) {
+              avatarSrc = data.photoPath;
+            } else {
+              const initials = (data.name || 'ST').split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
+              const colors = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
+              const color = colors[initials.charCodeAt(0) % colors.length];
+              avatarSrc = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
+            }
+            document.getElementById('sidebar-profile-img').src = avatarSrc;
+            document.getElementById('nav-profile-img').src = avatarSrc;
+
+          } catch (err) {
+            console.error('Profile fetch error:', err);
+            showToast('Failed to load profile details.', false);
+          }
+        }
+        await fetchStudentProfile();
+
+        // 2. Drag & Drop Supporting Document File selection
+        const dropzone = document.getElementById('leave-dropzone');
+        const fileInput = document.getElementById('supporting-document-file');
+        const dropzoneText = document.getElementById('dropzone-text');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            dropzoneText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color: #2E7D32;"></i> <strong>Attached:</strong> ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+            dropzone.style.borderColor = '#2E7D32';
+            dropzone.style.backgroundColor = 'rgba(46, 125, 50, 0.05)';
+          }
+        });
+
+        // 3. Dynamic leave days calculation
+        const fromDateInput = document.getElementById('leave-from-date');
+        const toDateInput = document.getElementById('leave-to-date');
+        const calculatedDaysDiv = document.getElementById('calculated-days');
+
+        function updateCalculatedDays() {
+          const fromVal = fromDateInput.value;
+          const toVal = toDateInput.value;
+          
+          if (fromVal && toVal) {
+            const start = new Date(fromVal);
+            const end = new Date(toVal);
+            if (end >= start) {
+              const diffTime = Math.abs(end - start);
+              const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+              calculatedDaysDiv.textContent = `${days} ${days === 1 ? 'Day' : 'Days'}`;
+              calculatedDaysDiv.style.color = 'var(--primary-red)';
+              calculatedDaysDiv.style.fontWeight = 'bold';
+            } else {
+              calculatedDaysDiv.textContent = 'Invalid Range';
+              calculatedDaysDiv.style.color = 'red';
+            }
+          } else {
+            calculatedDaysDiv.textContent = '0 Days';
+            calculatedDaysDiv.style.color = '#546E7A';
+          }
+        }
+
+        fromDateInput.addEventListener('change', updateCalculatedDays);
+        toDateInput.addEventListener('change', updateCalculatedDays);
+
+        // Reset form functionality
+        document.getElementById('reset-form-btn').addEventListener('click', () => {
+          setTimeout(() => {
+            updateCalculatedDays();
+            dropzoneText.textContent = 'Click or drag files here to upload certificate';
+            dropzone.style.borderColor = 'var(--primary-red)';
+            dropzone.style.backgroundColor = 'var(--white)';
+            fileInput.value = '';
+          }, 10);
+        });
+
+        // 4. Submit leave application
+        const leaveForm = document.getElementById('leave-request-form');
+        leaveForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const fromVal = fromDateInput.value;
+          const toVal = toDateInput.value;
+
+          if (new Date(toVal) < new Date(fromVal)) {
+            showToast('From Date cannot be after To Date.', false);
+            return;
+          }
+
+          const formData = new FormData(leaveForm);
+          // Multer checks file size & file extensions on backend
+
+          try {
+            const res = await fetch('/api/leaves', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              body: formData
+            });
+
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.message || 'Submission failed.');
+
+            showToast('Leave request submitted successfully!', true);
+            leaveForm.reset();
+            // Reset uploader display
+            dropzoneText.textContent = 'Click or drag files here to upload certificate';
+            dropzone.style.borderColor = 'var(--primary-red)';
+            dropzone.style.backgroundColor = 'var(--white)';
+            fileInput.value = '';
+            updateCalculatedDays();
+
+            // Refresh logs
+            await loadLeaveHistory();
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        });
+
+        // 5. Fetch and Render Student's Leave History
+        async function loadLeaveHistory() {
+          const tbody = document.getElementById('my-leaves-history-tbody');
+          try {
+            const res = await fetch('/api/leaves/my', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load leave history.');
+            const list = await res.json();
+
+            tbody.innerHTML = '';
+            if (list.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #78909C; padding: 2rem;">No leave requests submitted yet.</td></tr>`;
+              return;
+            }
+
+            list.forEach(item => {
+              let badgeClass = 'bg-blue-light';
+              let displayStatus = item.status;
+              const isCancellable = item.status === 'PENDING_CLASS_INCHARGE' || item.status === 'Pending';
+
+              if (item.status === 'APPROVED' || item.status === 'Approved') {
+                badgeClass = 'bg-green-light';
+                displayStatus = 'APPROVED';
+              } else if (item.status === 'PENDING_HOD') {
+                badgeClass = 'bg-orange-light';
+                displayStatus = 'Pending HOD Approval';
+              } else if (item.status === 'PENDING_CLASS_INCHARGE' || item.status === 'Pending') {
+                badgeClass = 'bg-blue-light';
+                displayStatus = 'Pending Class Incharge';
+              } else if (item.status === 'REJECTED_BY_CLASS_INCHARGE') {
+                badgeClass = 'bg-red-light';
+                displayStatus = 'Rejected by Class Incharge';
+              } else if (item.status === 'REJECTED_BY_HOD' || item.status === 'Rejected') {
+                badgeClass = 'bg-red-light';
+                displayStatus = 'Rejected by HOD';
+              }
+
+              const submitDate = new Date(item.submittedAt || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+              const fromD = new Date(item.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              const toD = new Date(item.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>LREQ-${item.id}</strong></td>
+                <td>${item.leaveType}</td>
+                <td>${fromD}</td>
+                <td>${toD}</td>
+                <td><strong>${item.numberOfDays || 1} ${(item.numberOfDays || 1) === 1 ? 'Day' : 'Days'}</strong></td>
+                <td>${submitDate}</td>
+                <td><span class="badge-pill ${badgeClass}">${displayStatus}</span></td>
+                <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${item.status === 'APPROVED' || item.status === 'Approved' ? (item.hodRemarks || '-') : (item.rejectionReason || '-')}
+                </td>
+                <td style="white-space: nowrap;">
+                  <button class="btn btn-sm btn-primary view-details-btn" data-id="${item.id}" style="padding: 0.3rem 0.6rem !important; font-size: 0.78rem !important; border-radius: 4px !important;">
+                    <i class="fa-solid fa-eye"></i> View
+                  </button>
+                  ${isCancellable ? `
+                    <button class="btn-danger-outline cancel-req-btn" data-id="${item.id}">
+                      Cancel
+                    </button>
+                  ` : ''}
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+            // Action listener for Details View
+            document.querySelectorAll('.view-details-btn').forEach(btn => {
+              btn.addEventListener('click', () => openDetailsModal(btn.dataset.id));
+            });
+
+            // Action listener for Cancel request
+            document.querySelectorAll('.cancel-req-btn').forEach(btn => {
+              btn.addEventListener('click', () => cancelLeaveRequest(btn.dataset.id));
+            });
+
+          } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: red; padding: 2rem;">Error: ${err.message}</td></tr>`;
+          }
+        }
+        await loadLeaveHistory();
+
+        // 6. Cancel Pending Request Action
+        async function cancelLeaveRequest(id) {
+          if (!confirm('Are you sure you want to cancel this pending leave request?')) return;
+          try {
+            const res = await fetch(`/api/leaves/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.message || 'Cancellation failed.');
+
+            showToast('Leave request cancelled successfully!', true);
+            await loadLeaveHistory();
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        // 7. Modal Open & Close logic
+        const modal = document.getElementById('details-modal');
+        document.getElementById('modal-close-btn').addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside content
+        window.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
+
+        async function openDetailsModal(id) {
+          try {
+            const res = await fetch(`/api/leaves/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load leave details.');
+            const data = await res.json();
+
+            // Populate Modal details
+            const _slName = data.student ? data.student.name : 'Student';
+            const _slAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_slName, data.student ? data.student.photoPath : null) : (data.student && data.student.photoPath ? data.student.photoPath : ''));
+            const modalImg = document.getElementById('modal-student-img');
+            modalImg.src = _slAvatar;
+            modalImg.alt = _slName;
+            modalImg.onerror = function() { this.onerror = null; this.src = (window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : ''); };
+            document.getElementById('modal-student-name').textContent = data.student ? data.student.name : 'Unknown';
+            document.getElementById('modal-student-reg').textContent = data.student ? data.student.registerNumber : 'N/A';
+            document.getElementById('modal-student-year-sem').textContent = data.student ? `${data.student.year} Year / Sem ${data.student.semester}` : '-';
+
+            document.getElementById('modal-leave-type').textContent = data.leaveType;
+            document.getElementById('modal-leave-days').textContent = `${data.numberOfDays} ${data.numberOfDays === 1 ? 'Day' : 'Days'}`;
+            document.getElementById('modal-leave-reason').textContent = data.reason;
+            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('modal-leave-duration').textContent = `${new Date(data.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(data.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+
+            // Document link
+            const docContainer = document.getElementById('modal-doc-container');
+            const docLink = document.getElementById('modal-doc-link');
+            if (data.supportingDocument) {
+              docContainer.style.display = 'block';
+              docLink.href = `${data.supportingDocument}`;
+            } else {
+              docContainer.style.display = 'none';
+            }
+
+            // Stepper and Feedback section
+            const stepPending = document.getElementById('step-pending');
+            const stepFinal = document.getElementById('step-final');
+            const line1 = document.getElementById('line-1');
+            const line2 = document.getElementById('line-2');
+            const finalNode = document.getElementById('step-final-node');
+            const finalLabel = document.getElementById('step-final-label');
+
+            const remarksBox = document.getElementById('modal-remarks-box');
+            const remarksLabel = document.getElementById('modal-remarks-label');
+            const remarksValue = document.getElementById('modal-remarks-value');
+
+            // Reset stepper styles
+            stepPending.className = 'step';
+            stepFinal.className = 'step';
+            line1.className = 'line';
+            line2.className = 'line';
+            finalNode.className = 'node';
+            finalLabel.textContent = 'Decided';
+
+            if (data.status === 'Pending') {
+              stepPending.className = 'step done';
+              line1.className = 'line done';
+              
+              remarksBox.style.backgroundColor = '#ECEFF1';
+              remarksLabel.textContent = 'HOD Processing State';
+              remarksValue.textContent = 'Awaiting department head review.';
+              remarksValue.style.color = '#546E7A';
+            } else {
+              stepPending.className = 'step done';
+              line1.className = 'line done';
+              
+              line2.className = 'line done';
+
+              if (data.status === 'Approved') {
+                stepFinal.className = 'step done approved';
+                finalNode.className = 'node';
+                finalNode.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                finalLabel.textContent = 'Approved';
+                
+                remarksBox.style.backgroundColor = '#E8F5E9';
+                remarksLabel.textContent = 'HOD Remarks (Approved)';
+                remarksValue.textContent = data.hodRemarks || 'Approved without additional remarks.';
+                remarksValue.style.color = '#1B5E20';
+              } else {
+                stepFinal.className = 'step done rejected';
+                finalNode.className = 'node';
+                finalNode.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                finalLabel.textContent = 'Rejected';
+
+                remarksBox.style.backgroundColor = '#FFEBEE';
+                remarksLabel.textContent = 'Rejection Reason (Rejected)';
+                remarksValue.textContent = data.rejectionReason || 'No specific reason provided.';
+                remarksValue.style.color = '#C62828';
+              }
+            }
+
+            modal.style.display = 'flex';
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        // 8. Notifications Bell logic
+        const notifBell = document.getElementById('notif-bell');
+        const notifDropdown = document.getElementById('notif-dropdown');
+        const notifCountBadge = document.getElementById('notif-count');
+        const notifDropdownList = document.getElementById('notif-dropdown-list');
+
+        notifBell.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isVisible = notifDropdown.style.display === 'block';
+          notifDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', () => {
+          notifDropdown.style.display = 'none';
+        });
+
+        async function loadNotifications() {
+          try {
+            const res = await fetch('/api/notifications', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load notifications.');
+            const list = await res.json();
+
+            const unreadList = list.filter(n => !n.isRead);
+            notifCountBadge.textContent = unreadList.length;
+            notifCountBadge.style.display = unreadList.length > 0 ? 'flex' : 'none';
+
+            notifDropdownList.innerHTML = '';
+            if (list.length === 0) {
+              notifDropdownList.innerHTML = '<div style="text-align: center; color: #78909C; padding: 1.5rem; font-size: 0.8rem;">No notifications.</div>';
+              return;
+            }
+
+            list.forEach(notif => {
+              const div = document.createElement('div');
+              div.className = `notif-dropdown-item ${notif.isRead ? '' : 'unread'}`;
+              div.innerHTML = `
+                <div style="line-height: 1.35;">${notif.message}</div>
+                <time style="font-size: 0.68rem; color: #90A4AE; margin-top: 0.2rem; display: block;">
+                  ${new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} | ${new Date(notif.createdAt).toLocaleDateString()}
+                </time>
+              `;
+
+              // Click to mark as read
+              div.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!notif.isRead) {
+                  try {
+                    await fetch(`/api/notifications/${notif.id}/read`, {
+                      method: 'PUT',
+                      headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    await loadNotifications();
+                    if (notif.relatedId) {
+                      openDetailsModal(notif.relatedId);
+                    }
+                  } catch (err) {
+                    console.error('Error reading notification:', err);
+                  }
+                } else if (notif.relatedId) {
+                  openDetailsModal(notif.relatedId);
+                }
+              });
+
+              notifDropdownList.appendChild(div);
+            });
+
+          } catch (err) {
+            console.error('Notifications loading error:', err);
+          }
+        }
+        await loadNotifications();
+
+        // Mark all as read
+        document.getElementById('notif-mark-all').addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          try {
+            const res = await fetch('/api/notifications', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const list = await res.json();
+            const unreads = list.filter(n => !n.isRead);
+            
+            for (const notif of unreads) {
+              await fetch(`/api/notifications/${notif.id}/read`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+            }
+            await loadNotifications();
+            showToast('All notifications marked as read.', true);
+          } catch (err) {
+            console.error(err);
+          }
+        });
+
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="student_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="student_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="student_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Marks</span>
+      </a>
+      <a href="student_leave.html" class="bottom-nav-item active">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">Leave</span>
+      </a>
+      <a href="student_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

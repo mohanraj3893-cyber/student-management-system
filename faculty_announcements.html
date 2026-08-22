@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Announcement | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title" style="font-size: 0.8rem; font-weight: 800;">CSE Portal</h4>
+              <span class="logo-subtitle">Faculty Workspace</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="faculty_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_assignments.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Assignments</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Exams & Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_announcements.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_resources.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📁</span>
+                <span class="menu-item-text">Resources</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_requests.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Post Announcements</h2>
+              <span class="navbar-subtitle">Broadcast critical reminders to your class batches</span>
+            </div>
+          </div>
+          <div class="navbar-right">
+            <span class="navbar-divider"></span>
+            <div class="nav-profile-block">
+              <div class="profile-block-txt"><span class="nav-profile-name" id="nav-profile-name">--</span></div>
+              <img class="nav-profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace-scroll-content">
+          <div class="main-three-columns-grid">
+            
+            <div class="workspace-column-card" style="grid-column: span 1; text-align: left;">
+              <div class="column-card-header">
+                <h3 class="column-card-title">Create Notice</h3>
+              </div>
+              <form class="login-form-block" id="broadcast-notice-form" style="margin-top: 1rem;">
+                <div class="form-group-item">
+                  <label for="ann-title">Notice Title</label>
+                  <input type="text" id="ann-title" placeholder="Enter headline..." required style="padding: 0.75rem 1rem;">
+                </div>
+                <div class="form-group-item">
+                  <label for="ann-content">Notice Content</label>
+                  <textarea id="ann-content" placeholder="Type announcement copy..." required style="min-height: 100px; border-radius: 8px; border: 1px solid #DDE3EA; padding: 0.8rem; font-family: var(--font-secondary); outline: none;"></textarea>
+                </div>
+                <div class="form-group-item">
+                  <label for="ann-priority">Priority</label>
+                  <select id="ann-priority" class="toolbar-select" style="width: 100%;">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Broadcast Notice</button>
+              </form>
+            </div>
+
+            <div class="workspace-column-card" style="grid-column: span 2;">
+              <div class="column-card-header">
+                <h3 class="column-card-title">Active Class Notices</h3>
+              </div>
+              <div class="column-card-content" style="margin-top: 1rem;">
+                <div class="announcements-card-list" id="active-notices-container">
+                  <!-- Notices dynamically load here -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Computer Science & Engineering Department Portal • Version 1.0</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html?role=faculty';
+          return;
+        }
+
+        const form = document.getElementById('broadcast-notice-form');
+        const noticesContainer = document.getElementById('active-notices-container');
+
+        // Fetch and load notices feed
+        async function loadNotices() {
+          noticesContainer.innerHTML = '<div style="text-align: center; color: #64748b; padding: 1.5rem;">Loading announcements...</div>';
+          try {
+            const res = await fetch('/api/announcements', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load announcements feed.');
+            const list = await res.json();
+
+            noticesContainer.innerHTML = '';
+            if (list.length === 0) {
+              noticesContainer.innerHTML = '<div style="text-align: center; color: #64748b; padding: 1.5rem;">No active notices broadcasted.</div>';
+              return;
+            }
+
+            list.forEach(a => {
+              const noticeDiv = document.createElement('div');
+              noticeDiv.className = 'notice-card-item';
+              
+              const priority = a.category || 'Medium'; // category field holds priority value
+              const priorityClass = priority.toLowerCase() === 'high' ? 'p-high' : (priority.toLowerCase() === 'low' ? 'p-low' : 'p-medium');
+              
+              const formattedDate = new Date(a.createdAt).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+
+              noticeDiv.innerHTML = `
+                <div class="notice-item-icon-wrap">${priority.toLowerCase() === 'high' ? '📌' : '📢'}</div>
+                <div class="notice-item-middle" style="text-align: left; flex: 1;">
+                  <h4 class="notice-item-title">${a.title}</h4>
+                  <p style="font-size: 0.78rem; color: #4B5563; margin: 0.25rem 0;">${a.content}</p>
+                  <span class="notice-item-date">${formattedDate} • Published by ${a.posterName}</span>
+                </div>
+                <div class="notice-item-right">
+                  <span class="priority-badge ${priorityClass}">${priority}</span>
+                  ${a.posterName !== 'HOD' ? `<button class="delete-notice-btn" data-id="${a.id}" style="background: transparent; border: none; color: #ef4444; font-size: 1.1rem; cursor: pointer; margin-left: 10px;">🗑️</button>` : ''}
+                </div>
+              `;
+              noticesContainer.appendChild(noticeDiv);
+            });
+
+            // Bind delete triggers
+            noticesContainer.querySelectorAll('.delete-notice-btn').forEach(btn => {
+              btn.addEventListener('click', async (e) => {
+                const id = btn.getAttribute('data-id');
+                if (!confirm('Are you sure you want to delete this notice?')) return;
+
+                try {
+                  const deleteRes = await fetch(`/api/announcements/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  });
+                  if (!deleteRes.ok) throw new Error('Failed to delete announcement.');
+
+                  alert('Announcement deleted successfully!');
+                  loadNotices();
+                } catch (deleteErr) {
+                  alert(deleteErr.message);
+                }
+              });
+            });
+
+          } catch (err) {
+            console.error(err);
+            noticesContainer.innerHTML = `<div style="text-align: center; color: #ef4444; padding: 1.5rem;">Error: ${err.message}</div>`;
+          }
+        }
+
+        // Handle Broadcast Notice Form
+        if (form) {
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('ann-title').value.trim();
+            const content = document.getElementById('ann-content').value.trim();
+            const category = document.getElementById('ann-priority').value;
+
+            try {
+              const res = await fetch('/api/announcements/create', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ title, content, category })
+              });
+
+              const resData = await res.json();
+              if (!res.ok) throw new Error(resData.message || 'Failed to broadcast announcement.');
+
+              alert('Notice broadcasted successfully!');
+              form.reset();
+              loadNotices();
+            } catch (err) {
+              alert(err.message);
+            }
+          });
+        }
+
+        await loadNotices();
+      });
+    </script>
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams &amp; Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+  </body>
+</html>

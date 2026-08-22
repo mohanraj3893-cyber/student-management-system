@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faculty | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Faculty Management</h2>
+              <span class="navbar-subtitle">Common faculty directory for all departments</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search anything..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="5 Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">5</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">HOD</span>
+                <span class="nav-profile-role" id="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL -->
+        <div class="workspace-scroll-content">
+          <div class="workspace-column-card">
+            <!-- Top Toolbar Controls -->
+            <div class="table-toolbar-row" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+              <div class="toolbar-left-search" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex: 1; min-width: 280px;">
+                <input type="text" placeholder="Search faculty by name, ID, email, designation, department, phone..." id="faculty-search-input" style="flex: 1; min-width: 200px;">
+              </div>
+              <button class="btn btn-primary" id="btn-add-faculty-trigger">+ Add Faculty Staff</button>
+            </div>
+            </div>
+
+            <!-- Faculty grid table -->
+            <div class="sms-table-responsive">
+              <table class="sms-data-table" id="faculty-table-elem">
+                <thead>
+                  <tr>
+                    <th>Photo</th>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Designation</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="faculty-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Add / Edit Faculty Modal -->
+    <div id="faculty-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color, #e2e8f0);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 id="modal-title" style="font-size: 18px; font-weight: 600; color: var(--text-primary, #1e293b); margin: 0;">Add Faculty</h3>
+          <button id="btn-close-modal" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1;">&times;</button>
+        </div>
+        <form id="faculty-form">
+          <input type="hidden" id="faculty-pk-id">
+          
+          <div style="margin-bottom: 16px;">
+            <label for="modal-emp-id" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Employee ID</label>
+            <input type="text" id="modal-emp-id" required placeholder="e.g. FAC003" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label for="modal-fullname" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Full Name</label>
+            <input type="text" id="modal-fullname" required placeholder="e.g. Dr. Priya Swamy" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-email" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Official Email</label>
+            <input type="email" id="modal-email" required placeholder="e.g. priyas@sms.com" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-phone" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Phone Number</label>
+            <input type="text" id="modal-phone" required placeholder="e.g. +91 94432 10987" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="modal-designation" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Designation</label>
+            <input type="text" id="modal-designation" required placeholder="Assistant Professor / Professor" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div id="modal-password-row" style="margin-bottom: 20px;">
+            <label for="modal-password" id="modal-password-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Password</label>
+            <input type="password" id="modal-password" placeholder="Create faculty password" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" id="btn-cancel-modal" class="btn btn-secondary" style="padding: 8px 16px;">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Alert toast container -->
+    <div id="toast-message-banner" style="position: fixed; bottom: 24px; right: 24px; z-index: 1100; padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none;"></div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', () => {
+        let facultyList = [];
+
+        function showToast(message, success = true) {
+          const toast = document.getElementById('toast-message-banner');
+          toast.textContent = message;
+          toast.style.backgroundColor = success ? '#10B981' : '#EF4444';
+          toast.style.transform = 'translateY(0)';
+          toast.style.opacity = '1';
+          setTimeout(() => {
+            toast.style.transform = 'translateY(100px)';
+            toast.style.opacity = '0';
+          }, 3500);
+        }
+
+        // Fetch faculty members from DB
+        async function fetchFaculty() {
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            window.location.href = '/login.html?role=hod';
+            return;
+          }
+
+          try {
+            const res = await fetch('/api/faculty', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+              if (res.status === 401 || res.status === 403) {
+                window.location.href = '/login.html?role=hod';
+                return;
+              }
+              throw new Error('Failed to fetch faculty from DB.');
+            }
+
+            facultyList = await res.json();
+            applySearch();
+
+          } catch (error) {
+            console.error('Error fetching faculty:', error);
+            showToast(error.message, false);
+          }
+        }
+
+        // Render table rows
+        function renderFacultyTable(list) {
+          const tbody = document.getElementById('faculty-table-body');
+          tbody.innerHTML = '';
+
+          if (list.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 32px; color: #64748b;">
+                  No approved faculty members found.
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          list.forEach(fac => {
+            const tr = document.createElement('tr');
+            tr.className = 'clickable-row';
+            tr.style.cursor = 'pointer';
+            tr.setAttribute('data-id', fac.id);
+
+            const facName = fac.name || 'Faculty';
+            const initials = facName.trim().split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2) || 'FA';
+            const colors = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
+            const color = colors[initials.charCodeAt(0) % colors.length];
+            const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230056D2'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E"));
+            const avatarUrl = getAvatar(facName, fac.photoPath);
+
+            tr.innerHTML = `
+              <td>
+                <div class="table-avatar-circle">
+                  <img src="${avatarUrl}" alt="${facName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
+                </div>
+              </td>
+              <td><strong>${fac.employeeId}</strong></td>
+              <td>${fac.name}</td>
+              <td>${fac.designation}</td>
+              <td>${fac.email}</td>
+              <td>${fac.phone || 'N/A'}</td>
+              <td class="text-right" onclick="event.stopPropagation();">
+                <div style="display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end; white-space: nowrap;">
+                  <a href="faculty_profile.html?id=${fac.employeeId}" class="action-tbl-btn bg-blue-light" style="text-decoration: none; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center;">View</a>
+                  <button class="action-tbl-btn bg-green-light btn-edit-faculty" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer;">Edit</button>
+                  <button class="action-tbl-btn bg-red-light btn-delete-faculty" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer;">Delete</button>
+                </div>
+              </td>
+            `;
+
+            // Edit Action
+            tr.querySelector('.btn-edit-faculty').addEventListener('click', (e) => {
+              e.stopPropagation();
+              openModal(fac);
+            });
+
+            // Delete Action
+            tr.querySelector('.btn-delete-faculty').addEventListener('click', async (e) => {
+              e.stopPropagation();
+              if (confirm(`Are you sure you want to delete faculty staff ${fac.name}?`)) {
+                await deleteFaculty(fac.id);
+              }
+            });
+
+            // Row profile redirect
+            tr.addEventListener('click', () => {
+              window.location.href = `faculty_profile.html?id=${fac.employeeId}`;
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Delete faculty
+        async function deleteFaculty(id) {
+          const token = localStorage.getItem('accessToken');
+          try {
+            const res = await fetch(`/api/faculty/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+              const errData = await res.json();
+              throw new Error(errData.message || 'Failed to delete faculty member.');
+            }
+
+            showToast('Faculty deleted successfully!', true);
+            fetchFaculty();
+
+          } catch (error) {
+            showToast(error.message, false);
+          }
+        }
+
+        // Modal triggers
+        const modal = document.getElementById('faculty-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const facultyForm = document.getElementById('faculty-form');
+        const pkInput = document.getElementById('faculty-pk-id');
+        const empInput = document.getElementById('modal-emp-id');
+        const nameInput = document.getElementById('modal-fullname');
+        const emailInput = document.getElementById('modal-email');
+        const phoneInput = document.getElementById('modal-phone');
+        const designationInput = document.getElementById('modal-designation');
+        const passwordInput = document.getElementById('modal-password');
+        const passwordLabel = document.getElementById('modal-password-label');
+
+        function openModal(fac = null) {
+          modal.style.display = 'flex';
+          facultyForm.reset();
+
+          if (fac) {
+            modalTitle.textContent = 'Edit Faculty Staff';
+            pkInput.value = fac.id;
+            empInput.value = fac.employeeId;
+            empInput.disabled = true; // cannot change employee ID
+            nameInput.value = fac.name;
+            emailInput.value = fac.email;
+            phoneInput.value = fac.phone || '';
+            designationInput.value = fac.designation || '';
+            passwordInput.required = false;
+            passwordInput.placeholder = 'Leave blank to keep existing password';
+            passwordLabel.textContent = 'Password (optional)';
+          } else {
+            modalTitle.textContent = 'Add Faculty Staff';
+            pkInput.value = '';
+            empInput.disabled = false;
+            passwordInput.required = true;
+            passwordInput.placeholder = 'Create faculty password';
+            passwordLabel.textContent = 'Password';
+          }
+        }
+
+        function closeModal() {
+          modal.style.display = 'none';
+        }
+
+        document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+        const addBtn = document.getElementById('btn-add-faculty-trigger');
+        if (addBtn) {
+          addBtn.addEventListener('click', () => openModal(null));
+        }
+
+        // Form submit
+        facultyForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const token = localStorage.getItem('accessToken');
+          const id = pkInput.value;
+          const employeeId = empInput.value.trim();
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const phone = phoneInput.value.trim();
+          const designation = designationInput.value.trim();
+          const password = passwordInput.value;
+
+          const payload = { employeeId, name, email, phone, designation };
+          if (password) payload.password = password;
+
+          try {
+            let res;
+            if (id) {
+              res = await fetch(`/api/faculty/${id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+            } else {
+              res = await fetch('/api/faculty', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+            }
+
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.message || 'Operation failed.');
+            }
+
+            showToast(id ? 'Faculty profile updated successfully!' : 'Faculty created successfully!', true);
+            closeModal();
+            fetchFaculty();
+
+          } catch (error) {
+            showToast(error.message, false);
+          }
+        });
+
+        function applySearch() {
+          const searchInput = document.getElementById('faculty-search-input');
+          const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+          if (!query) {
+            renderFacultyTable(facultyList);
+            return;
+          }
+
+          const filtered = facultyList.filter(fac => 
+            (fac.name || '').toLowerCase().includes(query) ||
+            (fac.employeeId || '').toLowerCase().includes(query) ||
+            (fac.email || '').toLowerCase().includes(query) ||
+            (fac.designation || '').toLowerCase().includes(query) ||
+            (fac.department || '').toLowerCase().includes(query) ||
+            (fac.phone || '').toLowerCase().includes(query)
+          );
+
+          renderFacultyTable(filtered);
+        }
+
+        // Instant Multi-Field Search
+        const searchInput = document.getElementById('faculty-search-input');
+        if (searchInput) {
+          searchInput.addEventListener('input', applySearch);
+        }
+
+        // Load initially
+        fetchFaculty();
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="students.html" class="bottom-nav-item">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📑</span>
+        <span class="nav-label">Leave Requests</span>
+      </a>
+      <a href="reports.html" class="bottom-nav-item">
+        <span class="nav-icon">📄</span>
+        <span class="nav-label">Reports</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

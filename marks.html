@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Internal Marks Audit | HOD Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+    </style>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- LEFT SIDEBAR NAVIGATION -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN WORKSPACE CONTENT PANEL -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Department Internal Marks Audit</h2>
+              <span class="navbar-subtitle">View-only department-wide assessment logs stored in database</span>
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-admin-name">HOD</span>
+                <span class="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL -->
+        <div class="workspace-scroll-content">
+          <div class="workspace-column-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+              <div>
+                <h3 class="column-card-title">Department Assessment Audit Logs</h3>
+                <span class="navbar-subtitle">Database Single Source of Truth</span>
+              </div>
+            </div>
+
+            <div class="sms-table-responsive">
+              <table class="sms-data-table">
+                <thead>
+                  <tr>
+                    <th>Register Number</th>
+                    <th>Student Name</th>
+                    <th>Course Code &amp; Name</th>
+                    <th>Assigned Faculty</th>
+                    <th>Assessment Block</th>
+                    <th>Score Secured</th>
+                    <th>Percentage</th>
+                  </tr>
+                </thead>
+                <tbody id="hod-marks-tbody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: #64748b; padding: 2rem;">Loading assessment audit logs from database...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Computer Science &amp; Engineering Department Portal</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+
+      <!-- Bottom Mobile Navigation Bar -->
+      <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="bottom-nav-item">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="students.html" class="bottom-nav-item">
+          <span class="nav-icon">🎓</span>
+          <span class="nav-label">Students</span>
+        </a>
+        <a href="attendance.html" class="bottom-nav-item">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Attendance</span>
+        </a>
+        <a href="leave.html" class="bottom-nav-item">
+          <span class="nav-icon">📑</span>
+          <span class="nav-label">Leave Requests</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Reports</span>
+        </a>
+      </nav>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module" src="/src/marks.js"></script>
+  </body>
+</html>

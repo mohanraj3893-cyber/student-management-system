@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Class Students | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title" style="font-size: 0.8rem; font-weight: 800;">CSE Portal</h4>
+              <span class="logo-subtitle">Faculty Workspace</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="faculty_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_students.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_assignments.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Assignments</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Exams & Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_resources.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📁</span>
+                <span class="menu-item-text">Resources</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_requests.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Assigned Students Roster</h2>
+              <span class="navbar-subtitle">Grade profiles and contact credentials</span>
+            </div>
+          </div>
+          <div class="navbar-right">
+            <span class="navbar-divider"></span>
+            <div class="nav-profile-block">
+              <div class="profile-block-txt"><span class="nav-profile-name" id="nav-profile-name">--</span></div>
+              <img class="nav-profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace-scroll-content">
+          <div class="workspace-column-card">
+            
+            <div class="table-toolbar-row" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+              <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; width: 100%;">
+                <div style="flex: 1 1 240px; min-width: 200px;">
+                  <input type="text" placeholder="Search by name, reg no, email..." id="roster-search-input" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 8px; font-size: 0.85rem; background: var(--bg-input, #ffffff); color: var(--text-color, #1e293b); outline: none;">
+                </div>
+                <div style="flex: 0 1 160px; min-width: 130px;">
+                  <select id="roster-year-select" aria-label="Filter by Year" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 8px; font-size: 0.85rem; background: var(--bg-input, #ffffff); color: var(--text-color, #1e293b); outline: none; cursor: pointer;">
+                    <option value="">All Years</option>
+                    <option value="I-Year">I-Year</option>
+                    <option value="II-Year">II-Year</option>
+                    <option value="III-Year">III-Year</option>
+                    <option value="IV-Year">IV-Year</option>
+                  </select>
+                </div>
+                <div style="flex: 0 1 260px; min-width: 180px;">
+                  <select id="roster-dept-select" aria-label="Filter by Department" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 8px; font-size: 0.85rem; background: var(--bg-input, #ffffff); color: var(--text-color, #1e293b); outline: none; cursor: pointer;">
+                    <option value="">All Departments</option>
+                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                    <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+                    <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="sms-table-responsive">
+              <table class="sms-data-table" id="roster-table">
+                <thead>
+                  <tr>
+                    <th>Photo</th>
+                    <th>Register Number</th>
+                    <th>Name</th>
+                    <th>Year / Sem</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Academic Management Portal • Version 1.0</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      function normalizeYear(value) {
+        if (!value) return '';
+        const str = String(value).toLowerCase().trim();
+        if (/^1(st)?(\s*year)?$/i.test(str) || /^i(-year)?$/i.test(str) || str === '1') return 'I-Year';
+        if (/^2(nd)?(\s*year)?$/i.test(str) || /^ii(-year)?$/i.test(str) || str === '2') return 'II-Year';
+        if (/^3(rd)?(\s*year)?$/i.test(str) || /^iii(-year)?$/i.test(str) || str === '3') return 'III-Year';
+        if (/^4(th)?(\s*year)?$/i.test(str) || /^iv(-year)?$/i.test(str) || str === '4') return 'IV-Year';
+        return value.trim();
+      }
+
+      function normalizeDepartment(value) {
+        if (!value) return '';
+        const str = String(value).toLowerCase().trim();
+        if (str.includes('computer') || str === 'cse') return 'Computer Science & Engineering';
+        if (str.includes('information') || str === 'it') return 'Information Technology';
+        if (str.includes('electronics') || str === 'ece') return 'Electronics & Communication Engineering';
+        if (str.includes('electrical') || str === 'eee') return 'Electrical & Electronics Engineering';
+        if (str.includes('artificial') || str.includes('data') || str === 'ai&ds' || str === 'aids') return 'Artificial Intelligence & Data Science';
+        return value.trim();
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html?role=faculty';
+          return;
+        }
+
+        const tbody = document.querySelector('#roster-table tbody');
+        const searchInput = document.getElementById('roster-search-input');
+        const yearSelect = document.getElementById('roster-year-select');
+        const deptSelect = document.getElementById('roster-dept-select');
+
+        let allStudents = [];
+
+        function renderRows(students) {
+          tbody.innerHTML = '';
+          if (!students || students.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #64748b; font-weight: 500;">No students found for the selected Year and Department.</td></tr>`;
+            return;
+          }
+
+          students.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.className = 'clickable-row';
+            tr.style.cursor = 'pointer';
+            tr.addEventListener('click', () => {
+              window.location.href = `student_profile.html?id=${s.registerNumber || s.username}`;
+            });
+            const sName = s.name || 'Student';
+            const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
+            const photo = getAvatar(sName, s.photoPath);
+            const yearDisplay = s.year ? normalizeYear(s.year) : 'N/A';
+            const semDisplay = s.semester ? ` / Sem ${s.semester}` : '';
+
+            tr.innerHTML = `
+              <td>
+                <div class="table-avatar-circle">
+                  <img src="${photo}" alt="${sName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
+                </div>
+              </td>
+              <td><strong>${s.registerNumber || s.username}</strong></td>
+              <td>${s.name || '--'}</td>
+              <td>${yearDisplay}${semDisplay}</td>
+              <td>${s.email || '--'}</td>
+              <td><span class="badge-pill bg-green-light">Active</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        function applyFilters() {
+          const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+          const selectedYear = (yearSelect ? yearSelect.value : '').trim();
+          const selectedDept = (deptSelect ? deptSelect.value : '').trim();
+
+          const filtered = allStudents.filter(s => {
+            // Search query filter
+            if (query) {
+              const name = (s.name || '').toLowerCase();
+              const reg = (s.registerNumber || s.username || '').toLowerCase();
+              const email = (s.email || '').toLowerCase();
+              const dept = (s.department || '').toLowerCase();
+              if (!name.includes(query) && !reg.includes(query) && !email.includes(query) && !dept.includes(query)) {
+                return false;
+              }
+            }
+
+            // Year filter
+            if (selectedYear) {
+              const normStudentYear = normalizeYear(s.year);
+              const normSelectedYear = normalizeYear(selectedYear);
+              if (normStudentYear !== normSelectedYear) return false;
+            }
+
+            // Department filter
+            if (selectedDept) {
+              const normStudentDept = normalizeDepartment(s.department);
+              const normSelectedDept = normalizeDepartment(selectedDept);
+              if (normStudentDept !== normSelectedDept) return false;
+            }
+
+            return true;
+          });
+
+          renderRows(filtered);
+        }
+
+        try {
+          // Fetch from /api/faculty/my-students endpoint
+          let res = await fetch('/api/faculty/my-students', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (!res.ok) {
+            // Fallback to /api/students if /api/faculty/my-students is unavailable
+            res = await fetch('/api/students', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+          }
+
+          if (!res.ok) throw new Error('Failed to load authorized students roster.');
+          allStudents = await res.json();
+
+          renderRows(allStudents);
+
+          if (searchInput) searchInput.addEventListener('input', applyFilters);
+          if (yearSelect) yearSelect.addEventListener('change', applyFilters);
+          if (deptSelect) deptSelect.addEventListener('change', applyFilters);
+
+        } catch (err) {
+          console.error(err);
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #ef4444;">Error: ${err.message}</td></tr>`;
+        }
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item active">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams &amp; Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

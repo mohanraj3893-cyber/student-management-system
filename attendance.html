@@ -1,0 +1,1382 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attendance | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Daily Attendance Tracker</h2>
+              <span class="navbar-subtitle">Take and review student attendance grids</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search anything..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="5 Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">5</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">HOD</span>
+                <span class="nav-profile-role" id="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL -->
+        <div class="workspace-scroll-content">
+          
+          <!-- HOD View Container -->
+          <div id="hod-attendance-container" style="display: none; padding: 1.25rem 1.25rem 90px 1.25rem; background: #FAFAFD;">
+            
+            <!-- 1. Welcome Greeting -->
+            <div style="margin-bottom: 1.25rem; padding: 0 0.25rem;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 0.4rem;" id="welcome-user-title">
+                Welcome back 👏
+              </h2>
+              <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;" id="welcome-user-subtitle">
+                Head of Department (HOD) | Computer Science &amp; Engineering
+              </p>
+            </div>
+
+            <!-- 2. Search Box Bar -->
+            <div style="margin-bottom: 1.25rem;">
+              <div style="background: white; border-radius: 14px; padding: 0.75rem 1rem; border: 1px solid #F1F5F9; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <span style="color: #94A3B8; font-size: 1.1rem;">🔍</span>
+                <input type="text" placeholder="Search anything..." style="border: none; outline: none; width: 100%; font-size: 0.85rem; color: #0F172A; background: transparent;" aria-label="Search dashboard">
+              </div>
+            </div>
+
+            <!-- 3. Class Incharge Assignment Management Card (HOD Only) -->
+            <div style="background: white; border-radius: 20px; padding: 1.25rem; border: 1px solid #F1F5F9; margin-bottom: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+              <div style="margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0;">Class Incharge Assignments</h3>
+                <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0; line-height: 1.4;">Assign or update the Faculty Class Incharge responsible for daily attendance per class.</p>
+              </div>
+
+              <!-- Table for Incharges -->
+              <div class="sms-table-responsive">
+                <table class="sms-data-table" style="width: 100%;">
+                  <tbody id="incharge-assignment-tbody">
+                    <tr><td colspan="4" style="text-align:center;color:#64748b;padding:1.5rem;">Loading Class Incharge assignments...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 4. Attendance Monitoring & Reports Panel -->
+            <div style="background: white; border-radius: 20px; padding: 1.25rem; border: 1px solid #F1F5F9; margin-bottom: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+              <div style="margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0;">Daily Attendance Monitoring &amp; Reports</h3>
+                <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;">View-only daily attendance reports submitted by Class Incharges.</p>
+              </div>
+              
+              <!-- 2x2 View-Only Filters Grid -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem;">
+                <div>
+                  <label style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 0.35rem;">DATE</label>
+                  <input type="date" id="hod-filter-date" style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                </div>
+                <div>
+                  <label style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 0.35rem;">FACULTY INCHARGE</label>
+                  <select id="hod-filter-faculty" style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                    <option value="">-- All Faculty --</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 0.35rem;">YEAR</label>
+                  <select id="hod-filter-year" style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                    <option value="">-- All Years --</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 0.35rem;">SECTION</label>
+                  <select id="hod-filter-section" style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                    <option value="">-- All --</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Search / Filter Button -->
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 1.25rem;">
+                <button id="btn-hod-filter" style="background: white; border: 1px solid #2563EB; color: #2563EB; font-weight: 700; font-size: 0.82rem; padding: 7px 16px; border-radius: 8px; cursor: pointer;">Search / Filter</button>
+              </div>
+
+              <!-- 4 Metrics Grid (2x2) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.5rem;">
+                <!-- Total Sessions -->
+                <div style="background: white; border-radius: 16px; padding: 0.95rem 1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: #F3E8FF; color: #9333EA; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">📅</div>
+                  <div>
+                    <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">TOTAL DAILY SESSIONS</span>
+                    <h3 id="hod-stats-total" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.1rem 0;">0</h3>
+                    <span style="font-size: 0.68rem; color: #64748B; font-weight: 600;">Logged class days</span>
+                  </div>
+                </div>
+
+                <!-- Present Students -->
+                <div style="background: white; border-radius: 16px; padding: 0.95rem 1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: #F0FDF4; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">👥</div>
+                  <div>
+                    <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">PRESENT STUDENTS</span>
+                    <h3 id="hod-stats-present" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.1rem 0;">0</h3>
+                    <span style="font-size: 0.68rem; color: #16A34A; font-weight: 600;">Cumulative present</span>
+                  </div>
+                </div>
+
+                <!-- Absent Students -->
+                <div style="background: white; border-radius: 16px; padding: 0.95rem 1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: #FEF2F2; color: #EF4444; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">👤</div>
+                  <div>
+                    <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">ABSENT STUDENTS</span>
+                    <h3 id="hod-stats-absent" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.1rem 0;">0</h3>
+                    <span style="font-size: 0.68rem; color: #DC2626; font-weight: 600;">Cumulative absent</span>
+                  </div>
+                </div>
+
+                <!-- Attendance Rate -->
+                <div style="background: white; border-radius: 16px; padding: 0.95rem 1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: #FFF7ED; color: #EA580C; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">📈</div>
+                  <div>
+                    <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">ATTENDANCE RATE</span>
+                    <h3 id="hod-stats-percentage" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.1rem 0;">0%</h3>
+                    <span style="font-size: 0.68rem; color: #9333EA; font-weight: 600;">Overall rate</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Logged Daily Attendance History Section -->
+              <div>
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 0.85rem 0;">Logged Daily Attendance History</h3>
+                <div class="sms-table-responsive">
+                  <table class="sms-data-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Year</th>
+                        <th>Class Incharge</th>
+                        <th>Present Count</th>
+                        <th>Percentage</th>
+                        <th class="text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="hod-history-table-body">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Faculty View Container -->
+          <div id="faculty-attendance-container" style="display: none;">
+            <div class="workspace-column-card">
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary);">Faculty Attendance Entry Portal</h3>
+
+              <div class="attendance-filter-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div class="attendance-filter-item">
+                  <label for="fac-select-subject">Select Subject & Section</label>
+                  <select id="fac-select-subject" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-input); color: var(--text-primary);">
+                    <option value="">-- Choose Subject --</option>
+                  </select>
+                </div>
+                <div class="attendance-filter-item">
+                  <label for="fac-select-date">Select Date</label>
+                  <input type="date" id="fac-select-date" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-input); color: var(--text-primary);">
+                </div>
+
+              </div>
+
+              <!-- Action buttons to bulk select -->
+              <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <button id="btn-mark-all-present" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">Mark All Present</button>
+                <button id="btn-mark-all-absent" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px; background-color: #fee2e2; color: #ef4444; border-color: #fca5a5;">Mark All Absent</button>
+              </div>
+
+              <!-- Student Checklist Table -->
+              <div class="sms-table-responsive">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Register Number</th>
+                      <th>Student Name</th>
+                      <th class="text-center">Present</th>
+                      <th class="text-center">Absent</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fac-student-checklist-body">
+                    <tr>
+                      <td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">
+                        Please select a subject to load students.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button id="btn-save-attendance" class="btn btn-primary" style="padding: 10px 20px;">Save Attendance Records</button>
+              </div>
+            </div>
+
+            <!-- Faculty Log Table -->
+            <div class="workspace-column-card" style="margin-top: 24px;">
+              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Your Recorded Sessions History & Corrections</h3>
+              <div class="sms-table-responsive">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Period</th>
+                      <th>Subject</th>
+                      <th>Sem/Sec</th>
+                      <th>Present / Absent</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fac-history-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student View Container -->
+          <div id="student-attendance-container" style="display: none;">
+            <div class="workspace-column-card">
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary);">Your Attendance Reports</h3>
+
+              <!-- Stats summary cards -->
+              <div class="dashboard-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="dashboard-stat-card theme-blue" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Overall Percentage</span>
+                  <h3 id="stud-stats-pct" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0%</h3>
+                  <span style="font-size: 0.68rem; color: #10B981; font-weight: 600;">Target: Min 75%</span>
+                </div>
+                <div class="dashboard-stat-card theme-green" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Total Classes Conducted</span>
+                  <h3 id="stud-stats-total" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0</h3>
+                  <span style="font-size: 0.68rem; color: #9CA3AF;">Across all curriculum subjects</span>
+                </div>
+                <div class="dashboard-stat-card theme-purple" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Classes Attended</span>
+                  <h3 id="stud-stats-present" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0</h3>
+                  <span style="font-size: 0.68rem; color: #9CA3AF;">Days marked present</span>
+                </div>
+                <div class="dashboard-stat-card theme-red" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Classes Absent</span>
+                  <h3 id="stud-stats-absent" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0</h3>
+                  <span style="font-size: 0.68rem; color: #EF4444; font-weight: 600;">Absent count</span>
+                </div>
+              </div>
+
+              <!-- Subject Wise table -->
+              <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Subject-wise Attendance Breakdown</h4>
+              <div class="sms-table-responsive" style="margin-bottom: 24px;">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Subject Code</th>
+                      <th>Subject Name</th>
+                      <th>Faculty Advisor</th>
+                      <th class="text-center">Total Classes</th>
+                      <th class="text-center">Present</th>
+                      <th class="text-center">Absent</th>
+                      <th class="text-center">Attendance %</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stud-subject-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Daily Logs list -->
+              <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Detailed Attendance Log History</h4>
+              <div class="sms-table-responsive">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Period</th>
+                      <th>Subject Name</th>
+                      <th>Faculty Advisor</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stud-logs-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
+          </footer>
+        </div>
+
+      </main>
+
+      <!-- Bottom Mobile Navigation Bar -->
+      <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="bottom-nav-item">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="students.html" class="bottom-nav-item">
+          <span class="nav-icon">🎓</span>
+          <span class="nav-label">Students</span>
+        </a>
+        <a href="attendance.html" class="bottom-nav-item active">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Attendance</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="settings.html" class="bottom-nav-item">
+          <span class="nav-icon">•••</span>
+          <span class="nav-label">More</span>
+        </a>
+      </nav>
+
+    </div>
+
+    <!-- HOD Session Details Modal -->
+    <div id="hod-details-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 550px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 0;">Session Attendance Details</h3>
+          <button id="btn-close-hod-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+        </div>
+        <div id="hod-session-meta" style="margin-bottom: 16px; font-size: 14px; color: #475569;"></div>
+        <div class="sms-table-responsive">
+          <table class="sms-data-table min-padding">
+            <thead>
+              <tr>
+                <th>Register No</th>
+                <th>Student Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="hod-session-students-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faculty Edit/Correction Modal -->
+    <div id="faculty-edit-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 550px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 0;">Correct / Edit Attendance</h3>
+          <button id="btn-close-fac-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+        </div>
+        <form id="faculty-edit-form">
+          <input type="hidden" id="edit-session-id">
+          <div id="fac-edit-meta" style="margin-bottom: 16px; font-size: 14px; color: #475569; font-weight: 500;"></div>
+          
+          <div class="sms-table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="sms-data-table min-padding">
+              <thead>
+                <tr>
+                  <th>Register No</th>
+                  <th>Student Name</th>
+                  <th class="text-center">Present</th>
+                  <th class="text-center">Absent</th>
+                </tr>
+              </thead>
+              <tbody id="fac-edit-students-body"></tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+            <button type="button" id="btn-cancel-edit" class="btn btn-secondary" style="padding: 8px 16px;">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Save Corrections</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Alert toast container -->
+    <div id="toast-message-banner" style="position: fixed; bottom: 24px; right: 24px; z-index: 1100; padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none;"></div>
+
+    <!-- Load Socket.io client script -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', () => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('accessToken');
+
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Add proper DOM hooks to navbar & sidebar elements
+        const navName = document.querySelector('.nav-profile-name');
+        const navRole = document.querySelector('.nav-profile-role');
+        const sidebarName = document.querySelector('.profile-widget-name');
+        const sidebarRole = document.querySelector('.profile-widget-role');
+
+        if (navName) navName.id = 'nav-profile-name';
+        if (sidebarName) sidebarName.id = 'sidebar-profile-name';
+
+        // Connect WebSocket for real-time changes
+        if (typeof io !== 'undefined') {
+          try {
+            const socket = io('http://localhost:5000');
+            socket.on('connect', () => {
+              console.log('[Socket] Connected to real-time notification socket.');
+            });
+
+            socket.on('attendanceUpdated', (data) => {
+              console.log('[Socket] Attendance updated event received:', data);
+              showToast('Real-time sync: Attendance records updated.', true);
+              reloadActiveRoleView();
+            });
+          } catch(e) {
+            console.error('Socket init error:', e);
+          }
+        }
+
+        // Listen for global custom event
+        document.addEventListener('sms:realtime_event', (e) => {
+          if (e.detail && e.detail.event === 'ATTENDANCE_UPDATED') {
+            showToast('Real-time update received.', true);
+            reloadActiveRoleView();
+          }
+        });
+
+        function showToast(message, success = true) {
+          const toast = document.getElementById('toast-message-banner');
+          if (toast) {
+            toast.textContent = message;
+            toast.style.backgroundColor = success ? '#10B981' : '#EF4444';
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+              toast.style.transform = 'translateY(100px)';
+              toast.style.opacity = '0';
+            }, 3500);
+          }
+        }
+
+        // Normalize User Role Detection to prevent blank page bug
+        const userRole = (typeof user.role === 'object' ? user.role?.name : user.role) || '';
+        const roleLower = String(userRole).toLowerCase().trim();
+
+        function reloadActiveRoleView() {
+          if (roleLower.includes('admin') || roleLower.includes('hod')) {
+            loadHODAttendance();
+          } else if (roleLower.includes('faculty')) {
+            loadFacultyHistoryLogs();
+          } else if (roleLower.includes('student')) {
+            loadStudentAttendance();
+          }
+        }
+
+        // Show/Hide appropriate role container
+        if (roleLower.includes('admin') || roleLower.includes('hod')) {
+          const hodContainer = document.getElementById('hod-attendance-container');
+          if (hodContainer) hodContainer.style.display = 'block';
+          initHODView();
+        } else if (roleLower.includes('faculty')) {
+          const facContainer = document.getElementById('faculty-attendance-container');
+          if (facContainer) facContainer.style.display = 'block';
+          initFacultyView();
+        } else if (roleLower.includes('student')) {
+          const studContainer = document.getElementById('student-attendance-container');
+          if (studContainer) studContainer.style.display = 'block';
+          loadStudentAttendance();
+        }
+
+        /* ==========================================
+           1. HOD ATTENDANCE IMPLEMENTATION
+           ========================================== */
+        let hodSessions = [];
+        let facultyList = [];
+
+        async function initHODView() {
+          document.getElementById('hod-filter-date').value = '';
+          
+          try {
+            // Fetch faculty list
+            const facRes = await fetch('/api/faculty', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (facRes.ok) {
+              facultyList = await facRes.json();
+              const facSelect = document.getElementById('hod-filter-faculty');
+              facultyList.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.textContent = f.name;
+                facSelect.appendChild(opt);
+              });
+            }
+
+            // Load Class Incharge Assignments Table
+            await loadClassInchargeAssignments();
+
+          } catch (err) {
+            console.error('Error seeding HOD filters:', err);
+          }
+
+          document.getElementById('btn-hod-filter').addEventListener('click', loadHODAttendance);
+          
+          // Initial load
+          loadHODAttendance();
+        }
+
+        async function loadClassInchargeAssignments() {
+          const tbody = document.getElementById('incharge-assignment-tbody');
+          if (!tbody) return;
+
+          try {
+            const res = await fetch('/api/admin/class-incharges', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load class incharges.');
+            const assignments = await res.json();
+
+            const defaultClasses = [
+              { year: '1st Year', semester: 'I', section: 'A' },
+              { year: '2nd Year', semester: 'III', section: 'A' },
+              { year: '3rd Year', semester: 'V', section: 'A' },
+              { year: '4th Year', semester: 'VII', section: 'A' }
+            ];
+
+              tbody.innerHTML = '';
+              defaultClasses.forEach(c => {
+                const current = assignments.find(a => a.year === c.year && a.section === c.section);
+                const currentFacId = current ? current.facultyId : '';
+                const isAssigned = !!current;
+
+                const tr = document.createElement('tr');
+                let optionsHtml = '<option value="">-- No Class Incharge Assigned --</option>';
+                facultyList.forEach(f => {
+                  const isSelected = String(f.id) === String(currentFacId) || String(f.facultyId) === String(currentFacId);
+                  optionsHtml += `<option value="${f.id}" ${isSelected ? 'selected' : ''}>${f.name} (${f.employeeId || 'FAC'})</option>`;
+                });
+
+                tr.innerHTML = `
+                  <td style="vertical-align: middle; padding: 12px 10px;">
+                    <strong style="font-size: 0.88rem; color: #0F172A; display: block;">${c.year}</strong>
+                    <span style="font-size: 0.74rem; color: #64748B;">Sem ${c.semester} - Section ${c.section}</span>
+                  </td>
+                  <td colspan="2" style="vertical-align: middle; padding: 12px 10px;">
+                    <select class="incharge-fac-select toolbar-select" style="padding: 8px 10px; border-radius: 8px; border: 1px solid #E2E8F0; width: 100%; max-width: 280px; font-size: 0.82rem; color: #0F172A; background: #FAFAFD; outline: none;">
+                      ${optionsHtml}
+                    </select>
+                  </td>
+                  <td class="text-right" style="vertical-align: middle; padding: 12px 10px;">
+                    <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                      <button class="btn btn-primary btn-save-incharge" style="padding: 6px 14px; font-weight: 700; font-size: 0.78rem; border-radius: 8px; ${isAssigned ? 'background: #0242B5;' : 'background: #0056D2;'}">${isAssigned ? 'Reassign / Save' : 'Assign'}</button>
+                      <button class="btn btn-secondary btn-remove-incharge" style="padding: 6px 12px; font-weight: 700; font-size: 0.78rem; border-radius: 8px; background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; ${!isAssigned ? 'opacity: 0.4; pointer-events: none;' : ''}">🗑 Remove</button>
+                    </div>
+                  </td>
+                `;
+
+                // Assign / Reassign Handler
+                tr.querySelector('.btn-save-incharge').addEventListener('click', async () => {
+                  const facId = tr.querySelector('.incharge-fac-select').value;
+                  if (!facId) {
+                    alert('Please select a faculty member to assign.');
+                    return;
+                  }
+
+                  try {
+                    const assignRes = await fetch('/api/admin/class-incharges/assign', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
+                      body: JSON.stringify({
+                        year: c.year,
+                        semester: c.semester,
+                        section: c.section,
+                        facultyId: parseInt(facId)
+                      })
+                    });
+                    const assignData = await assignRes.json();
+                    if (!assignRes.ok) throw new Error(assignData.message || 'Failed to assign class incharge.');
+
+                    showToast(assignData.message, true);
+                    await loadClassInchargeAssignments();
+                  } catch (err) {
+                    alert(err.message);
+                  }
+                });
+
+                // Remove Incharge Handler
+                tr.querySelector('.btn-remove-incharge').addEventListener('click', async () => {
+                  if (!confirm(`Are you sure you want to remove the Class Incharge for ${c.year} (Sem ${c.semester} - Sec ${c.section})? Attendance entry will be disabled for this class.`)) {
+                    return;
+                  }
+
+                  try {
+                    const removeRes = await fetch('/api/admin/class-incharges/remove', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
+                      body: JSON.stringify({
+                        year: c.year,
+                        semester: c.semester,
+                        section: c.section
+                      })
+                    });
+                    const removeData = await removeRes.json();
+                    if (!removeRes.ok) throw new Error(removeData.message || 'Failed to remove class incharge.');
+
+                    showToast(removeData.message, true);
+                    await loadClassInchargeAssignments();
+                  } catch (err) {
+                    alert(err.message);
+                  }
+                });
+
+                tbody.appendChild(tr);
+              });
+
+            } catch (err) {
+              console.error(err);
+              tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#ef4444;padding:1.5rem;">Error loading assignments: ${err.message}</td></tr>`;
+            }
+          }
+
+        async function loadHODAttendance() {
+          const date = document.getElementById('hod-filter-date').value;
+          const facultyId = document.getElementById('hod-filter-faculty').value;
+          const year = document.getElementById('hod-filter-year').value;
+          const section = document.getElementById('hod-filter-section').value;
+
+          let url = '/api/attendance/history?';
+          if (date) url += `date=${date}&`;
+          if (facultyId) url += `facultyId=${facultyId}&`;
+          if (year) url += `year=${year}&`;
+          if (section) url += `section=${section}&`;
+
+          const tbody = document.getElementById('hod-history-table-body');
+          if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">Loading attendance records...</td></tr>`;
+          }
+
+          try {
+            const res = await fetch(url, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load history.');
+
+            const data = await res.json();
+            let sessions = [];
+            let records = [];
+
+            if (Array.isArray(data)) {
+              sessions = data;
+            } else if (data && typeof data === 'object') {
+              sessions = data.sessions || [];
+              records = data.records || [];
+            }
+
+            hodSessions = sessions;
+            renderHODTable(sessions);
+            calculateHODAnalytics(sessions);
+          } catch (err) {
+            console.error('[HOD Attendance Load Error]:', err);
+            if (tbody) {
+              tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #ef4444;">Unable to load records: ${err.message}</td></tr>`;
+            }
+          }
+        }
+
+        function calculateHODAnalytics(sessions) {
+          let totalPresent = 0;
+          let totalAbsent = 0;
+          
+          sessions.forEach(s => {
+            totalPresent += s.presentCount;
+            totalAbsent += s.absentCount;
+          });
+
+          const total = totalPresent + totalAbsent;
+          const percentage = total > 0 ? Math.round((totalPresent / total) * 100) : 0;
+
+          document.getElementById('hod-stats-total').textContent = sessions.length;
+          document.getElementById('hod-stats-present').textContent = totalPresent;
+          document.getElementById('hod-stats-absent').textContent = totalAbsent;
+          document.getElementById('hod-stats-percentage').textContent = `${percentage}%`;
+        }
+
+        function renderHODTable(sessions) {
+          const tbody = document.getElementById('hod-history-table-body');
+          if (!tbody) return;
+          tbody.innerHTML = '';
+
+          if (!sessions || sessions.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 36px 16px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                    <span style="font-size: 32px;">📅</span>
+                    <strong style="font-size: 15px; color: #1e293b;">No attendance records found</strong>
+                    <span style="font-size: 13px; color: #64748b;">Daily attendance records submitted by Class Incharges will appear here.</span>
+                  </div>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          sessions.forEach(session => {
+            const tr = document.createElement('tr');
+            const pctVal = parseFloat(session.percentage) || 0;
+            tr.innerHTML = `
+              <td><strong>${session.formattedDate || session.date}</strong></td>
+              <td><strong>${session.year}</strong> <span style="font-size: 0.72rem; color: #64748B;">(Sec ${session.section})</span></td>
+              <td>${session.facultyName || 'Class Incharge'}</td>
+              <td><strong>${session.presentRatio || `${session.presentCount} / ${session.totalCount}`}</strong></td>
+              <td><span class="badge-pill ${pctVal >= 75 ? 'bg-green-light' : 'bg-red-light'}">${session.percentage}</span></td>
+              <td class="text-center">
+                <button class="btn-view-session-detail" style="background: #EFF6FF; color: #0056D2; border: 1px solid #DBEAFE; padding: 5px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">View</button>
+              </td>
+            `;
+
+            tr.querySelector('.btn-view-session-detail').addEventListener('click', () => {
+              openHODSessionDetails(session);
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+
+        function openHODSessionDetails(session) {
+          const modal = document.getElementById('hod-details-modal');
+          if (!modal) return;
+          modal.style.display = 'flex';
+          
+          document.getElementById('hod-session-meta').innerHTML = `
+            <div style="background: #FAFAFD; border: 1px solid #F1F5F9; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.82rem; color: #334155;">
+                <div><span style="color: #64748B;">Attendance Date:</span> <strong>${session.formattedDate || session.date}</strong></div>
+                <div><span style="color: #64748B;">Academic Year:</span> <strong>${session.year} (Sec ${session.section})</strong></div>
+                <div><span style="color: #64748B;">Class Incharge:</span> <strong>${session.facultyName}</strong></div>
+                <div><span style="color: #64748B;">Attendance Rate:</span> <span class="badge-pill bg-green-light">${session.percentage}</span></div>
+              </div>
+              <div style="display: flex; gap: 1.25rem; margin-top: 0.75rem; border-top: 1px solid #E2E8F0; padding-top: 0.6rem; font-size: 0.8rem; font-weight: 700;">
+                <span style="color: #475569;">Total Students: ${session.totalCount}</span>
+                <span style="color: #16A34A;">Present: ${session.presentCount}</span>
+                <span style="color: #DC2626;">Absent: ${session.absentCount}</span>
+              </div>
+            </div>
+          `;
+
+          const tbody = document.getElementById('hod-session-students-body');
+          tbody.innerHTML = '';
+
+          if (!session.records || session.records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 1.5rem; color: #64748b;">No student records found for this session.</td></tr>`;
+            return;
+          }
+
+          session.records.forEach(r => {
+            const tr = document.createElement('tr');
+            const statusClass = r.status === 'Present' ? 'bg-green-light' : 'bg-red-light';
+            tr.innerHTML = `
+              <td><code style="font-weight: 700; color: #2563EB;">${r.registerNumber}</code></td>
+              <td><strong style="color: #0F172A;">${r.studentName}</strong></td>
+              <td><span class="badge-pill ${statusClass}">${r.status}</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Close modal handler
+        const closeHodBtn = document.getElementById('btn-close-hod-modal');
+        if (closeHodBtn) {
+          closeHodBtn.addEventListener('click', () => {
+            const modal = document.getElementById('hod-details-modal');
+            if (modal) modal.style.display = 'none';
+          });
+        }
+
+        function exportHODCSV() {
+          if (hodSessions.length === 0) {
+            showToast('No logs to export.', false);
+            return;
+          }
+
+          let csvContent = 'data:text/csv;charset=utf-8,';
+          csvContent += 'Date,Period,Subject Code,Subject Name,Faculty,Semester,Section,Present Count,Absent Count,Attendance Rate\r\n';
+
+          hodSessions.forEach(s => {
+            csvContent += `${s.date},"${s.period}",${s.subjectCode},"${s.subjectName}","${s.facultyName}",${s.semester},${s.section},${s.presentCount},${s.absentCount},${s.percentage}\r\n`;
+          });
+
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement('a');
+          link.setAttribute('href', encodedUri);
+          link.setAttribute('download', `Attendance_Report_${Date.now()}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast('CSV Report downloaded successfully!', true);
+        }
+
+
+        /* ==========================================
+           2. FACULTY ATTENDANCE IMPLEMENTATION
+           ========================================== */
+        let activeChecklistStudents = [];
+        let facultySubjects = [];
+
+        async function initFacultyView() {
+          // Set Date input default to today
+          const dateInput = document.getElementById('fac-select-date');
+          dateInput.value = new Date().toISOString().split('T')[0];
+
+          // Load Assigned Subjects
+          try {
+            const res = await fetch('/api/attendance/subjects', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Could not load assigned subjects.');
+
+            facultySubjects = await res.json();
+            const select = document.getElementById('fac-select-subject');
+            select.innerHTML = '<option value="">-- Choose Subject --</option>';
+            
+            facultySubjects.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.id;
+              opt.textContent = `${s.code} - ${s.name} (Sem ${s.semester} / Sec ${s.section})`;
+              select.appendChild(opt);
+            });
+
+            select.addEventListener('change', loadStudentChecklist);
+            
+            // Mark all buttons
+            document.getElementById('btn-mark-all-present').addEventListener('click', () => toggleChecklistStatus('Present'));
+            document.getElementById('btn-mark-all-absent').addEventListener('click', () => toggleChecklistStatus('Absent'));
+
+            // Save attendance
+            document.getElementById('btn-save-attendance').addEventListener('click', submitFacultyAttendance);
+
+            // Modal closers
+            document.getElementById('btn-close-fac-modal').addEventListener('click', () => {
+              document.getElementById('faculty-edit-modal').style.display = 'none';
+            });
+            document.getElementById('btn-cancel-edit').addEventListener('click', () => {
+              document.getElementById('faculty-edit-modal').style.display = 'none';
+            });
+            document.getElementById('faculty-edit-form').addEventListener('submit', submitFacultyAttendanceEdits);
+
+            // Load historical logs
+            loadFacultyHistoryLogs();
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        async function loadStudentChecklist() {
+          const subjectId = document.getElementById('fac-select-subject').value;
+          const tbody = document.getElementById('fac-student-checklist-body');
+          tbody.innerHTML = '';
+
+          if (!subjectId) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">Please select a subject to load students.</td></tr>`;
+            return;
+          }
+
+          try {
+            const res = await fetch(`/api/attendance/students?subjectId=${subjectId}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load class roster.');
+
+            activeChecklistStudents = await res.json();
+
+            if (activeChecklistStudents.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">No active students found in this subject's Semester & Section.</td></tr>`;
+              return;
+            }
+
+            activeChecklistStudents.forEach(st => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>${st.registerNumber}</strong></td>
+                <td>${st.name}</td>
+                <td class="text-center">
+                  <label class="attendance-radio-wrap text-success">
+                    <input type="radio" name="status-${st.id}" value="Present" checked style="accent-color: #10b981;">
+                  </label>
+                </td>
+                <td class="text-center">
+                  <label class="attendance-radio-wrap text-danger">
+                    <input type="radio" name="status-${st.id}" value="Absent" style="accent-color: #ef4444;">
+                  </label>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        function toggleChecklistStatus(status) {
+          activeChecklistStudents.forEach(st => {
+            const radio = document.querySelector(`input[name="status-${st.id}"][value="${status}"]`);
+            if (radio) radio.checked = true;
+          });
+        }
+
+        async function submitFacultyAttendance() {
+          const subjectId = document.getElementById('fac-select-subject').value;
+          const date = document.getElementById('fac-select-date').value;
+          const period = document.getElementById('fac-select-period').value;
+
+          if (!subjectId) {
+            showToast('Please select a subject.', false);
+            return;
+          }
+
+          const records = activeChecklistStudents.map(st => {
+            const status = document.querySelector(`input[name="status-${st.id}"]:checked`).value;
+            return { studentId: st.id, status };
+          });
+
+          try {
+            const res = await fetch('/api/attendance/save', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ subjectId, date, period, records })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error saving attendance.');
+
+            showToast('Attendance recorded successfully!', true);
+            loadFacultyHistoryLogs();
+            
+            // reset subject input to trigger clean layout
+            document.getElementById('fac-select-subject').value = '';
+            loadStudentChecklist();
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        async function loadFacultyHistoryLogs() {
+          try {
+            const res = await fetch('/api/attendance/history', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load faculty history logs.');
+
+            const sessions = await res.json();
+            const tbody = document.getElementById('fac-history-table-body');
+            tbody.innerHTML = '';
+
+            if (sessions.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">No recorded attendance sessions found.</td></tr>`;
+              return;
+            }
+
+            sessions.forEach(s => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>${s.date}</strong></td>
+                <td>${s.period}</td>
+                <td><strong>${s.subjectCode}</strong> - ${s.subjectName}</td>
+                <td>Sem ${s.semester} - Sec ${s.section}</td>
+                <td><span class="badge-pill bg-green-light">${s.presentCount} Present</span> / <span class="badge-pill bg-red-light">${s.absentCount} Absent</span></td>
+                <td class="text-right">
+                  <button class="action-tbl-btn bg-green-light btn-edit-session" style="padding:4px 8px; border:none; border-radius:4px; cursor:pointer;">Correct / Edit</button>
+                </td>
+              `;
+
+              tr.querySelector('.btn-edit-session').addEventListener('click', () => {
+                openFacultyCorrectionModal(s);
+              });
+
+              tbody.appendChild(tr);
+            });
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        function openFacultyCorrectionModal(session) {
+          const modal = document.getElementById('faculty-edit-modal');
+          modal.style.display = 'flex';
+
+          document.getElementById('edit-session-id').value = session.id;
+          document.getElementById('fac-edit-meta').innerHTML = `
+            <strong>Date:</strong> ${session.date} | <strong>Period:</strong> ${session.period}<br>
+            <strong>Subject:</strong> ${session.subjectCode} - ${session.subjectName} (Sec ${session.section})
+          `;
+
+          const tbody = document.getElementById('fac-edit-students-body');
+          tbody.innerHTML = '';
+
+          session.records.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><strong>${r.registerNumber}</strong></td>
+              <td>${r.studentName}</td>
+              <td class="text-center">
+                <input type="radio" name="edit-status-${r.studentId}" value="Present" ${r.status === 'Present' ? 'checked' : ''} style="accent-color: #10b981;">
+              </td>
+              <td class="text-center">
+                <input type="radio" name="edit-status-${r.studentId}" value="Absent" ${r.status === 'Absent' ? 'checked' : ''} style="accent-color: #ef4444;">
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        async function submitFacultyAttendanceEdits(e) {
+          e.preventDefault();
+          const sessionId = document.getElementById('edit-session-id').value;
+          const rows = document.querySelectorAll('#fac-edit-students-body tr');
+
+          const records = [];
+          rows.forEach(row => {
+            const radioPresent = row.querySelector('input[value="Present"]');
+            const studentId = radioPresent.name.replace('edit-status-', '');
+            const status = row.querySelector(`input[name="edit-status-${studentId}"]:checked`).value;
+            records.push({ studentId: parseInt(studentId), status });
+          });
+
+          try {
+            const res = await fetch(`/api/attendance/session/${sessionId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ records })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error updating attendance.');
+
+            showToast('Attendance correction saved successfully!', true);
+            document.getElementById('faculty-edit-modal').style.display = 'none';
+            loadFacultyHistoryLogs();
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+
+        /* ==========================================
+           3. STUDENT ATTENDANCE IMPLEMENTATION
+           ========================================== */
+        async function loadStudentAttendance() {
+          try {
+            const res = await fetch('/api/attendance/history', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load student reports.');
+
+            const data = await res.json();
+            
+            // Calculate and bind analytics totals
+            let total = 0;
+            let present = 0;
+            let absent = 0;
+
+            data.subjectStats.forEach(s => {
+              total += s.totalClasses;
+              present += s.present;
+              absent += s.absent;
+            });
+
+            const percentage = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('stud-stats-pct').textContent = `${percentage}%`;
+            document.getElementById('stud-stats-total').textContent = total;
+            document.getElementById('stud-stats-present').textContent = present;
+            document.getElementById('stud-stats-absent').textContent = absent;
+
+            // Render subject stats breakdown
+            const subTbody = document.getElementById('stud-subject-table-body');
+            subTbody.innerHTML = '';
+            
+            if (data.subjectStats.length === 0) {
+              subTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">No logged subject records.</td></tr>`;
+            } else {
+              data.subjectStats.forEach(s => {
+                const pctVal = parseFloat(s.percentage);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td><strong>${s.subjectCode}</strong></td>
+                  <td>${s.subjectName}</td>
+                  <td>${s.facultyName}</td>
+                  <td class="text-center">${s.totalClasses}</td>
+                  <td class="text-center">${s.present}</td>
+                  <td class="text-center">${s.absent}</td>
+                  <td class="text-center"><span class="badge-pill ${pctVal >= 75 ? 'bg-green-light' : 'bg-red-light'}">${s.percentage}</span></td>
+                `;
+                subTbody.appendChild(tr);
+              });
+            }
+
+            // Render detailed log rows
+            const logTbody = document.getElementById('stud-logs-table-body');
+            logTbody.innerHTML = '';
+
+            if (data.records.length === 0) {
+              logTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">No attendance history logged.</td></tr>`;
+            } else {
+              data.records.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td><strong>${r.date}</strong></td>
+                  <td>${r.period}</td>
+                  <td><strong>${r.subjectCode}</strong> - ${r.subjectName}</td>
+                  <td>${r.facultyName}</td>
+                  <td><span class="badge-pill ${r.status === 'Present' ? 'bg-green-light' : 'bg-red-light'}">${r.status}</span></td>
+                `;
+                logTbody.appendChild(tr);
+              });
+            }
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+      });
+    </script>
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

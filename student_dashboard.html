@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Student Portal</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="student_dashboard.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">My Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Apply Leave</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Course Materials</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Student Dashboard</h2>
+              <span class="navbar-subtitle">Academic cycle status & performance logs</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search courses or notices..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="3 Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">3</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">Student</span>
+                <span class="nav-profile-role" id="nav-profile-role">Student</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL MATCHING REFERENCE SCREENSHOT DESIGN -->
+        <div class="workspace-scroll-content" style="padding: 1rem 1rem 90px 1rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Hero Purple Gradient Banner -->
+          <div style="background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #5B21B6 100%); border-radius: 20px; padding: 1.5rem; color: white; position: relative; overflow: hidden; margin-bottom: 1.25rem; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);">
+            <div style="position: relative; z-index: 2; max-width: 65%;">
+              <span style="font-size: 0.95rem; font-weight: 500; opacity: 0.9; display: block;">Good Morning,</span>
+              <h1 id="welcome-user-title" style="font-size: 1.6rem; font-weight: 800; color: white; margin: 0.1rem 0 0.4rem 0; line-height: 1.2;">Hello! 👋</h1>
+              <p style="font-size: 0.8rem; opacity: 0.85; margin: 0;">Stay organized, stay ahead.</p>
+            </div>
+            <div style="position: absolute; right: -10px; bottom: -10px; width: 140px; height: 120px; z-index: 1;">
+              <img src="/purple_student_banner.jpg" alt="3D Cap and books illustration" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+          </div>
+
+          <!-- 2. Quick Action Buttons Row -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; margin-bottom: 1.25rem;">
+            <a href="student_subjects.html" style="background: white; border-radius: 16px; padding: 0.85rem 0.4rem; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; display: flex; flex-direction: column; align-items: center;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #8B5CF6; display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; color: white; font-size: 1.2rem;">📘</div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #1E293B; line-height: 1.2;">Syllabus Copy</span>
+              <span style="font-size: 0.62rem; color: #94A3B8; margin-top: 1px;">Download</span>
+            </a>
+            <a href="student_leave.html" style="background: white; border-radius: 16px; padding: 0.85rem 0.4rem; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; display: flex; flex-direction: column; align-items: center;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #10B981; display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; color: white; font-size: 1.2rem;">📝</div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #1E293B; line-height: 1.2;">Request OD</span>
+              <span style="font-size: 0.62rem; color: #94A3B8; margin-top: 1px;">Apply</span>
+            </a>
+            <a href="student_attendance.html" style="background: white; border-radius: 16px; padding: 0.85rem 0.4rem; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; display: flex; flex-direction: column; align-items: center;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #F59E0B; display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; color: white; font-size: 1.2rem;">📅</div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #1E293B; line-height: 1.2;">Attendance</span>
+              <span style="font-size: 0.62rem; color: #94A3B8; margin-top: 1px;">View</span>
+            </a>
+            <a href="announcements.html" style="background: white; border-radius: 16px; padding: 0.85rem 0.4rem; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; display: flex; flex-direction: column; align-items: center;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #3B82F6; display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; color: white; font-size: 1.2rem;">📢</div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #1E293B; line-height: 1.2;">Notices</span>
+              <span style="font-size: 0.62rem; color: #94A3B8; margin-top: 1px;">View All</span>
+            </a>
+          </div>
+
+          <!-- 3. Search Bar -->
+          <div style="position: relative; margin-bottom: 1.25rem;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 1.1rem;">🔍</span>
+            <input type="text" placeholder="Search courses, notices..." style="width: 100%; background: white; border: 1px solid #E2E8F0; border-radius: 14px; padding: 0.75rem 2.8rem 0.75rem 2.6rem; font-size: 0.85rem; outline: none; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <button aria-label="Filter" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748B;">⚙️</button>
+          </div>
+
+          <!-- 4. Academic Status & Attendance Side-by-Side Cards -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.5rem;">
+            <!-- Academic Status Card -->
+            <div style="background: #F0FDF4; border: 1px solid #DCFCE7; border-radius: 18px; padding: 1rem; position: relative; overflow: hidden;">
+              <span style="font-size: 0.62rem; font-weight: 800; color: #16A34A; letter-spacing: 0.05em; text-transform: uppercase;">ACADEMIC STATUS</span>
+              <div style="margin-top: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+                <div style="width: 22px; height: 22px; border-radius: 50%; background: #16A34A; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">✓</div>
+                <h2 id="student-academic-status" style="font-size: 1.2rem; font-weight: 800; color: #0F172A; margin: 0;">Active</h2>
+              </div>
+              <span style="font-size: 0.7rem; color: #64748B; margin-top: 0.3rem; display: block; font-weight: 500;">Good standing</span>
+            </div>
+
+            <!-- Attendance Donut Chart Card -->
+            <div style="background: white; border: 1px solid #F1F5F9; border-radius: 18px; padding: 1rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+              <span style="font-size: 0.62rem; font-weight: 800; color: #7C3AED; letter-spacing: 0.05em; text-transform: uppercase; display: block; text-align: left; margin-bottom: 0.4rem;">ATTENDANCE</span>
+              <div style="position: relative; width: 68px; height: 68px; margin: 0 auto;">
+                <svg width="68" height="68" viewBox="0 0 36 36">
+                  <path fill="none" stroke="#F1F5F9" stroke-width="3.5" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path id="student-att-circle" fill="none" stroke="#7C3AED" stroke-width="3.5" stroke-dasharray="0, 100" stroke-linecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span id="student-att-val" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.85rem; font-weight: 800; color: #1E293B;">N/A</span>
+              </div>
+              <span id="student-att-sub" style="font-size: 0.65rem; color: #94A3B8; display: block; margin-top: 0.4rem; font-weight: 500;">No attendance recorded</span>
+            </div>
+          </div>
+
+          <!-- 5. Today's Classes List Section -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0;">Today's Classes</h3>
+              <a href="student_attendance.html" style="font-size: 0.78rem; font-weight: 700; color: #7C3AED; text-decoration: none; display: flex; align-items: center; gap: 0.2rem;">View Timetable &rsaquo;</a>
+            </div>
+
+            <div id="timetable-list" style="display: flex; flex-direction: column; gap: 0.65rem;">
+              <!-- Class Item 1 -->
+              <div style="background: white; border-radius: 16px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #F1F5F9; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 40px; height: 40px; border-radius: 12px; background: #F3E8FF; color: #7C3AED; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">💻</div>
+                  <div>
+                    <span style="font-size: 0.68rem; color: #94A3B8; font-weight: 600; display: block;">11:50 - 12:30</span>
+                    <h4 style="font-size: 0.88rem; font-weight: 700; color: #1E293B; margin: 0;">Computer Networks</h4>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="background: #F3E8FF; color: #7C3AED; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-block;">5th Period</span>
+                  <span style="font-size: 0.65rem; color: #94A3B8; display: block; margin-top: 2px;">Room 1.3 Hall</span>
+                </div>
+              </div>
+
+              <!-- Class Item 2 -->
+              <div style="background: white; border-radius: 16px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #F1F5F9; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 40px; height: 40px; border-radius: 12px; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">🌐</div>
+                  <div>
+                    <span style="font-size: 0.68rem; color: #94A3B8; font-weight: 600; display: block;">01:00 - 01:40</span>
+                    <h4 style="font-size: 0.88rem; font-weight: 700; color: #1E293B; margin: 0;">Web Technologies</h4>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="background: #F3E8FF; color: #7C3AED; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-block;">6th Period</span>
+                  <span style="font-size: 0.65rem; color: #94A3B8; display: block; margin-top: 2px;">Room 1.3 Hall</span>
+                </div>
+              </div>
+
+              <!-- Class Item 3 -->
+              <div style="background: white; border-radius: 16px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #F1F5F9; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 40px; height: 40px; border-radius: 12px; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">🔒</div>
+                  <div>
+                    <span style="font-size: 0.68rem; color: #94A3B8; font-weight: 600; display: block;">01:40 - 02:20</span>
+                    <h4 style="font-size: 0.88rem; font-weight: 700; color: #1E293B; margin: 0;">Cryptography & Cyber Security</h4>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="background: #F3E8FF; color: #7C3AED; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-block;">7th Period</span>
+                  <span style="font-size: 0.65rem; color: #94A3B8; display: block; margin-top: 2px;">Room 1.3 Hall</span>
+                </div>
+              </div>
+
+              <!-- Class Item 4 -->
+              <div style="background: white; border-radius: 16px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #F1F5F9; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                  <div style="width: 40px; height: 40px; border-radius: 12px; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">🛡️</div>
+                  <div>
+                    <span style="font-size: 0.68rem; color: #94A3B8; font-weight: 600; display: block;">02:20 - 03:00</span>
+                    <h4 style="font-size: 0.88rem; font-weight: 700; color: #1E293B; margin: 0;">Disaster Risk Reduction & Management</h4>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="background: #F3E8FF; color: #7C3AED; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-block;">8th Period</span>
+                  <span style="font-size: 0.65rem; color: #94A3B8; display: block; margin-top: 2px;">Room 1.3 Hall</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Internal Assessment Marks Section -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0;">Internal Assessment Marks</h3>
+              <a href="student_marks.html" style="background: #F3E8FF; color: #7C3AED; padding: 4px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-decoration: none;">View Marks</a>
+            </div>
+            <div style="background: white; border-radius: 16px; border: 1px solid #F1F5F9; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+              <div class="sms-table-responsive">
+                <table class="sms-data-table min-padding" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: #FAFAFD; font-size: 0.65rem; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #F1F5F9;">
+                      <th style="padding: 10px 14px; text-align: left;">SUBJECT CODE</th>
+                      <th style="padding: 10px 14px; text-align: left;">SUBJECT NAME</th>
+                      <th style="padding: 10px 14px; text-align: left;">EXAM TYPE</th>
+                      <th style="padding: 10px 14px; text-align: right;">MARKS</th>
+                    </tr>
+                  </thead>
+                  <tbody id="student-marks-tbody">
+                    <tr><td colspan="4" style="text-align: center; color: #94A3B8; padding: 1.5rem; font-size: 0.8rem;">📋 No internal marks recorded yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7. Department Notice Board Section -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0;">Department Notice Board</h3>
+              <a href="announcements.html" style="font-size: 0.78rem; font-weight: 700; color: #7C3AED; text-decoration: none;">View All &rsaquo;</a>
+            </div>
+
+            <div id="student-notices-container" style="display: flex; gap: 0.85rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 0.5rem; width: 100%;">
+              <!-- Dynamically populated from backend API or clean empty state -->
+            </div>
+          </div>
+
+        </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) return;
+
+        try {
+          const res = await fetch('/api/dashboard/timetable', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const timetableList = document.getElementById('timetable-list');
+            if (timetableList) {
+              timetableList.innerHTML = '';
+              if (data.isHoliday) {
+                timetableList.innerHTML = `
+                  <div style="text-align: center; padding: 2rem 1rem; color: #6B7280; font-weight: 600;">
+                    <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">🎉</span>
+                    ${data.message}
+                  </div>
+                `;
+              } else {
+                data.timetable.forEach((slot, idx) => {
+                  const lastItem = idx === data.timetable.length - 1;
+                  timetableList.innerHTML += `
+                    <div class="exp-timeline-item" style="margin-bottom: ${lastItem ? '0' : '1.25rem'}; position: relative; padding-left: 1.5rem;">
+                      <span class="exp-bullet success-bg" style="position: absolute; left: 0; top: 5px; width: 10px; height: 10px; border-radius: 50%;"></span>
+                      <h4 class="exp-item-title" style="font-size: 0.88rem; font-weight: 700; margin: 0 0 0.15rem; color: #111827;">Period ${slot.period}: ${slot.subjectCode}</h4>
+                      <span class="exp-item-date" style="font-size: 0.72rem; color: #6B7280; font-weight: 600; display: block; margin-bottom: 0.2rem;">${slot.timeSlot} • Room ${slot.room}</span>
+                      <span class="badge-pill bg-blue-light" style="font-size: 0.62rem; padding: 0.15rem 0.4rem; font-weight: 600;">${slot.subjectName}</span>
+                    </div>
+                  `;
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching timetable:', err);
+        }
+
+        // Load profile stats and marks dynamically
+        try {
+          const profileRes = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profileRes.ok) {
+            const pData = await profileRes.json();
+            
+            // Attendance
+            const att = pData.attendanceStats || {};
+            const attVal = document.getElementById('student-att-val');
+            const attCircle = document.getElementById('student-att-circle');
+            const attSub = document.getElementById('student-att-sub');
+
+            if (attVal && att.percentage !== null && att.percentage !== undefined) {
+              attVal.textContent = `${att.percentage}%`;
+              if (attCircle) attCircle.setAttribute('stroke-dasharray', `${att.percentage}, 100`);
+              if (attSub) attSub.textContent = `${att.presentDays} of ${att.totalDays} Days Present`;
+            } else {
+              if (attVal) attVal.textContent = 'N/A';
+              if (attSub) attSub.textContent = 'No Attendance Recorded';
+            }
+
+            // Marks
+            const marksTbody = document.getElementById('student-marks-tbody');
+            if (marksTbody && pData.marks && pData.marks.length > 0) {
+              marksTbody.innerHTML = pData.marks.map(m => `
+                <tr>
+                  <td><strong>${m.subjectCode}</strong></td>
+                  <td>${m.subjectName}</td>
+                  <td>${m.examType}</td>
+                  <td><strong>${m.marksObtained} / ${m.maxMarks}</strong></td>
+                </tr>
+              `).join('');
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching student profile stats:', e);
+        }
+
+        // Load Notices dynamically from backend API ONLY
+        async function loadStudentAnnouncements() {
+          try {
+            const notRes = await fetch('/api/announcements', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const container = document.getElementById('student-notices-container');
+            
+            if (notRes.ok) {
+              const notices = await notRes.json();
+
+              if (container) {
+                if (Array.isArray(notices) && notices.length > 0) {
+                  container.style.overflowX = 'auto';
+                  container.innerHTML = notices.map(n => {
+                    const dateStr = new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const categoryUpper = (n.category || 'ACADEMIC').toUpperCase();
+                    
+                    return `
+                      <div style="min-width: 250px; max-width: 300px; flex: 0 0 auto; background: white; border-radius: 16px; padding: 1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                            <span style="font-size: 1.1rem;">📌</span>
+                            <span style="background: #F3E8FF; color: #7C3AED; font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.04em;">${categoryUpper}</span>
+                          </div>
+                          <h4 style="font-size: 0.85rem; font-weight: 700; color: #1E293B; margin: 0 0 0.4rem 0; line-height: 1.35;">${n.title}</h4>
+                          <p style="font-size: 0.78rem; color: #64748B; margin: 0 0 0.75rem 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.content || ''}</p>
+                        </div>
+                        <div style="border-top: 1px solid #F1F5F9; padding-top: 0.5rem; margin-top: 0.25rem;">
+                          <span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500; display: block;">${dateStr} • Posted by <strong style="color: #475569;">${n.posterName || 'Department'}</strong></span>
+                        </div>
+                      </div>
+                    `;
+                  }).join('');
+                } else {
+                  // Empty state when 0 published announcements available
+                  container.style.overflowX = 'hidden';
+                  container.innerHTML = `
+                    <div style="width: 100%; text-align: center; padding: 2.5rem 1.5rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                      <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">📢</span>
+                      <h4 style="font-size: 1.05rem; font-weight: 700; color: #0F172A; margin: 0 0 0.25rem 0;">No announcements yet</h4>
+                      <p style="font-size: 0.85rem; color: #64748B; margin: 0;">There are no new notices or announcements from the department.</p>
+                    </div>
+                  `;
+                }
+              }
+            } else {
+              if (container) {
+                container.style.overflowX = 'hidden';
+                container.innerHTML = `
+                  <div style="width: 100%; text-align: center; padding: 2.5rem 1.5rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">📢</span>
+                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #0F172A; margin: 0 0 0.25rem 0;">No announcements yet</h4>
+                    <p style="font-size: 0.85rem; color: #64748B; margin: 0;">There are no new notices or announcements from the department.</p>
+                  </div>
+                `;
+              }
+            }
+          } catch (e) {
+            console.error('Error fetching announcements:', e);
+          }
+        }
+
+        loadStudentAnnouncements();
+
+        window.addEventListener('sms:realtime_event', (e) => {
+          const data = e.detail || {};
+          if (data.type === 'ANNOUNCEMENT_PUBLISHED' || data.type === 'NOTIFICATION_CREATED') {
+            loadStudentAnnouncements();
+          }
+        });
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="student_dashboard.html" class="bottom-nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="student_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="student_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Marks</span>
+      </a>
+      <a href="student_leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">Leave</span>
+      </a>
+      <a href="student_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+  </body>
+</html>

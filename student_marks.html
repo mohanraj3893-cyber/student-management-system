@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Internal Marks | Student Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+
+      .badge-not-updated {
+        background-color: #FEF3C7;
+        color: #D97706;
+        border: 1px solid #FCD34D;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .dark-theme .badge-not-updated {
+        background-color: rgba(217, 119, 6, 0.15);
+        color: #FBBF24;
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+    </style>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- LEFT SIDEBAR NAVIGATION -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Student Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="student_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">My Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_marks.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Apply Leave</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Course Materials</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN WORKSPACE CONTENT PANEL -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">My Assessment Marks</h2>
+              <span class="navbar-subtitle">Official internal assessment marks fetched from database</span>
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-student-name">Student</span>
+                <span class="nav-profile-role" id="nav-student-reg">Register No</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL MATCHING REFERENCE SCREENSHOT DESIGN -->
+        <div class="workspace-scroll-content" style="padding: 1rem 1rem 90px 1rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Top Greeting Card -->
+          <div style="background: white; border-radius: 20px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
+            <div>
+              <h2 id="marks-student-greeting" style="font-size: 1.3rem; font-weight: 800; color: #0F172A; margin: 0;">Hello, Student! 👋</h2>
+              <p style="font-size: 0.78rem; color: #64748B; margin: 0.25rem 0 0 0;">Official internal assessment marks fetched from database</p>
+            </div>
+            <div style="text-align: right;">
+              <a href="/role_selection.html" style="background: #EFF6FF; color: #2563EB; font-size: 0.75rem; font-weight: 700; padding: 6px 12px; border-radius: 8px; text-decoration: none; display: inline-block; margin-bottom: 0.35rem;">&larr; Back to Role Selection</a>
+              <span id="marks-student-reg-display" style="font-size: 0.7rem; color: #94A3B8; display: block; font-weight: 500;">512724104002</span>
+            </div>
+          </div>
+
+          <!-- 2. Horizontal Exam Tabs Bar -->
+          <div style="display: flex; gap: 1.25rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 1.25rem; padding: 0 0.5rem;">
+            <button class="profile-tab-btn active" id="btn-ia-1" style="background: transparent; border: none; border-bottom: 3px solid #7C3AED; color: #7C3AED; font-weight: 700; font-size: 0.9rem; padding: 0.6rem 0.25rem; cursor: pointer;">IA &ndash; 1</button>
+            <button class="profile-tab-btn" id="btn-ia-2" style="background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748B; font-weight: 600; font-size: 0.9rem; padding: 0.6rem 0.25rem; cursor: pointer;">IA &ndash; 2</button>
+            <button class="profile-tab-btn" id="btn-model" style="background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748B; font-weight: 600; font-size: 0.9rem; padding: 0.6rem 0.25rem; cursor: pointer;">Model Exam</button>
+          </div>
+
+          <!-- 3. Marks Table Card Container -->
+          <div style="background: white; border-radius: 20px; border: 1px solid #F1F5F9; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 1.5rem;">
+            <div class="sms-table-responsive">
+              <table class="sms-data-table min-padding" id="marks-card-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: #FAFAFD; border-bottom: 1px solid #F1F5F9; font-size: 0.65rem; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <th style="padding: 12px 16px; text-align: left;">SUBJECT</th>
+                    <th style="padding: 12px 16px; text-align: left;">FACULTY ADVISOR</th>
+                    <th style="padding: 12px 16px; text-align: left;">MARKS SECURED</th>
+                    <th style="padding: 12px 16px; text-align: left;">STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="student-marks-tbody">
+                  <!-- Dynamically populated from backend -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
+            <div class="footer-right"><span>Computer Science &amp; Engineering Department</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html?role=student';
+          return;
+        }
+
+        const tbody = document.getElementById('student-marks-tbody');
+        const subjectSelector = document.getElementById('calc-select-subject');
+        const targetSelector = document.getElementById('calc-target-grade');
+
+        let rawGradesList = [];
+        let activeExamTab = 'IA-1';
+
+        // Load Student Profile for header
+        try {
+          const profRes = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profRes.ok) {
+            const p = await profRes.json();
+            const sName = p.name || 'Student';
+            const regNo = p.registerNumber || p.username || '';
+            
+            const marksGreet = document.getElementById('marks-student-greeting');
+            if (marksGreet) marksGreet.textContent = `Hello, ${sName}! 👋`;
+            const marksRegDisp = document.getElementById('marks-student-reg-display');
+            if (marksRegDisp) marksRegDisp.textContent = regNo;
+
+            const navName = document.getElementById('nav-student-name');
+            if (navName) navName.textContent = sName;
+            const sideName = document.getElementById('sidebar-student-name');
+            if (sideName) sideName.textContent = sName;
+            const navReg = document.getElementById('nav-student-reg');
+            if (navReg) navReg.textContent = regNo;
+            const sideSub = document.getElementById('sidebar-student-sub');
+            if (sideSub) sideSub.textContent = `${p.year || ''} (${p.section || 'A'})`;
+
+            const photoUrl = (window.getAvatarUrl ? window.getAvatarUrl(typeof sName !== 'undefined' ? sName : (typeof fName !== 'undefined' ? fName : (p?.name || 'User')), profData?.photoPath || p?.photoPath || user?.photoPath) : (profData?.photoPath || p?.photoPath || user?.photoPath || ''));
+            const navAv = document.getElementById('nav-student-avatar');
+            if (navAv) navAv.src = photoUrl;
+            const sideAv = document.getElementById('sidebar-student-avatar');
+            if (sideAv) sideAv.src = photoUrl;
+          }
+        } catch (e) {
+          console.error('Error loading student profile:', e);
+        }
+
+        // Fetch Official Internal Marks from Database
+        try {
+          const res = await fetch('/api/marks/grades', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (!res.ok) {
+            throw new Error('Failed to load internal marks from database.');
+          }
+
+          rawGradesList = await res.json();
+          renderTabMarks(activeExamTab);
+          populateCalculatorSubjects();
+
+        } catch (err) {
+          console.error(err);
+        }
+
+        function renderTabMarks(examTab) {
+          tbody.innerHTML = '';
+          if (rawGradesList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 2.5rem; font-weight: 500;">No subjects assigned for your Department, Year, Semester, and Section.</td></tr>`;
+            return;
+          }
+          const filtered = rawGradesList.filter(g => g.examType === examTab);
+
+          if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 2.5rem; font-weight: 500;">No subjects assigned for your Department, Year, Semester, and Section.</td></tr>`;
+            return;
+          }
+
+          filtered.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid #F1F5F9';
+            
+            if (item.isUpdated && item.marksObtained !== null) {
+              const passBadge = item.isPass 
+                ? '<span style="background: #DCFCE7; color: #16A34A; border: 1px solid #86EFAC; font-size: 0.68rem; font-weight: 700; padding: 4px 12px; border-radius: 12px; display: inline-block;">Pass</span>' 
+                : '<span style="background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; font-size: 0.68rem; font-weight: 700; padding: 4px 12px; border-radius: 12px; display: inline-block;">Fail</span>';
+
+              tr.innerHTML = `
+                <td style="padding: 14px 16px;">
+                  <strong style="font-size: 0.88rem; color: #0F172A; display: block;">${item.subjectCode}</strong>
+                  <span style="font-size: 0.75rem; color: #64748B; display: block; margin-top: 2px;">${item.subjectName}</span>
+                </td>
+                <td style="padding: 14px 16px; font-size: 0.85rem; font-weight: 500; color: #1E293B;">${item.facultyName}</td>
+                <td style="padding: 14px 16px;"><strong style="color: #0F172A; font-size: 0.95rem;">${item.marksObtained}</strong> <span style="color: #64748B;">/ ${item.maxMarks}</span></td>
+                <td style="padding: 14px 16px;">${passBadge}</td>
+              `;
+            } else {
+              // Unentered / Not Updated State
+              tr.innerHTML = `
+                <td style="padding: 14px 16px;">
+                  <strong style="font-size: 0.88rem; color: #0F172A; display: block;">${item.subjectCode}</strong>
+                  <span style="font-size: 0.75rem; color: #64748B; display: block; margin-top: 2px;">${item.subjectName}</span>
+                </td>
+                <td style="padding: 14px 16px; font-size: 0.85rem; font-weight: 500; color: #1E293B;">${item.facultyName}</td>
+                <td style="padding: 14px 16px; font-size: 0.82rem; color: #64748B; font-style: italic;">Marks Not Updated</td>
+                <td style="padding: 14px 16px;"><span style="background: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; font-size: 0.68rem; font-weight: 700; padding: 4px 12px; border-radius: 12px; display: inline-block;">Not Published</span></td>
+              `;
+            }
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Setup Tab Click Listeners
+        const tabsMap = {
+          'btn-ia-1': 'IA-1',
+          'btn-ia-2': 'IA-2',
+          'btn-model': 'Model Exam'
+        };
+
+        Object.keys(tabsMap).forEach(btnId => {
+          const btn = document.getElementById(btnId);
+          if (btn) {
+            btn.addEventListener('click', (e) => {
+              document.querySelectorAll('.profile-tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.borderBottom = '3px solid transparent';
+                b.style.color = '#64748B';
+                b.style.fontWeight = '600';
+              });
+              e.target.classList.add('active');
+              e.target.style.borderBottom = '3px solid #7C3AED';
+              e.target.style.color = '#7C3AED';
+              e.target.style.fontWeight = '700';
+
+              activeExamTab = tabsMap[btnId];
+              renderTabMarks(activeExamTab);
+            });
+          }
+        });
+
+        // Calculator Subject Population
+        function populateCalculatorSubjects() {
+          if (!subjectSelector) return;
+          subjectSelector.innerHTML = '';
+
+          // Group by unique subject code
+          const subjectMap = {};
+          rawGradesList.forEach(g => {
+            if (!subjectMap[g.subjectCode]) {
+              subjectMap[g.subjectCode] = {
+                code: g.subjectCode,
+                name: g.subjectName,
+                ia1: null,
+                ia2: null
+              };
+            }
+            if (g.examType === 'IA-1' && g.isUpdated) subjectMap[g.subjectCode].ia1 = g.marksObtained;
+            if (g.examType === 'IA-2' && g.isUpdated) subjectMap[g.subjectCode].ia2 = g.marksObtained;
+          });
+
+          const codes = Object.keys(subjectMap);
+          if (codes.length === 0) {
+            subjectSelector.innerHTML = '<option value="">No subjects found</option>';
+            return;
+          }
+
+          codes.forEach(code => {
+            const s = subjectMap[code];
+            const opt = document.createElement('option');
+            opt.value = code;
+            opt.setAttribute('data-ia1', s.ia1 !== null ? s.ia1 : '');
+            opt.setAttribute('data-ia2', s.ia2 !== null ? s.ia2 : '');
+            
+            const ia1Txt = s.ia1 !== null ? s.ia1 : 'Unpublished';
+            const ia2Txt = s.ia2 !== null ? s.ia2 : 'Unpublished';
+            opt.textContent = `${s.code} - ${s.name} (IA1: ${ia1Txt}, IA2: ${ia2Txt})`;
+            subjectSelector.appendChild(opt);
+          });
+
+          runGradeCalculation();
+        }
+
+        function runGradeCalculation() {
+          if (!subjectSelector || !targetSelector || subjectSelector.options.length === 0) return;
+          const opt = subjectSelector.options[subjectSelector.selectedIndex];
+          if (!opt) return;
+
+          const rawIa1 = opt.getAttribute('data-ia1');
+          const rawIa2 = opt.getAttribute('data-ia2');
+
+          const intDisplay = document.getElementById('calc-display-internal');
+          const extDisplay = document.getElementById('calc-display-external-raw');
+          const pctDisplay = document.getElementById('calc-display-percentage');
+
+          if (!rawIa1 && !rawIa2) {
+            intDisplay.textContent = '- / 20';
+            extDisplay.textContent = '- / 80';
+            pctDisplay.textContent = 'Marks Not Published';
+            pctDisplay.style.color = '#D97706';
+            return;
+          }
+
+          const ia1 = rawIa1 !== '' ? parseFloat(rawIa1) : 0;
+          const ia2 = rawIa2 !== '' ? parseFloat(rawIa2) : 0;
+          const count = (rawIa1 !== '' ? 1 : 0) + (rawIa2 !== '' ? 1 : 0);
+          const target = parseFloat(targetSelector.value);
+
+          const avgScore = count > 0 ? (ia1 + ia2) / count : 0;
+          const internalOut20 = (avgScore / 100) * 20;
+          const externalNeeded80 = Math.max(0, target - internalOut20);
+          const universityExamPercent = (externalNeeded80 / 80) * 100;
+
+          intDisplay.textContent = `${internalOut20.toFixed(2)} / 20`;
+          extDisplay.textContent = `${externalNeeded80.toFixed(2)} / 80`;
+
+          if (universityExamPercent > 100) {
+            pctDisplay.textContent = 'Not Reachable';
+            pctDisplay.style.color = '#EF4444';
+          } else {
+            pctDisplay.textContent = `${universityExamPercent.toFixed(2)}%`;
+            pctDisplay.style.color = '#10B981';
+          }
+        }
+
+        if (subjectSelector && targetSelector) {
+          subjectSelector.addEventListener('change', runGradeCalculation);
+          targetSelector.addEventListener('change', runGradeCalculation);
+        }
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="student_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="student_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="student_marks.html" class="bottom-nav-item active">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Marks</span>
+      </a>
+      <a href="student_leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">Leave</span>
+      </a>
+      <a href="student_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

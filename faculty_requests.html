@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Requests | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title" style="font-size: 0.8rem; font-weight: 800;">CSE Portal</h4>
+              <span class="logo-subtitle">Faculty Workspace</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="faculty_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_assignments.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Assignments</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Exams & Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_resources.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📁</span>
+                <span class="menu-item-text">Resources</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_requests.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Student Leave Requests</h2>
+              <span class="navbar-subtitle">Approve or reject leave logs submitted by your mentees</span>
+            </div>
+          </div>
+          <div class="navbar-right">
+            <span class="navbar-divider"></span>
+            <div class="nav-profile-block">
+              <div class="profile-block-txt"><span class="nav-profile-name" id="nav-profile-name">--</span></div>
+              <img class="nav-profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace-scroll-content">
+          
+          <div id="requests-alert-banner" style="display: none; padding: 12px 16px; border-radius: 10px; margin-bottom: 1.5rem; font-size: 14px; font-weight: 600;"></div>
+
+          <div class="workspace-column-card">
+            
+            <div class="profile-tabs-header" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem;">
+              <button class="profile-tab-btn active" id="tab-pending-btn" style="padding: 0.6rem 1.25rem; font-weight: 700; border-radius: 10px; cursor: pointer;">Pending Leave Requests (<span id="pending-count">0</span>)</button>
+              <button class="profile-tab-btn" id="tab-history-btn" style="padding: 0.6rem 1.25rem; font-weight: 700; border-radius: 10px; cursor: pointer;">Past Log History (<span id="history-count">0</span>)</button>
+            </div>
+
+            <div class="registrations-approval-list" id="requests-list-container">
+              <div style="text-align: center; color: #94A3B8; padding: 2rem;">Loading student leave requests...</div>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Computer Science &amp; Engineering Department Portal • Version 1.0</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html?role=faculty';
+          return;
+        }
+
+        const container = document.getElementById('requests-list-container');
+        const pendingBtn = document.getElementById('tab-pending-btn');
+        const historyBtn = document.getElementById('tab-history-btn');
+        const pendingCountEl = document.getElementById('pending-count');
+        const historyCountEl = document.getElementById('history-count');
+        const alertBanner = document.getElementById('requests-alert-banner');
+
+        let activeTab = 'pending'; // 'pending' | 'history'
+        let allRequests = [];
+
+        function showAlert(msg, isError = false) {
+          if (!alertBanner) return;
+          alertBanner.style.display = 'block';
+          if (isError) {
+            alertBanner.style.background = 'rgba(239, 68, 68, 0.1)';
+            alertBanner.style.color = '#EF4444';
+            alertBanner.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+            alertBanner.innerHTML = `⚠️ ${msg}`;
+          } else {
+            alertBanner.style.background = 'rgba(16, 185, 129, 0.1)';
+            alertBanner.style.color = '#10B981';
+            alertBanner.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+            alertBanner.innerHTML = `✅ ${msg}`;
+          }
+          setTimeout(() => {
+            alertBanner.style.display = 'none';
+          }, 4000);
+        }
+
+        // Fetch Faculty Profile for navbar header
+        try {
+          const profRes = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profRes.ok) {
+            const p = await profRes.json();
+            const fName = p.name || 'Faculty Member';
+            document.querySelectorAll('.nav-profile-name, .profile-widget-name').forEach(el => el.textContent = fName);
+            if (p.photoPath) {
+              document.querySelectorAll('.nav-profile-avatar img, .profile-widget-avatar img').forEach(el => el.src = p.photoPath);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        // Real-Time Event listener for live updates
+        window.addEventListener('sms:realtime_event', () => {
+          loadLeaveRequests();
+        });
+
+        // Load Leave Requests from Database
+        async function loadLeaveRequests() {
+          try {
+            const res = await fetch('/api/leaves/requests', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load leave applications.');
+            const data = await res.json();
+            allRequests = data.requests || [];
+
+            const pendingList = allRequests.filter(r => r.status === 'PENDING_CLASS_INCHARGE' || r.status === 'Pending');
+            const historyList = allRequests.filter(r => r.status !== 'PENDING_CLASS_INCHARGE' && r.status !== 'Pending');
+
+            if (pendingCountEl) pendingCountEl.textContent = pendingList.length;
+            if (historyCountEl) historyCountEl.textContent = historyList.length;
+
+            renderList();
+          } catch (err) {
+            console.error(err);
+            if (container) {
+              container.innerHTML = `<div style="text-align: center; color: #EF4444; padding: 2rem;">Error: ${err.message}</div>`;
+            }
+          }
+        }
+
+        function renderList() {
+          if (!container) return;
+          const list = activeTab === 'pending' 
+            ? allRequests.filter(r => r.status === 'PENDING_CLASS_INCHARGE' || r.status === 'Pending')
+            : allRequests.filter(r => r.status !== 'PENDING_CLASS_INCHARGE' && r.status !== 'Pending');
+
+          if (list.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: #94A3B8; padding: 2.5rem; font-size: 0.9rem;">
+              ${activeTab === 'pending' ? 'No pending leave applications awaiting Class Incharge review.' : 'No past leave history recorded yet.'}
+            </div>`;
+            return;
+          }
+
+          container.innerHTML = list.map(item => {
+            const sName = item.student ? item.student.name : 'Student';
+            const regNo = item.student ? item.student.registerNumber : 'N/A';
+            const days = item.numberOfDays || 1;
+            const docLink = item.supportingDocument ? `<a href="${item.supportingDocument}" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: underline;">View Document</a>` : '<span style="color: #94A3B8;">None</span>';
+            
+            let statusBadgeClass = 'bg-blue-light';
+            let statusLabel = item.status;
+            if (item.status === 'APPROVED' || item.status === 'Approved') {
+              statusBadgeClass = 'bg-green-light';
+              statusLabel = 'Approved by HOD';
+            } else if (item.status === 'PENDING_HOD') {
+              statusBadgeClass = 'bg-orange-light';
+              statusLabel = 'Pending HOD Approval';
+            } else if (item.status === 'REJECTED_BY_CLASS_INCHARGE') {
+              statusBadgeClass = 'bg-red-light';
+              statusLabel = 'Rejected by Class Incharge';
+            } else if (item.status === 'REJECTED_BY_HOD' || item.status === 'Rejected') {
+              statusBadgeClass = 'bg-red-light';
+              statusLabel = 'Rejected by HOD';
+            } else if (item.status === 'PENDING_CLASS_INCHARGE' || item.status === 'Pending') {
+              statusBadgeClass = 'bg-blue-light';
+              statusLabel = 'Pending Incharge Review';
+            }
+
+            const isPendingStage1 = item.status === 'PENDING_CLASS_INCHARGE' || item.status === 'Pending';
+
+            return `
+              <div class="approval-card-item" style="margin-bottom: 1rem; padding: 1.25rem; border: 1px solid #E2E8F0; border-radius: 14px; background: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div class="approval-card-info" style="text-align: left; flex: 1; min-width: 250px;">
+                  <h4 class="student-approval-name" style="font-size: 1rem; font-weight: 700; color: #0F172A; margin: 0 0 0.35rem 0;">${sName} (${regNo})</h4>
+                  <p class="student-approval-details" style="font-size: 0.82rem; color: #475569; margin: 0 0 0.25rem 0;">
+                    Category: <strong>${item.leaveType || 'Leave'}</strong> | Duration: <strong>${item.fromDate} to ${item.toDate} (${days} ${days === 1 ? 'Day' : 'Days'})</strong>
+                  </p>
+                  <p class="student-approval-details" style="font-size: 0.8rem; color: #64748B; margin: 0 0 0.25rem 0;">Reason: <em>${item.reason || 'N/A'}</em></p>
+                  <p class="student-approval-doc" style="font-size: 0.8rem; color: #64748B; margin: 0;">Uploaded Document: ${docLink}</p>
+                </div>
+                <div class="approval-card-actions" style="display: flex; align-items: center; gap: 0.75rem;">
+                  ${isPendingStage1 ? `
+                    <button class="btn btn-sm btn-success approve-btn" data-id="${item.id}" style="padding: 0.55rem 1.25rem; font-weight: 700; border-radius: 8px;">Approve & Forward to HOD</button>
+                    <button class="btn btn-sm btn-danger reject-btn" data-id="${item.id}" style="padding: 0.55rem 1.25rem; font-weight: 700; border-radius: 8px;">Reject</button>
+                  ` : `
+                    <span class="badge-pill ${statusBadgeClass}" style="font-weight: 700; font-size: 0.85rem; padding: 0.4rem 0.85rem;">${statusLabel}</span>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Attach Approve Handlers
+          container.querySelectorAll('.approve-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const id = btn.getAttribute('data-id');
+              const remarks = prompt('Enter HOD/Faculty Approval Remarks (Optional):') || '';
+              btn.disabled = true;
+              btn.textContent = 'Processing...';
+
+              try {
+                const res = await fetch(`/api/leaves/${id}/approve`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({ hodRemarks: remarks })
+                });
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message || 'Failed to approve leave request.');
+
+                showAlert('Leave request approved successfully!');
+                await loadLeaveRequests();
+              } catch (err) {
+                showAlert(err.message, true);
+                btn.disabled = false;
+                btn.textContent = 'Approve';
+              }
+            });
+          });
+
+          // Attach Reject Handlers
+          container.querySelectorAll('.reject-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const id = btn.getAttribute('data-id');
+              const reason = prompt('Enter Rejection Reason (Required):');
+              if (!reason || reason.trim() === '') {
+                showAlert('Rejection reason is required.', true);
+                return;
+              }
+              btn.disabled = true;
+              btn.textContent = 'Processing...';
+
+              try {
+                const res = await fetch(`/api/leaves/${id}/reject`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({ rejectionReason: reason })
+                });
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message || 'Failed to reject leave request.');
+
+                showAlert('Leave request rejected.');
+                await loadLeaveRequests();
+              } catch (err) {
+                showAlert(err.message, true);
+                btn.disabled = false;
+                btn.textContent = 'Reject';
+              }
+            });
+          });
+        }
+
+        // Tab Switching
+        pendingBtn.addEventListener('click', () => {
+          activeTab = 'pending';
+          pendingBtn.classList.add('active');
+          historyBtn.classList.remove('active');
+          renderList();
+        });
+
+        historyBtn.addEventListener('click', () => {
+          activeTab = 'history';
+          historyBtn.classList.add('active');
+          pendingBtn.classList.remove('active');
+          renderList();
+        });
+
+        await loadLeaveRequests();
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams &amp; Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+  </body>
+</html>

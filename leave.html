@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leave Requests | CSE Portal</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Link existing stylesheet -->
+    <link rel="stylesheet" href="/src/style.css" />
+
+    <!-- Red & White Theme Custom Overrides -->
+    <style>
+      :root {
+        --primary-red: var(--primary-blue, #0056D2);
+        --dark-red: var(--dark-blue, #0043A4);
+        --light-red: var(--light-blue, #E6F0FD);
+        --white: #FFFFFF;
+        --bg-color: #F8F9FA;
+        --text-color: #212121;
+        --border-color: #E0E0E0;
+      }
+
+      body.dashboard-body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Inter', sans-serif;
+      }
+
+      /* Sidebar Overrides */
+      .sidebar-panel {
+        background: var(--dark-red) !important;
+      }
+      .sidebar-logo-block {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .logo-icon.light {
+        background: var(--primary-red) !important;
+      }
+      .sidebar-menu-item.active {
+        background: var(--primary-red) !important;
+        color: var(--white) !important;
+        border-left: 4px solid var(--white);
+      }
+      .sidebar-menu-item:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: var(--white) !important;
+      }
+      .sidebar-profile-widget {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.15);
+      }
+
+      /* Top Navbar Overrides */
+      .workspace-top-navbar {
+        background: var(--white);
+        border-bottom: 1px solid var(--border-color);
+      }
+      .bell-badge-count {
+        background-color: var(--primary-red) !important;
+      }
+
+      /* Statistics Grid */
+      .stats-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      @media (max-width: 1024px) {
+        .stats-cards-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .stats-cards-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .stat-card {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+      }
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+      .stat-icon.total { background: #E3F2FD; color: #1565C0; }
+      .stat-icon.pending { background: #FFF3E0; color: #E65100; }
+      .stat-icon.approved { background: #E8F5E9; color: #2E7D32; }
+      .stat-icon.rejected { background: var(--light-red); color: var(--primary-red); }
+
+      .stat-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .stat-val {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-color);
+        line-height: 1.2;
+      }
+      .stat-label {
+        font-size: 0.78rem;
+        color: #78909C;
+        font-weight: 600;
+      }
+
+      /* Filters Toolbar */
+      .filters-toolbar {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+      }
+      @media (max-width: 900px) {
+        .filters-toolbar {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 600px) {
+        .filters-toolbar {
+          grid-template-columns: 1fr;
+        }
+      }
+      .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .filter-item label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #546E7A;
+      }
+      .filter-item input, .filter-item select {
+        border: 1.5px solid var(--border-color);
+        border-radius: 6px;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+        outline: none;
+        background-color: var(--white);
+      }
+      .filter-item input:focus, .filter-item select:focus {
+        border-color: var(--primary-red);
+        box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1);
+      }
+
+      /* Container card for the table */
+      .workspace-column-card {
+        background: var(--white) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02) !important;
+        padding: 1.5rem !important;
+      }
+      .column-card-title {
+        color: var(--dark-red);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        border-bottom: 2px solid var(--light-red);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.25rem;
+      }
+
+      /* Table and Actions */
+      .data-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .data-grid-table th {
+        background-color: var(--light-red) !important;
+        color: var(--dark-red) !important;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 2px solid var(--border-color);
+      }
+      .data-grid-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.85rem;
+        color: var(--text-color);
+      }
+      .data-grid-table tbody tr:hover {
+        background-color: #FAFAFA;
+      }
+
+      .btn {
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+      }
+      .btn-primary {
+        background-color: var(--primary-red);
+        color: var(--white);
+      }
+      .btn-primary:hover {
+        background-color: var(--dark-red);
+      }
+      .btn-success {
+        background-color: #2E7D32;
+        color: var(--white);
+      }
+      .btn-success:hover {
+        background-color: #1B5E20;
+      }
+      .btn-danger {
+        background-color: #D32F2F;
+        color: var(--white);
+      }
+      .btn-danger:hover {
+        background-color: #C62828;
+      }
+      .btn-outline {
+        border-color: var(--border-color);
+        background: transparent;
+        color: #37474F;
+      }
+      .btn-outline:hover {
+        background-color: #ECEFF1;
+      }
+
+      /* Badge status indicators */
+      .badge-pill {
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        text-align: center;
+      }
+      .badge-pill.bg-orange-light {
+        background-color: #FFF3E0 !important;
+        color: #E65100 !important;
+        border: 1px solid #FFE0B2;
+      }
+      .badge-pill.bg-green-light {
+        background-color: #E8F5E9 !important;
+        color: #1B5E20 !important;
+        border: 1px solid #C8E6C9;
+      }
+      .badge-pill.bg-red-light {
+        background-color: var(--light-red) !important;
+        color: var(--dark-red) !important;
+        border: 1px solid #FFCDD2;
+      }
+
+      /* Dynamic Toasts */
+      .toast-notification {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        padding: 1rem 1.5rem;
+        border-radius: 6px;
+        color: var(--white);
+        font-size: 0.88rem;
+        font-weight: 600;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-20px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 9999;
+      }
+      .toast-notification.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast-notification.success {
+        background: #2E7D32;
+        border: 1px solid rgba(46, 125, 50, 0.2);
+      }
+      .toast-notification.error {
+        background: var(--primary-red);
+        border: 1px solid rgba(198, 40, 40, 0.2);
+      }
+
+      /* Notification dropdown panel */
+      .notif-dropdown-wrapper {
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        width: 320px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        display: none;
+        z-index: 1000;
+        overflow: hidden;
+      }
+      .notif-dropdown-header {
+        background: var(--light-red);
+        color: var(--dark-red);
+        padding: 0.8rem 1rem;
+        font-weight: 700;
+        font-size: 0.88rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .notif-dropdown-list {
+        max-height: 250px;
+        overflow-y: auto;
+      }
+      .notif-dropdown-item {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #ECEFF1;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .notif-dropdown-item:hover {
+        background: var(--light-red);
+      }
+      .notif-dropdown-item.unread {
+        border-left: 3px solid var(--primary-red);
+        font-weight: 600;
+      }
+
+      /* Modal Dialog Styling */
+      .modal-dialog-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        display: none;
+      }
+      .modal-dialog-card {
+        background: var(--white);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+        overflow: hidden;
+        animation: scaleUp 0.2s ease-out;
+      }
+      @keyframes scaleUp {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .modal-dialog-header {
+        background: var(--primary-red);
+        color: var(--white);
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-dialog-close {
+        background: transparent;
+        border: none;
+        color: var(--white);
+        font-size: 1.25rem;
+        cursor: pointer;
+      }
+      .modal-dialog-body {
+        padding: 1.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      .modal-info-section {
+        margin-bottom: 1.25rem;
+      }
+      .modal-info-section h4 {
+        color: var(--primary-red);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.3rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .modal-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+      }
+      .modal-info-item span.label {
+        font-size: 0.78rem;
+        color: #78909C;
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .modal-info-item span.value {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    </style>
+    
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <i class="fa-solid fa-graduation-cap" style="color: white; font-size: 1.1rem;"></i>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item" id="logout-btn">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img id="sidebar-profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <i class="fa-solid fa-bars" style="font-size: 1.1rem;"></i>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Student Leave Requests</h2>
+              <span class="navbar-subtitle leave-dept-subtitle">Approve or reject leave & duty requests from CSE department</span>
+            </div>
+          </div>
+
+          <div class="navbar-right" style="position: relative;">
+            <button class="nav-action-btn notification-bell-btn" id="notif-bell" aria-label="Notifications">
+              <i class="fa-solid fa-bell"></i>
+              <span class="bell-badge-count" id="notif-count">0</span>
+            </button>
+
+            <!-- Notifications Dropdown -->
+            <div class="notif-dropdown-wrapper" id="notif-dropdown">
+              <div class="notif-dropdown-header">
+                <span>Notifications</span>
+                <a href="#" style="font-size: 0.75rem; text-decoration: underline;" id="notif-mark-all">Mark all read</a>
+              </div>
+              <div class="notif-dropdown-list" id="notif-dropdown-list">
+                <div style="text-align: center; color: #78909C; padding: 1.5rem; font-size: 0.8rem;">No new notifications.</div>
+              </div>
+            </div>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">Loading...</span>
+                <span class="nav-profile-role" id="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar">
+                <img id="nav-profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- DASHBOARD WORKSPACE SCROLL CONTENT -->
+        <div class="workspace-scroll-content" style="padding: 1.25rem 1.25rem 90px 1.25rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Page Header Welcome Title & Subtitle -->
+          <div style="margin-bottom: 1.25rem; padding: 0 0.25rem;">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0;">
+              Student Leave Requests
+            </h2>
+            <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;" class="leave-dept-subtitle">
+              Approve or reject leave &amp; duty requests from CSE department
+            </p>
+          </div>
+
+          <!-- 2. 4 Metrics Overview Cards (2x2 Grid) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.25rem;">
+            <!-- Total Requests -->
+            <div style="background: white; border-radius: 18px; padding: 0.95rem 1.1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">📂</div>
+              <div>
+                <h3 id="stats-total" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0;">0</h3>
+                <span style="font-size: 0.72rem; font-weight: 700; color: #64748B; display: block; margin-top: 0.1rem;">Total Requests</span>
+              </div>
+            </div>
+
+            <!-- Pending Review -->
+            <div style="background: white; border-radius: 18px; padding: 0.95rem 1.1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFF7ED; color: #EA580C; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">⏳</div>
+              <div>
+                <h3 id="stats-pending" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0;">0</h3>
+                <span style="font-size: 0.72rem; font-weight: 700; color: #64748B; display: block; margin-top: 0.1rem;">Pending Review</span>
+              </div>
+            </div>
+
+            <!-- Approved -->
+            <div style="background: white; border-radius: 18px; padding: 0.95rem 1.1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #F0FDF4; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">✔️</div>
+              <div>
+                <h3 id="stats-approved" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0;">0</h3>
+                <span style="font-size: 0.72rem; font-weight: 700; color: #64748B; display: block; margin-top: 0.1rem;">Approved</span>
+              </div>
+            </div>
+
+            <!-- Rejected -->
+            <div style="background: white; border-radius: 18px; padding: 0.95rem 1.1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">✖️</div>
+              <div>
+                <h3 id="stats-rejected" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0;">0</h3>
+                <span style="font-size: 0.72rem; font-weight: 700; color: #64748B; display: block; margin-top: 0.1rem;">Rejected</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Search & Filters Panel Card -->
+          <div style="background: white; border-radius: 20px; padding: 1.25rem; border: 1px solid #F1F5F9; margin-bottom: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+            
+            <!-- Row 1: Student Name & Register Number -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 0.35rem;">Student Name</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <span style="position: absolute; left: 10px; color: #94A3B8; font-size: 0.85rem;">🔍</span>
+                  <input type="text" id="filter-student-name" placeholder="Search by student name..." style="width: 100%; padding: 8px 12px 8px 30px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 0.35rem;">Register Number</label>
+                <input type="text" id="filter-register-number" placeholder="Search by register no..." style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+              </div>
+            </div>
+
+            <!-- Row 2: Leave Type -->
+            <div style="margin-bottom: 1rem;">
+              <label style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 0.35rem;">Leave Type</label>
+              <select id="filter-leave-type" style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                <option value="">All Categories</option>
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Medical Leave">Medical Leave</option>
+                <option value="Personal Leave">Personal Leave</option>
+                <option value="On-Duty">On-Duty</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- Row 3: Status, From Date, To Date -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 0.35rem;">Status</label>
+                <select id="filter-status" style="width: 100%; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.82rem; color: #0F172A; outline: none; background: #FAFAFD;">
+                  <option value="">All Statuses</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 0.35rem;">From Date</label>
+                <input type="date" id="filter-from-date" style="width: 100%; padding: 8px 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.78rem; color: #0F172A; outline: none; background: #FAFAFD;">
+              </div>
+
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 0.35rem;">To Date</label>
+                <input type="date" id="filter-to-date" style="width: 100%; padding: 8px 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.78rem; color: #0F172A; outline: none; background: #FAFAFD;">
+              </div>
+            </div>
+
+            <!-- Full Width Primary Blue Search/Filter Button -->
+            <button id="btn-trigger-filter-action" style="width: 100%; background: #0056D2; border: none; color: white; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(0, 86, 210, 0.2);">
+              🎛 Search / Filter
+            </button>
+
+          </div>
+
+          <!-- 4. Leave Application Records Section -->
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 0.85rem 0; display: flex; align-items: center; gap: 0.4rem;">
+              📑 Leave Application Records
+            </h3>
+
+            <div style="background: white; border-radius: 18px; border: 1px solid #F1F5F9; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+              <div class="sms-table-responsive">
+                <table class="sms-data-table" style="width: 100%;">
+                  <thead>
+                    <tr style="background: #EFF6FF; color: #1E3A8A;">
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;">Student</th>
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;">Register No</th>
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;">Leave Type</th>
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;">From - To</th>
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;">Days</th>
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;">Status</th>
+                      <th style="font-size: 0.72rem; font-weight: 800; color: #2563EB;" class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="leaves-requests-tbody">
+                    <tr>
+                      <td colspan="7" style="text-align: center; color: #94A3B8; padding: 2rem;">Loading leave requests...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <footer class="dashboard-footer-bar" style="margin-top: 1.5rem; text-align: center; color: #94A3B8; font-size: 0.75rem;">
+            <div>© 2026 CSE Department Portal. All rights reserved.</div>
+            <div style="margin-top: 0.2rem;">Developed by <strong>MohanRaj</strong> | 3rd Year CSE</div>
+          </footer>
+
+        </div>
+
+      </main>
+
+      <!-- Bottom Mobile Navigation Bar -->
+      <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="bottom-nav-item">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="students.html" class="bottom-nav-item">
+          <span class="nav-icon">🎓</span>
+          <span class="nav-label">Students</span>
+        </a>
+        <a href="attendance.html" class="bottom-nav-item">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Attendance</span>
+        </a>
+        <a href="leave.html" class="bottom-nav-item active">
+          <span class="nav-icon">📑</span>
+          <span class="nav-label">Leave Requests</span>
+        </a>
+        <a href="settings.html" class="bottom-nav-item">
+          <span class="nav-icon">•••</span>
+          <span class="nav-label">More</span>
+        </a>
+      </nav>
+
+      </main>
+    </div>
+
+    <!-- HOD Leave Details & Processing Modal -->
+    <div class="modal-dialog-backdrop" id="details-modal">
+      <div class="modal-dialog-card">
+        <div class="modal-dialog-header">
+          <span><i class="fa-solid fa-file-invoice"></i> Review Leave Application</span>
+          <button class="modal-dialog-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-dialog-body">
+          
+          <!-- Student profile section -->
+          <div class="modal-info-section">
+            <h4>Student Information</h4>
+            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+              <img id="modal-student-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+              <div>
+                <h5 id="modal-student-name" style="font-weight: 700; margin: 0; font-size: 1rem;">Student Name</h5>
+                <span id="modal-student-reg" style="font-size: 0.82rem; color: #78909C;">Register Number</span>
+              </div>
+            </div>
+            <div class="modal-info-grid">
+              <div class="modal-info-item">
+                <span class="label">Department</span>
+                <span class="value">Computer Science & Engineering</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Year / Semester</span>
+                <span class="value" id="modal-student-year-sem">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leave details section -->
+          <div class="modal-info-section">
+            <h4>Leave Information</h4>
+            <div class="modal-info-grid" style="margin-bottom: 0.8rem;">
+              <div class="modal-info-item">
+                <span class="label">Leave Type</span>
+                <span class="value" id="modal-leave-type">Medical Leave</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Submitted Date</span>
+                <span class="value" id="modal-leave-submitted">Aug 12, 2026</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Leave Duration</span>
+                <span class="value" id="modal-leave-duration">Aug 15 - Aug 16, 2026</span>
+              </div>
+              <div class="modal-info-item">
+                <span class="label">Number of Days</span>
+                <span class="value" id="modal-leave-days">2 Days</span>
+              </div>
+            </div>
+            <div class="modal-info-item" style="margin-bottom: 0.8rem;">
+              <span class="label">Reason</span>
+              <span class="value" id="modal-leave-reason" style="font-weight: normal; line-height: 1.4;">Details of the reason statements.</span>
+            </div>
+            <div class="modal-info-item" id="modal-doc-container" style="margin-bottom: 0.8rem;">
+              <span class="label">Supporting Document</span>
+              <a href="#" target="_blank" class="value" id="modal-doc-link" style="color: var(--primary-red); text-decoration: underline;"><i class="fa-solid fa-file-pdf"></i> View Attachment Document</a>
+            </div>
+            <div class="modal-info-item">
+              <span class="label">Current Status</span>
+              <span class="badge-pill" id="modal-leave-status">Pending</span>
+            </div>
+          </div>
+
+          <!-- HOD Action form (displays if status is pending) -->
+          <div class="modal-info-section" id="hod-action-form-section">
+            <h4>Process Request Decision</h4>
+            <div style="background-color: var(--light-red); padding: 1.2rem; border-radius: 8px; border: 1px solid #FFCDD2;">
+              <div class="form-group-item">
+                <label for="hod-remarks-input">Decision Remarks / Feedback</label>
+                <textarea id="hod-remarks-input" placeholder="Type remarks (optional for Approval, mandatory for Rejection)..." style="min-height: 70px; border-radius: 4px; border: 1px solid var(--border-color); font-family: inherit; padding: 0.5rem;"></textarea>
+                <span id="remarks-validation-error" style="color: var(--primary-red); font-size: 0.78rem; font-weight: 600; display: none;">Rejection reason is required when rejecting a request.</span>
+              </div>
+              <div style="display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1rem;">
+                <button class="btn btn-danger" id="btn-reject-request"><i class="fa-solid fa-times-circle"></i> Reject Request</button>
+                <button class="btn btn-success" id="btn-approve-request"><i class="fa-solid fa-check-circle"></i> Approve Request</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feedback logs (displays if status is already approved/rejected) -->
+          <div class="modal-info-section" id="hod-processed-feedback-section">
+            <h4>Processed Response Details</h4>
+            <div style="padding: 1rem; border-radius: 6px;" id="modal-remarks-box">
+              <div class="modal-info-item">
+                <span class="label" id="modal-remarks-label">HOD Feedback</span>
+                <span class="value" id="modal-remarks-value" style="font-weight: normal;">No feedback logs yet.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- UI Logic Scripts -->
+    <script>
+      function showToast(message, isSuccess = true) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${isSuccess ? 'success' : 'error'}`;
+        toast.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Validate Token Role
+        let payload;
+        try {
+          payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.role !== 'admin') {
+            window.location.href = '/login.html';
+            return;
+          }
+        } catch (e) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Setup logout action
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+          e.preventDefault();
+          localStorage.removeItem('accessToken');
+          sessionStorage.removeItem('accessToken');
+          window.location.href = '/login.html';
+        });
+
+        // 1. Fetch HOD Profile
+        async function fetchHODProfile() {
+          try {
+            const res = await fetch('/api/auth/profile', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to fetch profile.');
+            const data = await res.json();
+
+            // Set profile text
+            const sbName = document.getElementById('sidebar-profile-name');
+            if (sbName) sbName.textContent = data.name || 'HOD - CSE';
+            const nvName = document.getElementById('nav-profile-name');
+            if (nvName) nvName.textContent = data.name || 'HOD - CSE';
+
+            let avatarSrc = window.getAvatarUrl ? window.getAvatarUrl(data.name || 'HOD', data.photoPath) : (data.photoPath || "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E");
+
+            const sbImg = document.getElementById('sidebar-profile-img');
+            if (sbImg) sbImg.src = avatarSrc;
+            const nvImg = document.getElementById('nav-profile-img');
+            if (nvImg) nvImg.src = avatarSrc;
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        await fetchHODProfile();
+
+        // 2. Fetch and render Leave Requests list with filters
+        let activeLeaveId = null;
+
+        const filterNameInput = document.getElementById('filter-student-name');
+        const filterRegInput = document.getElementById('filter-register-number');
+        const filterTypeSelect = document.getElementById('filter-leave-type');
+        const filterStatusSelect = document.getElementById('filter-status');
+        const filterFromInput = document.getElementById('filter-from-date');
+        const filterToInput = document.getElementById('filter-to-date');
+
+        async function loadLeaveRequests() {
+          const name = filterNameInput.value;
+          const reg = filterRegInput.value;
+          const type = filterTypeSelect.value;
+          const status = filterStatusSelect.value;
+          const from = filterFromInput.value;
+          const to = filterToInput.value;
+
+          let query = `?studentName=${encodeURIComponent(name)}&registerNumber=${encodeURIComponent(reg)}&leaveType=${encodeURIComponent(type)}&status=${encodeURIComponent(status)}&fromDate=${encodeURIComponent(from)}&toDate=${encodeURIComponent(to)}`;
+
+          try {
+            const res = await fetch(`/api/admin/leaves${query}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load leave applications.');
+            const { stats, requests } = await res.json();
+
+            // Populate Stats Cards
+            document.getElementById('stats-total').textContent = stats.total;
+            document.getElementById('stats-pending').textContent = stats.pending;
+            document.getElementById('stats-approved').textContent = stats.approved;
+            document.getElementById('stats-rejected').textContent = stats.rejected;
+
+            // Populate Table
+            const tbody = document.getElementById('leaves-requests-tbody');
+            tbody.innerHTML = '';
+
+            if (requests.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #78909C; padding: 2rem;">No leave requests found matching filters.</td></tr>`;
+              return;
+            }
+
+            requests.forEach(r => {
+              let badgeClass = 'bg-orange-light';
+              let displayStatus = r.status;
+              let isHodActionable = r.status === 'PENDING_HOD' || r.status === 'Pending';
+
+              if (r.status === 'APPROVED' || r.status === 'Approved') {
+                badgeClass = 'bg-green-light';
+                displayStatus = 'APPROVED';
+              } else if (r.status === 'PENDING_HOD') {
+                badgeClass = 'bg-orange-light';
+                displayStatus = 'Pending HOD Approval';
+              } else if (r.status === 'PENDING_CLASS_INCHARGE') {
+                badgeClass = 'bg-blue-light';
+                displayStatus = 'Pending Class Incharge';
+              } else if (r.status === 'REJECTED_BY_CLASS_INCHARGE') {
+                badgeClass = 'bg-red-light';
+                displayStatus = 'Rejected by Class Incharge';
+              } else if (r.status === 'REJECTED_BY_HOD' || r.status === 'Rejected') {
+                badgeClass = 'bg-red-light';
+                displayStatus = 'Rejected by HOD';
+              }
+
+              const sName = r.student ? r.student.name : (r.studentName || 'Unknown');
+              const regNo = r.student ? r.student.registerNumber : (r.registerNumber || 'N/A');
+              const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
+              const defaultAvatar = getAvatar(sName, null);
+              const photo = getAvatar(sName, r.student ? r.student.photoPath : r.photoPath);
+
+              const fromD = new Date(r.fromDate || r.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              const toD = new Date(r.toDate || r.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td style="vertical-align: middle; padding: 12px 10px;">
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <img src="${photo}" alt="${sName}" onerror="this.onerror=null; if(window.getAvatarUrl){ this.src=window.getAvatarUrl(this.alt, null); }else{ this.src='${defaultAvatar}'; }" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                    <div>
+                      <strong style="font-size: 0.85rem; color: #0F172A; display: block;">${sName}</strong>
+                      <span style="font-size: 0.72rem; color: #94A3B8;">${regNo}</span>
+                    </div>
+                  </div>
+                </td>
+                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #475569;">${regNo}</td>
+                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #0F172A; font-weight: 500;">${r.leaveType}</td>
+                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #475569; white-space: nowrap;">${fromD} - ${toD}</td>
+                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.85rem; font-weight: 700; color: #0F172A;">${(r.numberOfDays || r.days || 1)} ${(r.numberOfDays || r.days || 1) === 1 ? 'Day' : 'Days'}</td>
+                <td style="vertical-align: middle; padding: 12px 10px;"><span class="badge-pill ${badgeClass}">${displayStatus}</span></td>
+                <td style="vertical-align: middle; padding: 12px 10px; white-space: nowrap;" class="text-right">
+                  ${isHodActionable ? `
+                    <button class="btn btn-primary btn-view" data-id="${r.id}" style="padding: 5px 12px; font-weight: 600; font-size: 0.78rem; border-radius: 6px; background: white; color: #0F172A; border: 1px solid #E2E8F0;">👁 View</button>
+                    <button class="btn btn-success btn-approve" data-id="${r.id}" style="padding: 5px 12px; font-weight: 600; font-size: 0.78rem; border-radius: 6px; background: #16A34A; color: white;">✔️ Approve</button>
+                    <button class="btn btn-danger btn-reject" data-id="${r.id}" style="padding: 5px 12px; font-weight: 600; font-size: 0.78rem; border-radius: 6px; background: #DC2626; color: white;">✖️ Reject</button>
+                  ` : `
+                    <button class="btn btn-outline btn-view" data-id="${r.id}" style="padding: 5px 12px; font-weight: 600; font-size: 0.78rem; border-radius: 6px; background: white; color: #0F172A; border: 1px solid #E2E8F0;">👁 View</button>
+                  `}
+                </td>
+              `;
+
+              tbody.appendChild(tr);
+            });
+
+            // Attach listeners to buttons
+            document.querySelectorAll('.btn-view').forEach(btn => {
+              btn.addEventListener('click', () => openDetailsModal(btn.dataset.id));
+            });
+
+            document.querySelectorAll('.btn-approve').forEach(btn => {
+              btn.addEventListener('click', () => openDetailsModal(btn.dataset.id, 'approve'));
+            });
+
+            document.querySelectorAll('.btn-reject').forEach(btn => {
+              btn.addEventListener('click', () => openDetailsModal(btn.dataset.id, 'reject'));
+            });
+
+          } catch (err) {
+            console.error(err);
+            showToast('Error loading leave records: ' + err.message, false);
+          }
+        }
+
+        const btnFilterTrigger = document.getElementById('btn-trigger-filter-action');
+        if (btnFilterTrigger) {
+          btnFilterTrigger.addEventListener('click', loadLeaveRequests);
+        }
+
+        // Attach filters event listeners for live searches
+        [filterNameInput, filterRegInput].forEach(inp => {
+          inp.addEventListener('input', loadLeaveRequests);
+        });
+        [filterTypeSelect, filterStatusSelect, filterFromInput, filterToInput].forEach(sel => {
+          sel.addEventListener('change', loadLeaveRequests);
+        });
+
+        await loadLeaveRequests();
+
+        // 3. Modal Opening & Action Form Logic
+        const modal = document.getElementById('details-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const hodRemarksInput = document.getElementById('hod-remarks-input');
+        const remarksErr = document.getElementById('remarks-validation-error');
+
+        modalCloseBtn.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+        window.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
+
+        async function openDetailsModal(id, actionFocus = '') {
+          activeLeaveId = id;
+          remarksErr.style.display = 'none';
+          hodRemarksInput.value = '';
+
+          try {
+            const res = await fetch(`/api/leaves/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to fetch request details.');
+            const data = await res.json();
+
+            // Student profile section
+            const _stName = data.student ? data.student.name : 'Student';
+            const _stAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_stName, data.student ? data.student.photoPath : null) : (data.student && data.student.photoPath ? data.student.photoPath : ''));
+            const modalImg = document.getElementById('modal-student-img');
+            if (modalImg) {
+              modalImg.src = _stAvatar;
+              modalImg.alt = _stName;
+              modalImg.onerror = function() { this.onerror = null; this.src = (window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : ''); };
+            }
+            const stNameEl = document.getElementById('modal-student-name');
+            if (stNameEl) stNameEl.textContent = data.student ? data.student.name : 'Unknown';
+            const stRegEl = document.getElementById('modal-student-reg');
+            if (stRegEl) stRegEl.textContent = data.student ? data.student.registerNumber : 'N/A';
+            const stYearEl = document.getElementById('modal-student-year-sem');
+            if (stYearEl) stYearEl.textContent = data.student ? `${data.student.year} Year / Sem ${data.student.semester}` : '-';
+
+            // Leave information
+            document.getElementById('modal-leave-type').textContent = data.leaveType;
+            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('modal-leave-duration').textContent = `${new Date(data.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(data.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+            const numDaysVal = data.numberOfDays || data.days || 1;
+            document.getElementById('modal-leave-days').textContent = `${numDaysVal} ${numDaysVal === 1 ? 'Day' : 'Days'}`;
+            document.getElementById('modal-leave-reason').textContent = data.reason;
+
+            // Supporting document
+            const docContainer = document.getElementById('modal-doc-container');
+            const docLink = document.getElementById('modal-doc-link');
+            if (data.supportingDocument) {
+              docContainer.style.display = 'block';
+              docLink.href = `${data.supportingDocument}`;
+            } else {
+              docContainer.style.display = 'none';
+            }
+
+            // Status Badge in modal
+            const statusBadge = document.getElementById('modal-leave-status');
+            statusBadge.textContent = data.status;
+            statusBadge.className = 'badge-pill';
+            if (data.status === 'APPROVED' || data.status === 'Approved') {
+              statusBadge.classList.add('bg-green-light');
+            } else if (data.status === 'PENDING_HOD' || data.status === 'Pending') {
+              statusBadge.classList.add('bg-orange-light');
+            } else if (data.status === 'PENDING_CLASS_INCHARGE') {
+              statusBadge.classList.add('bg-blue-light');
+            } else {
+              statusBadge.classList.add('bg-red-light');
+            }
+
+            // Action form section displays
+            const actionFormSec = document.getElementById('hod-action-form-section');
+            const feedbackSec = document.getElementById('hod-processed-feedback-section');
+
+            if (data.status === 'PENDING_HOD' || data.status === 'Pending') {
+              actionFormSec.style.display = 'block';
+              feedbackSec.style.display = 'none';
+              
+              if (actionFocus === 'approve') {
+                hodRemarksInput.focus();
+                hodRemarksInput.placeholder = 'Type approval remarks (optional)...';
+              } else if (actionFocus === 'reject') {
+                hodRemarksInput.focus();
+                hodRemarksInput.placeholder = 'Specify rejection reason (mandatory)...';
+              }
+            } else {
+              actionFormSec.style.display = 'none';
+              feedbackSec.style.display = 'block';
+
+              const remarksBox = document.getElementById('modal-remarks-box');
+              const remarksLabel = document.getElementById('modal-remarks-label');
+              const remarksValue = document.getElementById('modal-remarks-value');
+
+              if (data.status === 'APPROVED' || data.status === 'Approved') {
+                remarksBox.style.backgroundColor = '#E8F5E9';
+                remarksLabel.textContent = 'HOD Remarks (Approved)';
+                remarksValue.textContent = data.hodRemarks || 'Approved without additional remarks.';
+                remarksValue.style.color = '#1B5E20';
+              } else {
+                remarksBox.style.backgroundColor = '#FFEBEE';
+                remarksLabel.textContent = 'Rejection Reason (Rejected)';
+                remarksValue.textContent = data.rejectionReason || 'No specific reason provided.';
+                remarksValue.style.color = '#C62828';
+              }
+            }
+
+            modal.style.display = 'flex';
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        // 4. Modal HOD Decisions Submission
+        document.getElementById('btn-approve-request').addEventListener('click', async () => {
+          const remarks = hodRemarksInput.value.trim();
+          try {
+            const res = await fetch(`/api/admin/leaves/${activeLeaveId}/approve`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ hodRemarks: remarks })
+            });
+
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.message || 'Approval processing failed.');
+
+            showToast('Leave request approved successfully!', true);
+            modal.style.display = 'none';
+            await loadLeaveRequests();
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        });
+
+        document.getElementById('btn-reject-request').addEventListener('click', async () => {
+          const reason = hodRemarksInput.value.trim();
+          if (!reason) {
+            remarksErr.style.display = 'block';
+            hodRemarksInput.focus();
+            return;
+          }
+          remarksErr.style.display = 'none';
+
+          try {
+            const res = await fetch(`/api/admin/leaves/${activeLeaveId}/reject`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ rejectionReason: reason })
+            });
+
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.message || 'Rejection processing failed.');
+
+            showToast('Leave request rejected successfully.', true);
+            modal.style.display = 'none';
+            await loadLeaveRequests();
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        });
+
+        // 5. Notifications Bell logic
+        const notifBell = document.getElementById('notif-bell');
+        const notifDropdown = document.getElementById('notif-dropdown');
+        const notifCountBadge = document.getElementById('notif-count');
+        const notifDropdownList = document.getElementById('notif-dropdown-list');
+
+        notifBell.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isVisible = notifDropdown.style.display === 'block';
+          notifDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', () => {
+          notifDropdown.style.display = 'none';
+        });
+
+        async function loadNotifications() {
+          try {
+            const res = await fetch('/api/notifications', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load notifications.');
+            const list = await res.json();
+
+            const unreadList = list.filter(n => !n.isRead);
+            notifCountBadge.textContent = unreadList.length;
+            notifCountBadge.style.display = unreadList.length > 0 ? 'flex' : 'none';
+
+            notifDropdownList.innerHTML = '';
+            if (list.length === 0) {
+              notifDropdownList.innerHTML = '<div style="text-align: center; color: #78909C; padding: 1.5rem; font-size: 0.8rem;">No notifications.</div>';
+              return;
+            }
+
+            list.forEach(notif => {
+              const div = document.createElement('div');
+              div.className = `notif-dropdown-item ${notif.isRead ? '' : 'unread'}`;
+              div.innerHTML = `
+                <div style="line-height: 1.35;">${notif.message}</div>
+                <time style="font-size: 0.68rem; color: #90A4AE; margin-top: 0.2rem; display: block;">
+                  ${new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} | ${new Date(notif.createdAt).toLocaleDateString()}
+                </time>
+              `;
+
+              // Click to mark as read and load details
+              div.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!notif.isRead) {
+                  try {
+                    await fetch(`/api/notifications/${notif.id}/read`, {
+                      method: 'PUT',
+                      headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    await loadNotifications();
+                    if (notif.relatedId) {
+                      openDetailsModal(notif.relatedId);
+                    }
+                  } catch (err) {
+                    console.error('Error reading notification:', err);
+                  }
+                } else if (notif.relatedId) {
+                  openDetailsModal(notif.relatedId);
+                }
+              });
+
+              notifDropdownList.appendChild(div);
+            });
+
+          } catch (err) {
+            console.error('Notifications loading error:', err);
+          }
+        }
+        await loadNotifications();
+
+        // Mark all as read
+        document.getElementById('notif-mark-all').addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          try {
+            const res = await fetch('/api/notifications', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const list = await res.json();
+            const unreads = list.filter(n => !n.isRead);
+            
+            for (const notif of unreads) {
+              await fetch(`/api/notifications/${notif.id}/read`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+            }
+            await loadNotifications();
+            showToast('All notifications marked as read.', true);
+          } catch (err) {
+            console.error(err);
+          }
+        });
+
+      });
+    </script>
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

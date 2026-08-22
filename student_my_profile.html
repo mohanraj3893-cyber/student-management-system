@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Student Portal</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="student_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_my_profile.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">My Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Apply Leave</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Course Materials</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">My Profile</h2>
+              <span class="navbar-subtitle">View your student credentials & semester transcripts</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search courses or notices..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="3 Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">3</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">--</span>
+                <span class="nav-profile-role">22CSE015</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL MATCHING REFERENCE SCREENSHOT DESIGN -->
+        <div class="workspace-scroll-content" style="padding: 1rem 1rem 90px 1rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Top Profile Summary Card -->
+          <div style="background: white; border-radius: 20px; padding: 1.5rem 1.25rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
+            <!-- Profile Avatar -->
+            <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 0.85rem auto;">
+              <img id="my-profile-avatar-img" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #7C3AED; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+
+            <!-- Student Name & Register Number -->
+            <h2 id="my-profile-name" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0 0 0.2rem 0;">Student</h2>
+            <span id="my-profile-reg" style="font-size: 0.85rem; color: #64748B; display: block; margin-bottom: 0.75rem; font-weight: 500;">Reg No: 512724104002</span>
+
+            <!-- Year & Section Badge -->
+            <div style="margin-bottom: 1.25rem;">
+              <span id="my-profile-class-badge" style="background: #DCFCE7; color: #16A34A; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em; padding: 5px 16px; border-radius: 50px; display: inline-block; text-transform: uppercase;">3RD YEAR CSE - SECTION A</span>
+            </div>
+
+            <div style="border-top: 1px solid #F1F5F9; margin: 1rem 0; width: 100%;"></div>
+
+            <!-- Degree Course Info -->
+            <div style="text-align: left; padding: 0 0.25rem;">
+              <span style="font-size: 0.62rem; font-weight: 800; color: #64748B; letter-spacing: 0.06em; text-transform: uppercase; display: block;">DEGREE COURSE</span>
+              <h4 id="my-profile-dept" style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0.25rem 0 0 0;">Computer Science &amp; Engineering</h4>
+            </div>
+          </div>
+
+          <!-- 2. Bottom Details Card with Horizontal Tabs -->
+          <div style="background: white; border-radius: 20px; border: 1px solid #F1F5F9; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 1.5rem;">
+            <!-- Tabs Navigation Header -->
+            <div style="display: flex; border-bottom: 1px solid #F1F5F9; background: white; padding: 0 0.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+              <button class="profile-tab-btn active" id="tab-btn-academic" style="flex: 1; padding: 1rem 0.75rem; background: transparent; border: none; border-bottom: 3px solid #7C3AED; color: #7C3AED; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; text-align: center;">Qualifications</button>
+              <button class="profile-tab-btn" id="tab-btn-gpa" style="flex: 1; padding: 1rem 0.75rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748B; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; text-align: center;">GPA Log</button>
+              <button class="profile-tab-btn" id="tab-btn-personal" style="flex: 1; padding: 1rem 0.75rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748B; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; text-align: center;">Personal Details</button>
+            </div>
+
+            <!-- Tab 1: Academic Profile -->
+            <div class="profile-tab-panel active" id="stud-tab-academic" style="padding: 1.25rem; display: block;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 1.25rem 0;">Academic Profile</h3>
+              
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">DEGREE COURSE</span>
+                  <span id="my-profile-course" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">B.E</span>
+                </div>
+
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">BRANCH / SPECIALIZATION</span>
+                  <span id="my-profile-branch" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">Computer Science &amp; Engineering</span>
+                </div>
+
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">ACADEMIC BATCH</span>
+                  <span id="my-profile-batch" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">2024-2028</span>
+                </div>
+
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">YEAR OF STUDY</span>
+                  <span id="my-profile-year" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">3rd Year</span>
+                </div>
+
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">CURRENT SEMESTER</span>
+                  <span id="my-profile-sem" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">Semester V</span>
+                </div>
+
+                <div>
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">SECTION</span>
+                  <span id="my-profile-sec" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">Section A</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: GPA Log -->
+            <div class="profile-tab-panel" id="stud-tab-gpa" style="padding: 1.25rem; display: none;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 1.25rem 0;">Semester GPA Log</h3>
+              <div style="text-align: center; padding: 2rem 1rem; color: #94A3B8;">
+                <p style="font-size: 0.85rem; font-weight: 600;">No published GPA logs recorded yet.</p>
+              </div>
+            </div>
+
+            <!-- Tab 3: Personal Details -->
+            <div class="profile-tab-panel" id="stud-tab-personal" style="padding: 1.25rem; display: none;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 1.25rem 0;">Personal Contact Details</h3>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">DATE OF BIRTH (D.O.B)</span>
+                  <span id="my-profile-dob" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">BLOOD GROUP</span>
+                  <span id="my-profile-blood" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">AADHAAR NUMBER</span>
+                  <span id="my-profile-aadhaar" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">EMAIL ADDRESS</span>
+                  <span id="my-profile-email" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">PHONE NUMBER</span>
+                  <span id="my-profile-phone" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">RESIDENTIAL ADDRESS</span>
+                  <span id="my-profile-address" style="font-size: 0.95rem; font-weight: 600; color: #0F172A; white-space: pre-line;">N/A</span>
+                </div>
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">PARENT / GUARDIAN NAME</span>
+                  <span id="my-profile-guardian" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div>
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.2rem;">PARENT / GUARDIAN PHONE</span>
+                  <span id="my-profile-guardian-phone" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Text -->
+          <div style="text-align: center; color: #64748B; font-size: 0.75rem; padding: 1rem 0;">
+            <p style="margin: 0 0 0.25rem 0;">&copy; 2026 CSE Department Portal. All rights reserved.</p>
+            <p style="margin: 0;">Developed by <strong style="color: #475569;">MohanRaj</strong> | 3rd Year CSE</p>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const buttons = document.querySelectorAll('.profile-tab-btn');
+        const panels = document.querySelectorAll('.profile-tab-panel');
+
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            buttons.forEach(b => {
+              b.classList.remove('active');
+              b.style.borderBottom = '3px solid transparent';
+              b.style.color = '#64748B';
+              b.style.fontWeight = '600';
+            });
+            panels.forEach(p => {
+              p.classList.remove('active');
+              p.style.display = 'none';
+            });
+
+            btn.classList.add('active');
+            btn.style.borderBottom = '3px solid #7C3AED';
+            btn.style.color = '#7C3AED';
+            btn.style.fontWeight = '700';
+            
+            const targetId = btn.id.replace('tab-btn-', 'stud-tab-');
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) {
+              targetPanel.classList.add('active');
+              targetPanel.style.display = 'block';
+            }
+          });
+        });
+
+        // Load profile data dynamically
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error('Failed to load profile.');
+          const data = await res.json();
+
+          const avatarUrl = (window.getAvatarUrl ? window.getAvatarUrl(data.name, data.photoPath) : (data.photoPath || ''));
+          const myAvatarImg = document.getElementById('my-profile-avatar-img');
+          if (myAvatarImg) {
+            myAvatarImg.src = avatarUrl;
+            myAvatarImg.alt = data.name || 'Student';
+          }
+          document.getElementById('my-profile-name').textContent = data.name || 'N/A';
+          document.getElementById('my-profile-reg').textContent = `Reg No: ${data.registerNumber || 'N/A'}`;
+          
+          const classText = `${data.year ? data.year + ' Year' : ''} CSE - Section ${data.section || 'A'}`;
+          document.getElementById('my-profile-class-badge').textContent = classText;
+          document.getElementById('my-profile-dept').textContent = data.department || 'Computer Science & Engineering';
+
+          if (document.getElementById('my-profile-course')) document.getElementById('my-profile-course').textContent = data.course || 'B.E';
+          if (document.getElementById('my-profile-branch')) document.getElementById('my-profile-branch').textContent = data.branch || 'Computer Science & Engineering';
+          if (document.getElementById('my-profile-batch')) document.getElementById('my-profile-batch').textContent = data.batch || '2024-2028';
+          document.getElementById('my-profile-year').textContent = data.year ? `${data.year} Year` : 'N/A';
+          document.getElementById('my-profile-sem').textContent = data.semester ? `Semester ${data.semester}` : 'N/A';
+          document.getElementById('my-profile-sec').textContent = data.section ? `Section ${data.section}` : 'N/A';
+
+          if (document.getElementById('my-profile-dob')) document.getElementById('my-profile-dob').textContent = data.dob || 'N/A';
+          if (document.getElementById('my-profile-blood')) document.getElementById('my-profile-blood').textContent = data.bloodGroup || 'N/A';
+          if (document.getElementById('my-profile-aadhaar')) document.getElementById('my-profile-aadhaar').textContent = data.aadhaarNo || 'N/A';
+          document.getElementById('my-profile-email').textContent = data.email || 'N/A';
+          document.getElementById('my-profile-phone').textContent = data.phone || 'N/A';
+          if (document.getElementById('my-profile-address')) document.getElementById('my-profile-address').textContent = data.address || 'N/A';
+          document.getElementById('my-profile-guardian').textContent = data.guardianName || 'N/A';
+          document.getElementById('my-profile-guardian-phone').textContent = data.guardianPhone || 'N/A';
+
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="student_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="student_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="student_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Marks</span>
+      </a>
+      <a href="student_leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">Leave</span>
+      </a>
+      <a href="student_my_profile.html" class="bottom-nav-item active">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

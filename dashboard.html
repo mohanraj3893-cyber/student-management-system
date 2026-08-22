@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Department Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👨‍🏫</span>
+                <span class="menu-item-text">Faculty</span>
+              </a>
+            </li>
+            <li>
+              <a href="subjects.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Subjects</span>
+              </a>
+            </li>
+            <li>
+              <a href="attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="new_registrations.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🆕</span>
+                <span class="menu-item-text">New Registrations</span>
+                <span class="pending-reg-badge" style="display: none; background: #EF4444; color: white; font-size: 0.72rem; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-left: auto;">0</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Computer Science & Engineering Department</h2>
+              <span class="navbar-subtitle">Academic Management Portal</span>
+            </div>
+          </div>
+
+          <div class="navbar-center">
+            <div class="navbar-search-wrapper">
+              <span class="search-icon-node">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" placeholder="Search anything..." aria-label="Search dashboard">
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn notification-bell-btn" aria-label="Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="bell-badge-count">0</span>
+            </button>
+
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-profile-name">HOD</span>
+                <span class="nav-profile-role" id="nav-profile-role">HOD - CSE</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- DASHBOARD WORKSPACE SCROLL CONTENT -->
+        <div class="workspace-scroll-content" style="padding: 1.25rem 1.25rem 90px 1.25rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Welcome Card -->
+          <div style="margin-bottom: 1.25rem; padding: 0 0.25rem;">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 0.4rem;" id="welcome-user-title">
+              Welcome back 👋
+            </h2>
+            <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;" id="welcome-user-subtitle">
+              Here's what's happening in CSE Department today.
+            </p>
+          </div>
+
+          <!-- 2. Dark Blue Academic Banner Card -->
+          <div style="background: linear-gradient(135deg, #0242B5 0%, #002B80 100%); border-radius: 20px; padding: 1.25rem 1.35rem; color: white; margin-bottom: 1.25rem; box-shadow: 0 8px 20px rgba(2, 66, 181, 0.15);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1rem;">
+              
+              <!-- Item 1: Academic Year -->
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">📅</div>
+                <div>
+                  <span style="font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.05em; display: block;">ACADEMIC YEAR</span>
+                  <span style="font-size: 0.92rem; font-weight: 800; color: white; display: block; margin-top: 0.15rem;">2026 – 2027</span>
+                </div>
+              </div>
+
+              <!-- Item 2: Semester -->
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">🏫</div>
+                <div>
+                  <span style="font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.05em; display: block;">SEMESTER</span>
+                  <span id="dashboard-banner-semester" style="font-size: 0.92rem; font-weight: 800; color: white; display: block; margin-top: 0.15rem;">Odd Semester</span>
+                </div>
+              </div>
+
+              <!-- Item 3: Department -->
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">🏢</div>
+                <div>
+                  <span style="font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.05em; display: block;">DEPARTMENT</span>
+                  <span id="dashboard-banner-department" style="font-size: 0.92rem; font-weight: 800; color: white; display: block; margin-top: 0.15rem;">Computer Science & Engineering</span>
+                </div>
+              </div>
+
+              <!-- Item 4: Last Login -->
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">🕒</div>
+                <div>
+                  <span style="font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.05em; display: block;">LAST LOGIN</span>
+                  <span id="dashboard-banner-last-login" style="font-size: 0.85rem; font-weight: 800; color: white; display: block; margin-top: 0.15rem;">-</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 3. Metric Cards Row 1 (3 Cards) -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 0.75rem;">
+            <!-- Students -->
+            <div style="background: white; border-radius: 18px; padding: 0.85rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: #EEF2FF; color: #4F46E5; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 0.5rem;">👥</div>
+              <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">TOTAL STUDENTS</span>
+              <h3 id="stats-total-students" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.2rem 0 0.4rem 0;">5</h3>
+              <span style="font-size: 0.68rem; font-weight: 700; color: #16A34A;">↑ 4 this month</span>
+            </div>
+
+            <!-- Faculty -->
+            <div style="background: white; border-radius: 18px; padding: 0.85rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: #F0FDF4; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 0.5rem;">👨‍🏫</div>
+              <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">TOTAL FACULTY</span>
+              <h3 id="stats-total-faculty" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.2rem 0 0.4rem 0;">7</h3>
+              <span style="font-size: 0.68rem; font-weight: 700; color: #16A34A;">↑ 1 this month</span>
+            </div>
+
+            <!-- Subjects -->
+            <div style="background: white; border-radius: 18px; padding: 0.85rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: #F3E8FF; color: #9333EA; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 0.5rem;">📚</div>
+              <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">TOTAL SUBJECTS</span>
+              <h3 id="stats-total-subjects" style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0.2rem 0 0.4rem 0;">7</h3>
+              <span style="font-size: 0.68rem; font-weight: 600; color: #64748B;">— No change</span>
+            </div>
+          </div>
+
+          <!-- 4. Metric Cards Row 2 (2 Cards) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <!-- Attendance -->
+            <div style="background: white; border-radius: 18px; padding: 0.95rem 1.1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">📅</div>
+              <div>
+                <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">ATTENDANCE</span>
+                <h3 id="stats-attendance-rate" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0.1rem 0;">95%</h3>
+                <span style="font-size: 0.68rem; font-weight: 700; color: #16A34A;">↑ 3% from yesterday</span>
+              </div>
+            </div>
+
+            <!-- Pending Leaves -->
+            <div style="background: white; border-radius: 18px; padding: 0.95rem 1.1rem; border: 1px solid #F1F5F9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #FEF2F2; color: #EF4444; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">📝</div>
+              <div>
+                <span style="font-size: 0.62rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.03em; display: block;">PENDING LEAVES</span>
+                <h3 id="stats-pending-leaves" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0.1rem 0;">0</h3>
+                <span style="font-size: 0.68rem; font-weight: 700; color: #DC2626;">↓ 2 from yesterday</span>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- 6. Quick Actions Grid -->
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 0.85rem 0;">Quick Actions</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+              
+              <a href="students.html" style="background: white; border-radius: 16px; padding: 1rem; border: 1px solid #F1F5F9; text-decoration: none; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 38px; height: 38px; border-radius: 10px; background: #EEF2FF; color: #4F46E5; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">👤+</div>
+                  <div>
+                    <h4 style="font-size: 0.85rem; font-weight: 700; color: #0F172A; margin: 0 0 0.15rem 0;">Add Student</h4>
+                    <span style="font-size: 0.72rem; color: #94A3B8;">Register new student</span>
+                  </div>
+                </div>
+                <span style="color: #94A3B8; font-size: 1rem;">→</span>
+              </a>
+
+              <a href="faculty.html" style="background: white; border-radius: 16px; padding: 1rem; border: 1px solid #F1F5F9; text-decoration: none; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 38px; height: 38px; border-radius: 10px; background: #F3E8FF; color: #9333EA; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">🏛</div>
+                  <div>
+                    <h4 style="font-size: 0.85rem; font-weight: 700; color: #0F172A; margin: 0 0 0.15rem 0;">Add Faculty</h4>
+                    <span style="font-size: 0.72rem; color: #94A3B8;">Register new faculty</span>
+                  </div>
+                </div>
+                <span style="color: #94A3B8; font-size: 1rem;">→</span>
+              </a>
+
+              <a href="announcements.html" style="background: white; border-radius: 16px; padding: 1rem; border: 1px solid #F1F5F9; text-decoration: none; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 38px; height: 38px; border-radius: 10px; background: #FEE2E2; color: #EF4444; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">📢</div>
+                  <div>
+                    <h4 style="font-size: 0.85rem; font-weight: 700; color: #0F172A; margin: 0 0 0.15rem 0;">New Notice</h4>
+                    <span style="font-size: 0.72rem; color: #94A3B8;">Post new notice</span>
+                  </div>
+                </div>
+                <span style="color: #94A3B8; font-size: 1rem;">→</span>
+              </a>
+
+              <a href="reports.html" style="background: white; border-radius: 16px; padding: 1rem; border: 1px solid #F1F5F9; text-decoration: none; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 38px; height: 38px; border-radius: 10px; background: #F0FDF4; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">📄</div>
+                  <div>
+                    <h4 style="font-size: 0.85rem; font-weight: 700; color: #0F172A; margin: 0 0 0.15rem 0;">Generate Report</h4>
+                    <span style="font-size: 0.72rem; color: #94A3B8;">Download reports</span>
+                  </div>
+                </div>
+                <span style="color: #94A3B8; font-size: 1rem;">→</span>
+              </a>
+
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <footer class="dashboard-footer-bar" style="margin-top: 1.5rem; text-align: center; color: #94A3B8; font-size: 0.75rem;">
+            <div>Computer Science &amp; Engineering Department Portal • Version 1.0</div>
+            <div style="margin-top: 0.2rem;">© 2026 All Rights Reserved.</div>
+          </footer>
+        </div>
+      </main>
+
+      <!-- Bottom Mobile Navigation Bar -->
+      <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="bottom-nav-item active">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="students.html" class="bottom-nav-item">
+          <span class="nav-icon">🎓</span>
+          <span class="nav-label">Students</span>
+        </a>
+        <a href="faculty.html" class="bottom-nav-item">
+          <span class="nav-icon">🏛</span>
+          <span class="nav-label">Faculty</span>
+        </a>
+        <a href="attendance.html" class="bottom-nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Attendance</span>
+        </a>
+        <a href="settings.html" class="bottom-nav-item">
+          <span class="nav-icon">•••</span>
+          <span class="nav-label">More</span>
+        </a>
+      </nav>
+
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

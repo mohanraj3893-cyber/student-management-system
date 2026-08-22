@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resource Management | Faculty Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+    </style>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body theme-faculty">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- LEFT SIDEBAR NAVIGATION -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title" style="font-size: 0.8rem; font-weight: 800;">CSE Portal</h4>
+              <span class="logo-subtitle">Faculty Workspace</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="faculty_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Exams & Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_requests.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_resources.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📁</span>
+                <span class="menu-item-text">Resources</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN WORKSPACE CONTENT PANEL -->
+      <main class="main-workspace-panel">
+        
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Upload Course Materials &amp; Notes</h2>
+              <span class="navbar-subtitle">Upload lecture notes, syllabus copies, and lab manuals for assigned courses</span>
+            </div>
+          </div>
+          <div class="navbar-right">
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+            <span class="navbar-divider"></span>
+            <div class="nav-profile-block">
+              <div class="profile-block-txt"><span class="nav-profile-name" id="nav-faculty-name">Faculty</span></div>
+              <img class="nav-profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace-scroll-content">
+
+          <!-- Alert Notification Banner -->
+          <div id="res-alert-banner" style="display: none; padding: 12px 16px; border-radius: 10px; margin-bottom: 1.5rem; font-size: 14px; font-weight: 600;"></div>
+
+          <div class="main-three-columns-grid">
+            
+            <!-- Left panel: Upload Form (span 1) -->
+            <div class="workspace-column-card" style="grid-column: span 1; text-align: left;">
+              <div class="column-card-header">
+                <h3 class="column-card-title">Upload New Material</h3>
+              </div>
+              
+              <form id="upload-resource-form" class="login-form-block" style="margin-top: 1rem;">
+                <div class="form-group-item">
+                  <label for="res-sub">Assigned Course</label>
+                  <select id="res-sub" class="toolbar-select" style="width: 100%;" required>
+                    <option value="">Loading assigned courses...</option>
+                  </select>
+                </div>
+
+                <div class="form-group-item">
+                  <label for="res-title">Material Title</label>
+                  <input type="text" id="res-title" placeholder="e.g., Unit 1 Lecture Slides &amp; Notes" required style="padding: 0.75rem 1rem;">
+                </div>
+
+                <div class="form-group-item">
+                  <label for="res-category">Material Category</label>
+                  <select id="res-category" class="toolbar-select" style="width: 100%;">
+                    <option value="Lecture Notes">Lecture Notes</option>
+                    <option value="Syllabus Copy">Syllabus Copy</option>
+                    <option value="Lab Manual">Lab Manual</option>
+                    <option value="Question Bank">Question Bank</option>
+                    <option value="Assignment Sheet">Assignment Sheet</option>
+                    <option value="Video Lecture">Video Recording / Link</option>
+                  </select>
+                </div>
+
+                <div class="form-group-item">
+                  <label for="res-file-input">Select File Attachment</label>
+                  <input type="file" id="res-file-input" required style="padding: 0.5rem; font-size: 0.85rem; border: 1px solid #CBD5E1; border-radius: 8px; width: 100%;">
+                  <span style="font-size: 0.72rem; color: #64748B; display: block; margin-top: 0.25rem;">Supported: PDF, PPT, DOCX, ZIP, MP4 (Max 50MB)</span>
+                </div>
+
+                <button type="submit" id="btn-upload-submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%; font-weight: 700;">Upload Course Material</button>
+              </form>
+            </div>
+
+            <!-- Right panel: Resources Catalog (span 2) -->
+            <div class="workspace-column-card" style="grid-column: span 2; text-align: left;">
+              <div class="column-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="column-card-title">My Uploaded Course Materials</h3>
+                <span id="res-count-badge" class="badge-pill bg-blue-light" style="font-size: 0.8rem; font-weight: 700;">0 Materials</span>
+              </div>
+              
+              <div class="sms-table-responsive" style="margin-top: 1rem;">
+                <table class="sms-data-table min-padding">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">Format</th>
+                      <th style="width: 110px;">Course</th>
+                      <th>Material Title &amp; File</th>
+                      <th>Category</th>
+                      <th>Size</th>
+                      <th class="text-center" style="width: 140px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="faculty-resources-tbody">
+                    <tr>
+                      <td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">Loading your uploaded materials...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Computer Science &amp; Engineering Department Portal</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html?role=faculty';
+          return;
+        }
+
+        const subjectSelect = document.getElementById('res-sub');
+        const uploadForm = document.getElementById('upload-resource-form');
+        const fileInput = document.getElementById('res-file-input');
+        const titleInput = document.getElementById('res-title');
+        const categorySelect = document.getElementById('res-category');
+        const submitBtn = document.getElementById('btn-upload-submit');
+        const tbody = document.getElementById('faculty-resources-tbody');
+        const alertBanner = document.getElementById('res-alert-banner');
+        const countBadge = document.getElementById('res-count-badge');
+
+        function showAlert(msg, isError = false) {
+          if (!alertBanner) return;
+          alertBanner.style.display = 'block';
+          if (isError) {
+            alertBanner.style.background = 'rgba(239, 68, 68, 0.1)';
+            alertBanner.style.color = '#EF4444';
+            alertBanner.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+            alertBanner.innerHTML = `⚠️ ${msg}`;
+          } else {
+            alertBanner.style.background = 'rgba(16, 185, 129, 0.1)';
+            alertBanner.style.color = '#10B981';
+            alertBanner.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+            alertBanner.innerHTML = `✅ ${msg}`;
+          }
+          setTimeout(() => {
+            alertBanner.style.display = 'none';
+          }, 4000);
+        }
+
+        // Fetch Faculty Profile
+        try {
+          const profRes = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profRes.ok) {
+            const p = await profRes.json();
+            const fName = p.name || 'Faculty Member';
+            const navName = document.getElementById('nav-faculty-name');
+            if (navName) navName.textContent = fName;
+            const sideName = document.getElementById('sidebar-faculty-name');
+            if (sideName) sideName.textContent = fName;
+
+            const defaultAvatar = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
+            const photoUrl = (window.getAvatarUrl ? window.getAvatarUrl(typeof sName !== 'undefined' ? sName : (typeof fName !== 'undefined' ? fName : (p?.name || 'User')), profData?.photoPath || p?.photoPath || user?.photoPath) : (profData?.photoPath || p?.photoPath || user?.photoPath || ''));
+            const navAv = document.getElementById('nav-faculty-avatar');
+            if (navAv) navAv.src = photoUrl;
+            const sideAv = document.getElementById('sidebar-faculty-avatar');
+            if (sideAv) sideAv.src = photoUrl;
+          }
+        } catch (e) {
+          console.error('Error loading faculty profile:', e);
+        }
+
+        // Fetch assigned subjects
+        try {
+          const subRes = await fetch('/api/attendance/subjects', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (!subRes.ok) throw new Error('Failed to load assigned subjects.');
+          const subjects = await subRes.json();
+
+          subjectSelect.innerHTML = '';
+          if (subjects.length === 0) {
+            subjectSelect.innerHTML = '<option value="">No assigned subjects</option>';
+            submitBtn.disabled = true;
+          } else {
+            subjects.forEach(sub => {
+              const opt = document.createElement('option');
+              opt.value = sub.id;
+              opt.textContent = `${sub.code} - ${sub.name}`;
+              subjectSelect.appendChild(opt);
+            });
+          }
+        } catch (err) {
+          console.error(err);
+          subjectSelect.innerHTML = `<option value="">Error loading courses</option>`;
+        }
+
+        // Load uploaded resources library
+        async function loadFacultyResources() {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">Loading your uploaded materials...</td></tr>';
+          try {
+            const res = await fetch('/api/resources/faculty', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load materials.');
+            const list = await res.json();
+
+            if (countBadge) countBadge.textContent = `${list.length} Material${list.length === 1 ? '' : 's'}`;
+
+            tbody.innerHTML = '';
+            if (list.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">You have not uploaded any course materials yet. Use the form on the left to upload notes.</td></tr>';
+              return;
+            }
+
+            list.forEach(item => {
+              const tr = document.createElement('tr');
+              const icon = item.fileName.toLowerCase().endsWith('.pdf') ? '📄' : (item.fileName.toLowerCase().endsWith('.mp4') ? '🎥' : '📁');
+
+              tr.innerHTML = `
+                <td style="font-size: 1.3rem;">${icon}</td>
+                <td><strong>${item.subjectCode}</strong></td>
+                <td>
+                  <strong>${item.title}</strong>
+                  <span style="font-size: 0.78rem; color: #64748B; display: block;">${item.fileName}</span>
+                </td>
+                <td><span class="badge-pill bg-blue-light">${item.category}</span></td>
+                <td><span style="font-size: 0.82rem; color: #64748B;">${item.fileSize}</span></td>
+                <td class="text-center">
+                  <div style="display: flex; gap: 0.4rem; justify-content: center;">
+                    <a href="${item.filePath}" target="_blank" download="${item.fileName}" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.78rem;">⬇️ View</a>
+                    <button type="button" class="btn btn-secondary btn-sm btn-delete-res" data-id="${item.id}" style="padding: 4px 10px; font-size: 0.78rem; background: #FEE2E2; color: #DC2626; border-color: #FCA5A5;">🗑️ Delete</button>
+                  </div>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+            // Delete handlers
+            tbody.querySelectorAll('.btn-delete-res').forEach(btn => {
+              btn.addEventListener('click', async (e) => {
+                const id = e.target.getAttribute('data-id');
+                if (!confirm('Are you sure you want to delete this course material?')) return;
+
+                try {
+                  const delRes = await fetch(`/api/resources/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  });
+                  const delJson = await delRes.json();
+                  if (!delRes.ok) throw new Error(delJson.message || 'Failed to delete resource.');
+                  showAlert(delJson.message || 'Course material deleted.');
+                  loadFacultyResources();
+                } catch (err) {
+                  showAlert(err.message, true);
+                }
+              });
+            });
+
+          } catch (err) {
+            console.error(err);
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;">Error loading resources: ${err.message}</td></tr>`;
+          }
+        }
+
+        await loadFacultyResources();
+
+        // Handle File Upload Form Submission
+        uploadForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!subjectSelect.value) {
+            showAlert('Please select an assigned course.', true);
+            return;
+          }
+          if (!fileInput.files || fileInput.files.length === 0) {
+            showAlert('Please select a file to upload.', true);
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append('subjectId', subjectSelect.value);
+          formData.append('title', titleInput.value);
+          formData.append('category', categorySelect.value);
+          formData.append('file', fileInput.files[0]);
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Uploading File...';
+
+          try {
+            const res = await fetch('/api/resources/upload', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+
+            const resData = await res.json();
+            if (!res.ok) throw new Error(resData.message || 'Failed to upload course material.');
+
+            showAlert(resData.message || 'Course material uploaded successfully!');
+            uploadForm.reset();
+            await loadFacultyResources();
+          } catch (err) {
+            showAlert(err.message, true);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Upload Course Material';
+          }
+        });
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams &amp; Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Materials | Student Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+
+      .resource-file-card {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s ease;
+      }
+      .dark-theme .resource-file-card {
+        background: #1E293B;
+        border-color: #334155;
+      }
+      .resource-file-card:hover {
+        border-color: #CBD5E1;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      }
+    </style>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- LEFT SIDEBAR NAVIGATION -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE</h4>
+              <span class="logo-subtitle">Student Portal</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="student_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_my_profile.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📅</span>
+                <span class="menu-item-text">My Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Internal Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_leave.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Apply Leave</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_subjects.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">📚</span>
+                <span class="menu-item-text">Course Materials</span>
+              </a>
+            </li>
+            <li>
+              <a href="student_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙️</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN WORKSPACE CONTENT PANEL -->
+      <main class="main-workspace-panel">
+        
+        <!-- TOP NAVBAR HEADER -->
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Course Materials Catalog</h2>
+              <span class="navbar-subtitle">View and download official notes uploaded by your course instructors</span>
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <button class="nav-action-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <span class="navbar-divider"></span>
+
+            <div class="nav-profile-block">
+              <div class="profile-block-txt">
+                <span class="nav-profile-name" id="nav-student-name">Student</span>
+                <span class="nav-profile-role" id="nav-student-reg">Register No</span>
+              </div>
+              <div class="nav-profile-avatar"><img class="nav-profile-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT PANEL -->
+        <div class="workspace-scroll-content">
+          <div class="workspace-column-card">
+            
+            <div id="student-subjects-list" style="display: flex; flex-direction: column; gap: 1.25rem; text-align: left; margin-top: 0.5rem;">
+              <div style="text-align: center; color: #64748b; font-size: 0.9rem; padding: 3rem 0;">Loading course materials from database...</div>
+            </div>
+
+          </div>
+
+          <footer class="dashboard-footer-bar">
+            <div class="footer-left"><span>Computer Science &amp; Engineering Department Portal</span></div>
+            <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html?role=student';
+          return;
+        }
+
+        const listContainer = document.getElementById('student-subjects-list');
+
+        // Fetch Student Profile for Header
+        try {
+          const profRes = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profRes.ok) {
+            const p = await profRes.json();
+            const sName = p.name || 'Student';
+            const regNo = p.registerNumber || p.username || '';
+
+            const navName = document.getElementById('nav-student-name');
+            if (navName) navName.textContent = sName;
+            const sideName = document.getElementById('sidebar-student-name');
+            if (sideName) sideName.textContent = sName;
+            const navReg = document.getElementById('nav-student-reg');
+            if (navReg) navReg.textContent = regNo;
+            const sideSub = document.getElementById('sidebar-student-sub');
+            if (sideSub) sideSub.textContent = `${p.year || ''} (${p.section || 'A'})`;
+
+            const photoUrl = (window.getAvatarUrl ? window.getAvatarUrl(typeof sName !== 'undefined' ? sName : (typeof fName !== 'undefined' ? fName : (p?.name || 'User')), profData?.photoPath || p?.photoPath || user?.photoPath) : (profData?.photoPath || p?.photoPath || user?.photoPath || ''));
+            const navAv = document.getElementById('nav-student-avatar');
+            if (navAv) navAv.src = photoUrl;
+            const sideAv = document.getElementById('sidebar-student-avatar');
+            if (sideAv) sideAv.src = photoUrl;
+          }
+        } catch (e) {
+          console.error('Error loading student profile:', e);
+        }
+
+        // Fetch Real Uploaded Materials from Database
+        try {
+          const res = await fetch('/api/resources/student', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (!res.ok) throw new Error('Failed to load course materials from database.');
+          const subjectsWithMaterials = await res.json();
+
+          listContainer.innerHTML = '';
+
+          // Check if any materials exist across all subjects
+          const totalMaterials = subjectsWithMaterials.reduce((acc, sub) => acc + (sub.resources ? sub.resources.length : 0), 0);
+
+          if (subjectsWithMaterials.length === 0 || totalMaterials === 0) {
+            listContainer.innerHTML = `
+              <div style="text-align: center; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 16px; padding: 3.5rem 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📂</div>
+                <h3 style="font-size: 1.2rem; font-weight: 800; color: #0F172A; margin-bottom: 0.5rem;">No course materials available yet.</h3>
+                <p style="color: #64748B; font-size: 0.9rem; max-width: 480px; margin: 0 auto; line-height: 1.5;">Your course instructors have not uploaded any study materials or lecture notes for your assigned subjects yet. Once uploaded, they will automatically appear here for download.</p>
+              </div>
+            `;
+            return;
+          }
+
+          subjectsWithMaterials.forEach(s => {
+            const folderId = `sub-${s.subjectId}`;
+            const materials = s.resources || [];
+            const hasMaterials = materials.length > 0;
+
+            const folderDiv = document.createElement('div');
+            folderDiv.className = 'subject-folder-item';
+            folderDiv.style.cssText = 'border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; background-color: #FFFFFF; transition: all 0.2s ease;';
+
+            let bodyHtml = '';
+            if (hasMaterials) {
+              const cardsHtml = materials.map(m => {
+                const icon = m.fileName.toLowerCase().endsWith('.pdf') ? '📄' : (m.fileName.toLowerCase().endsWith('.mp4') ? '🎥' : '📁');
+                return `
+                  <div class="resource-file-card">
+                    <div style="display: flex; align-items: center; gap: 0.85rem; overflow: hidden;">
+                      <span style="font-size: 1.4rem;">${icon}</span>
+                      <div style="overflow: hidden;">
+                        <strong style="font-size: 0.9rem; color: #0F172A; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.title}</strong>
+                        <span style="font-size: 0.76rem; color: #64748B;">${m.fileName} • ${m.fileSize} • <span class="badge-pill bg-blue-light" style="font-size: 0.7rem; padding: 2px 8px;">${m.category}</span></span>
+                      </div>
+                    </div>
+                    <a href="${m.filePath}" target="_blank" download="${m.fileName}" class="btn btn-secondary btn-sm" style="padding: 6px 14px; font-weight: 700; font-size: 0.82rem; white-space: nowrap;">⬇️ View / Download</a>
+                  </div>
+                `;
+              }).join('');
+
+              bodyHtml = `
+                <div class="subject-folder-body" id="body-${folderId}" style="display: flex; padding: 1.25rem; flex-direction: column; gap: 0.85rem; border-top: 1px solid #F1F5F9;">
+                  ${cardsHtml}
+                </div>
+              `;
+            } else {
+              bodyHtml = `
+                <div class="subject-folder-body" id="body-${folderId}" style="display: none; padding: 1.5rem; text-align: center; color: #94A3B8; font-size: 0.85rem; border-top: 1px solid #F1F5F9;">
+                  No course materials uploaded for this course yet.
+                </div>
+              `;
+            }
+
+            folderDiv.innerHTML = `
+              <div class="subject-folder-header" id="header-${folderId}" style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background-color: #F8FAFC;">
+                <div>
+                  <strong style="font-size: 1rem; color: #0F172A;">${s.subjectCode} - ${s.subjectName}</strong>
+                  <span style="font-size: 0.78rem; color: #64748B; display: block; margin-top: 0.15rem;">Instructor: ${s.facultyName} | Credits: ${s.credits}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <span class="badge-pill ${hasMaterials ? 'bg-green-light' : 'bg-gray-light'}" style="font-weight: 700; font-size: 0.75rem;">
+                    ${hasMaterials ? `${materials.length} Material${materials.length === 1 ? '' : 's'}` : 'No Materials'}
+                  </span>
+                  <span style="font-size: 1.2rem; font-weight: 700; color: #64748B;">${hasMaterials ? '−' : '+'}</span>
+                </div>
+              </div>
+              ${bodyHtml}
+            `;
+
+            listContainer.appendChild(folderDiv);
+
+            // Toggle folder collapse
+            const headerEl = folderDiv.querySelector(`#header-${folderId}`);
+            const bodyEl = folderDiv.querySelector(`#body-${folderId}`);
+            const indicator = headerEl.querySelector('span:last-child');
+
+            headerEl.addEventListener('click', () => {
+              if (bodyEl.style.display === 'none') {
+                bodyEl.style.display = 'flex';
+                indicator.textContent = '−';
+              } else {
+                bodyEl.style.display = 'none';
+                indicator.textContent = '+';
+              }
+            });
+          });
+
+        } catch (err) {
+          console.error(err);
+          listContainer.innerHTML = `<div style="text-align: center; color: #ef4444; font-size: 0.9rem; padding: 2rem 0;">Error: ${err.message}</div>`;
+        }
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="student_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="student_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="student_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Marks</span>
+      </a>
+      <a href="student_leave.html" class="bottom-nav-item">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">Leave</span>
+      </a>
+      <a href="student_my_profile.html" class="bottom-nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

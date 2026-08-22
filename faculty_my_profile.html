@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile | CSE Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('no-transition');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      })();
+    </script>
+    <style>
+      .no-transition * {
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-panel {
+        width: 85px !important;
+        padding: 2.2rem 1rem !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .main-workspace-panel {
+        margin-left: 85px !important;
+        width: calc(100% - 85px) !important;
+        transition: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-logo-block .logo-text,
+      html.sidebar-collapsed-init .sidebar-menu-nav .menu-item-text,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-txt,
+      html.sidebar-collapsed-init .sidebar-profile-widget .profile-widget-chevron {
+        display: none !important;
+      }
+      html.sidebar-collapsed-init .sidebar-profile-widget,
+      html.sidebar-collapsed-init .logo-group,
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        justify-content: center !important;
+      }
+      html.sidebar-collapsed-init .sidebar-menu-item {
+        padding: 0.8rem !important;
+      }
+    </style>
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body class="dashboard-body">
+    
+    <div class="dashboard-layout-container">
+      
+      <!-- ==========================================
+           1. LEFT SIDEBAR NAVIGATION
+           ========================================== -->
+      <aside class="sidebar-panel" id="dashboard-sidebar">
+        <div class="sidebar-logo-block">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title" style="font-size: 0.8rem; font-weight: 800;">CSE Portal</h4>
+              <span class="logo-subtitle">Faculty Workspace</span>
+            </div>
+          </div>
+        </div>
+
+                <nav class="sidebar-menu-nav">
+          <ul>
+            <li>
+              <a href="faculty_dashboard.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_students.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">🎓</span>
+                <span class="menu-item-text">Students</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_attendance.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-text">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_assignments.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📝</span>
+                <span class="menu-item-text">Assignments</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_marks.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📊</span>
+                <span class="menu-item-text">Exams & Marks</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_announcements.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📢</span>
+                <span class="menu-item-text">Announcements</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_resources.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📁</span>
+                <span class="menu-item-text">Resources</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_requests.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-text">Leave Requests</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_settings.html" class="sidebar-menu-item">
+                <span class="menu-item-icon">⚙</span>
+                <span class="menu-item-text">Settings</span>
+              </a>
+            </li>
+            <li>
+              <a href="faculty_my_profile.html" class="sidebar-menu-item active">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">My Profile</span>
+              </a>
+            </li>
+            <li class="menu-separator"></li>
+            <li>
+              <a href="/role_selection.html" class="sidebar-menu-item logout-item">
+                <span class="menu-item-icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-profile-widget">
+          <div class="profile-widget-avatar">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar">
+          </div>
+          <div class="profile-widget-txt">
+            <span class="profile-widget-name" id="sidebar-profile-name">--</span>
+            <span class="profile-widget-role" id="sidebar-profile-role">--</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           2. MAIN WORKSPACE CONTENT PANEL
+           ========================================== -->
+      <main class="main-workspace-panel">
+        
+        <header class="workspace-top-navbar">
+          <div class="navbar-left">
+            <button class="btn-sidebar-collapse" id="sidebar-collapse-btn" aria-label="Toggle Sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="navbar-title-block">
+              <h2 class="navbar-title">Faculty Ledger Profile</h2>
+              <span class="navbar-subtitle">View qualifications and academic records</span>
+            </div>
+          </div>
+          <div class="navbar-right">
+            <span class="navbar-divider"></span>
+            <div class="nav-profile-block">
+              <div class="profile-block-txt"><span class="nav-profile-name" id="nav-profile-name">--</span></div>
+              <img class="nav-profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace-scroll-content" style="padding: 1.25rem 1.25rem 90px 1.25rem !important; background: #FAFAFD;">
+          
+          <!-- 1. Top Greeting Header -->
+          <div style="margin-bottom: 1.25rem; padding: 0 0.25rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+              Good Morning, <span id="mobile-greeting-name">Faculty Advisor</span>
+            </h2>
+            <p id="mobile-greeting-sub" style="font-size: 0.78rem; color: #64748B; margin: 0.25rem 0 0 0;">
+              AP | Computer Science &amp; Engineering
+            </p>
+          </div>
+
+          <!-- 2. Back to Role Selection Action Row -->
+          <div style="margin-bottom: 1.25rem;">
+            <a href="/role_selection.html" style="background: #F8FAFC; border: 1px solid #E2E8F0; color: #2563EB; font-weight: 700; padding: 0.75rem 1rem; border-radius: 14px; text-decoration: none; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; box-sizing: border-box;">
+              <span style="font-size: 1.1rem;">←</span> Back to Role Selection
+            </a>
+          </div>
+
+          <!-- 3. Top Faculty Profile Summary Card -->
+          <div style="background: white; border-radius: 20px; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+              <!-- Photo Avatar -->
+              <div style="position: relative; width: 90px; height: 90px; flex-shrink: 0;">
+                <img id="my-fac-avatar-img" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #E2E8F0;" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2364748B'/%3E%3Ctext x='32' y='38' font-family='Inter,sans-serif' font-size='22' font-weight='700' fill='white' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E" alt="Avatar" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+
+              <!-- Name & Employee ID + Pill Badge -->
+              <div>
+                <h2 id="my-fac-name" style="font-size: 1.3rem; font-weight: 800; color: #0F172A; margin: 0 0 0.3rem 0;">Faculty Advisor</h2>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span id="my-fac-empid" style="font-size: 0.82rem; color: #64748B; font-weight: 600;">Employee ID: CS003</span>
+                  <span id="my-fac-designation-badge" style="background: #DCFCE7; color: #16A34A; font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 50px; text-transform: uppercase;">AP</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid #F1F5F9; margin: 1rem 0; width: 100%;"></div>
+
+            <!-- Department info -->
+            <div style="text-align: left;">
+              <span style="font-size: 0.65rem; font-weight: 800; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.25rem;">DEPARTMENT</span>
+              <h4 id="my-fac-dept" style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0;">Computer Science &amp; Engineering</h4>
+            </div>
+          </div>
+
+          <!-- 4. Tabbed Details Card -->
+          <div style="background: white; border-radius: 20px; border: 1px solid #F1F5F9; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 1.5rem;">
+            <!-- Tabs Header -->
+            <div style="display: flex; border-bottom: 1px solid #F1F5F9; background: white; padding: 0 0.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+              <button class="profile-tab-btn active" id="tab-btn-qual" style="flex: 1; padding: 1rem 0.75rem; background: transparent; border: none; border-bottom: 3px solid #10B981; color: #10B981; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; text-align: center;">Qualifications</button>
+              <button class="profile-tab-btn" id="tab-btn-pub" style="flex: 1; padding: 1rem 0.75rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748B; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; text-align: center;">Publications</button>
+              <button class="profile-tab-btn" id="tab-btn-contact" style="flex: 1; padding: 1rem 0.75rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748B; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; text-align: center;">Contact Details</button>
+            </div>
+
+            <!-- Tab 1: Qualifications -->
+            <div class="profile-tab-panel active" id="fac-tab-qual" style="padding: 1.25rem; display: block;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 1.25rem 0;">Academic Qualifications</h3>
+              <div>
+                <span style="font-size: 0.65rem; font-weight: 800; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.3rem;">QUALIFICATIONS</span>
+                <span id="my-fac-qual" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+              </div>
+            </div>
+
+            <!-- Tab 2: Publications -->
+            <div class="profile-tab-panel" id="fac-tab-pub" style="padding: 1.25rem; display: none;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 1.25rem 0;">Research &amp; Publications</h3>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.3rem;">RESEARCH AREA</span>
+                  <span id="my-fac-research" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div>
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.3rem;">PUBLICATIONS</span>
+                  <span id="my-fac-pubs" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Contact Details -->
+            <div class="profile-tab-panel" id="fac-tab-contact" style="padding: 1.25rem; display: none;">
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin: 0 0 1.25rem 0;">Contact Information</h3>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="border-bottom: 1px solid #F8FAFC; padding-bottom: 0.75rem;">
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.3rem;">WORK EMAIL</span>
+                  <span id="my-fac-email" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+                <div>
+                  <span style="font-size: 0.65rem; font-weight: 800; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 0.3rem;">MOBILE NUMBER</span>
+                  <span id="my-fac-phone" style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">N/A</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <footer class="dashboard-footer-bar" style="margin-top: 1.5rem; text-align: center; color: #94A3B8; font-size: 0.75rem;">
+            <div>Computer Science &amp; Engineering Department Portal • Version 1.0</div>
+            <div style="margin-top: 0.2rem;">© 2026 All Rights Reserved.</div>
+          </footer>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">✅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams & Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item active">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">My Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', async () => {
+        const buttons = document.querySelectorAll('.profile-tab-btn');
+        const panels = document.querySelectorAll('.profile-tab-panel');
+
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            buttons.forEach(b => {
+              b.classList.remove('active');
+              b.style.borderBottomColor = 'transparent';
+              b.style.color = '#64748B';
+              b.style.fontWeight = '600';
+            });
+            panels.forEach(p => {
+              p.classList.remove('active');
+              p.style.display = 'none';
+            });
+
+            btn.classList.add('active');
+            btn.style.borderBottomColor = '#10B981';
+            btn.style.color = '#10B981';
+            btn.style.fontWeight = '700';
+
+            const targetId = btn.id.replace('tab-btn-', 'fac-tab-');
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) {
+              targetPanel.classList.add('active');
+              targetPanel.style.display = 'block';
+            }
+          });
+        });
+
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error('Failed to load profile.');
+          const data = await res.json();
+
+          const _fi = (data.name || 'FA').split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
+          const _fc = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
+          const _fcolor = _fc[_fi.charCodeAt(0) % _fc.length];
+          const defaultAvatar = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
+
+          const name = data.name || 'Faculty Advisor';
+          const myFacAvatar = document.getElementById('my-fac-avatar-img');
+          if (myFacAvatar) {
+            myFacAvatar.src = (window.getAvatarUrl ? window.getAvatarUrl(name, data.photoPath) : (data.photoPath || ''));
+            myFacAvatar.alt = name;
+          }
+          document.getElementById('my-fac-name').textContent = name;
+
+          const greetingName = document.getElementById('mobile-greeting-name');
+          if (greetingName) greetingName.textContent = name;
+
+          const empId = data.employeeId || 'CS003';
+          document.getElementById('my-fac-empid').textContent = `Employee ID: ${empId}`;
+
+          const desig = data.designation || 'Assistant Professor';
+          let desigAbbr = 'AP';
+          if (desig.toLowerCase().includes('assistant')) desigAbbr = 'AP';
+          else if (desig.toLowerCase().includes('associate')) desigAbbr = 'Assoc. P';
+          else if (desig.toLowerCase().includes('hod')) desigAbbr = 'HOD';
+          else if (desig.toLowerCase().includes('professor')) desigAbbr = 'Prof';
+
+          const badge = document.getElementById('my-fac-designation-badge');
+          if (badge) badge.textContent = desigAbbr;
+
+          const dept = data.department || 'Computer Science & Engineering';
+          document.getElementById('my-fac-dept').textContent = dept;
+
+          const greetingSub = document.getElementById('mobile-greeting-sub');
+          if (greetingSub) greetingSub.textContent = `${desigAbbr} | ${dept}`;
+
+          document.getElementById('my-fac-qual').textContent = data.qualification || 'N/A';
+          document.getElementById('my-fac-research').textContent = data.researchArea || 'N/A';
+          document.getElementById('my-fac-pubs').textContent = data.publications || 'N/A';
+          document.getElementById('my-fac-email').textContent = data.email || 'N/A';
+          document.getElementById('my-fac-phone').textContent = data.phone || 'N/A';
+
+        } catch (err) {
+          console.error('Error fetching profile:', err);
+        }
+      });
+    </script>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <a href="faculty_dashboard.html" class="bottom-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="faculty_students.html" class="bottom-nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Students</span>
+      </a>
+      <a href="faculty_attendance.html" class="bottom-nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Attendance</span>
+      </a>
+      <a href="faculty_marks.html" class="bottom-nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Exams &amp; Marks</span>
+      </a>
+      <a href="faculty_my_profile.html" class="bottom-nav-item active">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <script type="module" src="/src/dashboard_global.js"></script>
+  </body>
+</html>

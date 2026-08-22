@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | SMS</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body>
+    <div class="login-split-wrapper theme-admin" id="login-theme-container">
+      
+      <!-- BACKGROUND GRADIENT BLOBS -->
+      <div class="mock-bg-blobs">
+        <div class="bg-blob blob-top-left"></div>
+        <div class="bg-blob blob-bottom-right"></div>
+      </div>
+
+      <!-- MASTER MODAL CARD CONTAINER (MOCKUP REPLICA) -->
+      <div class="login-master-card">
+        
+        <!-- LEFT SIDE PANEL (ACCENTED GRADIENT OVERLAY & SLOGANS) -->
+        <section class="left-brand-panel" id="left-panel-bg">
+          <div class="panel-gradient-overlay"></div>
+          
+          <!-- Logo block -->
+          <div class="left-panel-header">
+            <div class="logo-group light">
+              <div class="logo-icon light">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="logo-text">
+                <h4 class="logo-title">SMS</h4>
+                <span class="logo-subtitle">Student Management System</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main text / Slogans -->
+          <div class="left-panel-content">
+            <h2 class="left-panel-slogan" id="left-slogan">Smart Campus.<br>Smarter Management.</h2>
+            <p class="left-panel-desc" id="left-desc">A complete solution to manage students, faculty, attendance, academics and more — all in one place.</p>
+            
+            <!-- Checklist Tags Grid (4 Items) -->
+            <div class="left-panel-tags" id="left-tags-grid">
+              <!-- Dynamic tags will be injected here by login.js -->
+            </div>
+          </div>
+
+          <!-- Statistics Strip at bottom of Left Panel -->
+          <div class="left-panel-footer">
+            <div class="stats-strip">
+              <div class="stat-strip-item">
+                <span class="stat-strip-icon">👥</span>
+                <div class="stat-strip-txt">
+                  <span class="stat-strip-num">5000+</span>
+                  <span class="stat-strip-lbl">Students</span>
+                </div>
+              </div>
+              <div class="stat-strip-item">
+                <span class="stat-strip-icon">👨‍🏫</span>
+                <div class="stat-strip-txt">
+                  <span class="stat-strip-num">100+</span>
+                  <span class="stat-strip-lbl">Faculty</span>
+                </div>
+              </div>
+              <div class="stat-strip-item">
+                <span class="stat-strip-icon">🏫</span>
+                <div class="stat-strip-txt">
+                  <span class="stat-strip-num">15+</span>
+                  <span class="stat-strip-lbl">Departments</span>
+                </div>
+              </div>
+              <div class="stat-strip-item">
+                <span class="stat-strip-icon">📚</span>
+                <div class="stat-strip-txt">
+                  <span class="stat-strip-num">50+</span>
+                  <span class="stat-strip-lbl">Courses</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CURVED PANEL SEPARATOR (MOCKUP REPLICA) -->
+        <div class="panel-curve-border-container">
+          <svg class="panel-curve-border" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M 85,0 C 98,30 98,70 85,100" fill="none" stroke="#FFFFFF" stroke-width="2.5" />
+          </svg>
+        </div>
+
+        <!-- RIGHT SIDE PANEL (LOGIN CONTAINER) -->
+        <section class="right-login-panel">
+          
+          <!-- Back Button positioned at top-right of panel -->
+          <div class="right-panel-top">
+            <a href="/role_selection.html" class="btn-back-role">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              <span>Back to Role Selection</span>
+            </a>
+          </div>
+
+          <!-- Login Form Box -->
+          <div class="login-card-inner">
+            
+            <!-- Centered Logo inside card -->
+            <div class="login-card-logo-group">
+              <div class="card-logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#login-card-grad)" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <defs>
+                    <linearGradient id="login-card-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#2563EB"/>
+                      <stop offset="1" stop-color="#1E3A8A"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="card-logo-text">
+                <h3 class="card-logo-title">SMS</h3>
+                <span class="card-logo-subtitle">Student Management System</span>
+              </div>
+            </div>
+
+            <!-- Colored Badge -->
+            <div class="login-badge-container">
+              <span class="login-badge-bubble" id="role-badge">
+                <span class="login-badge-icon" id="role-badge-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                </span>
+                <span class="login-badge-text" id="role-badge-text">HOD LOGIN</span>
+              </span>
+            </div>
+
+            <!-- Headings -->
+            <div class="login-welcome-block text-center">
+              <h2 class="login-welcome-title" id="welcome-heading">Welcome Back, HOD!</h2>
+              <p class="login-welcome-desc" id="welcome-sub">Sign in to access the HOD dashboard</p>
+            </div>
+
+            <!-- Forms -->
+            <form class="login-form-block" id="login-form">
+              
+              <div class="form-group-item">
+                <label for="login-id" id="login-id-label">HOD ID / Email</label>
+                <div class="input-icon-wrapper">
+                  <span class="input-icon-node">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </span>
+                  <input type="text" id="login-id" placeholder="Enter your HOD ID or email" required autocomplete="username">
+                </div>
+              </div>
+
+              <div class="form-group-item">
+                <label for="login-password">Password</label>
+                <div class="input-icon-wrapper">
+                  <span class="input-icon-node">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </span>
+                  <input type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password">
+                  <button type="button" class="password-toggle-trigger" id="password-toggle-btn" aria-label="Toggle password visibility">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-options-row">
+                <label class="login-checkbox-group">
+                  <input type="checkbox">
+                  <span class="checkbox-box-custom"></span>
+                  Remember Me
+                </label>
+                <a href="#" class="login-forgot-link">Forgot Password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-login-submit" id="submit-action-btn">
+                <svg class="submit-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+                <span>Login to Dashboard</span>
+              </button>
+
+              <div class="login-register-prompt">
+                New to the portal? <a href="#" class="login-register-link" id="register-link-btn">Register Now</a>
+              </div>
+            </form>
+
+            <!-- Security notice footer -->
+            <div class="right-panel-bottom text-center">
+              <span class="secure-badge">
+                <svg class="secure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <polyline points="9 11 11 13 15 9"></polyline>
+                </svg>
+                <span>Secure Login | Encrypted Connection</span>
+              </span>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- SVG Clip Path Definitions for Curved Separation -->
+    <svg width="0" height="0" style="position: absolute;">
+      <defs>
+        <clipPath id="panel-clip" clipPathUnits="objectBoundingBox">
+          <path d="M 0,0 L 0.85,0 C 0.98,0.3 0.98,0.7 0.85,1 L 0,1 Z" />
+        </clipPath>
+      </defs>
+    </svg>
+
+    <!-- Script loading -->
+    <script type="module" src="/src/login.js"></script>
+  </body>
+</html>

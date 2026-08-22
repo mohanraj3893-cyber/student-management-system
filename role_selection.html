@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Choose Your Role | SMS</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body>
+    <!-- Top Navigation Header -->
+    <header class="header mock-header" id="header">
+      <div class="header-container">
+        <a href="/" class="logo-group">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#header-blue-grad)" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="header-blue-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2563EB"/>
+                  <stop offset="1" stop-color="#1E3A8A"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1 class="logo-title">SMS</h1>
+            <span class="logo-subtitle">Student Management System</span>
+          </div>
+        </a>
+        
+        <div class="nav-actions">
+          <a href="/" class="btn-back-home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back to Home</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mock-roles-wrapper">
+      <!-- Background Elements -->
+      <div class="mock-bg-blobs">
+        <div class="bg-blob blob-top-left"></div>
+        <div class="bg-blob blob-bottom-right"></div>
+      </div>
+      
+      <!-- Faint Building Graphic overlay on the right background -->
+      <div class="mock-building-overlay" style="background-image: url('/about_building.jpg');"></div>
+      
+      <!-- Dot grid SVGs on the left/right side -->
+      <div class="dot-grid grid-pos-top-left">
+        <svg width="120" height="160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="dot-pattern-1" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+              <circle cx="3" cy="3" r="2.5" fill="#DDE3EA"/>
+            </pattern>
+          </defs>
+          <rect width="120" height="160" fill="url(#dot-pattern-1)"/>
+        </svg>
+      </div>
+      
+      <div class="dot-grid grid-pos-bottom-left">
+        <svg width="120" height="160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="dot-pattern-2" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+              <circle cx="3" cy="3" r="2.5" fill="#DDE3EA"/>
+            </pattern>
+          </defs>
+          <rect width="120" height="160" fill="url(#dot-pattern-2)"/>
+        </svg>
+      </div>
+
+      <div class="container mock-roles-container">
+        <!-- Title Header -->
+        <div class="mock-title-header text-center">
+          <h2 class="mock-title">Choose Your Role</h2>
+          <div class="mock-title-underline"></div>
+          <p class="mock-subtitle">Select how you want to sign in to your account</p>
+        </div>
+
+        <!-- Role Cards Grid -->
+        <div class="mock-cards-grid">
+          
+          <!-- Card 1: Admin -->
+          <div class="mock-role-card mock-admin-card">
+            <!-- Central Emblem -->
+            <div class="mock-emblem-wrapper admin-theme">
+              <div class="mock-emblem-circle">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Outer Badge Circle -->
+                  <circle cx="50" cy="50" r="40" fill="#E6F0FD"/>
+                  <!-- Core Shield Icon -->
+                  <path d="M50 32C50 32 62 36 62 45V57C62 65 50 71 50 71C50 71 38 65 38 57V45C38 36 50 32 50 32Z" fill="#0056D2" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+                  <!-- User Avatar inside shield -->
+                  <circle cx="50" cy="46" r="5" fill="#FFFFFF"/>
+                  <path d="M44 56C44 52 46.5 51 50 51C53.5 51 56 52 56 56" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Small Gear icon in bottom-right of shield -->
+                  <circle cx="59" cy="59" r="6" fill="#0056D2" stroke="#FFFFFF" stroke-width="2"/>
+                  <path d="M59 56V62M56 59H62" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="mock-card-header text-center">
+              <h3 class="mock-role-name admin-text">HOD</h3>
+              <p class="mock-role-subtitle">Head of Department</p>
+            </div>
+            
+            <div class="mock-card-divider"></div>
+            
+            <ul class="mock-features-list">
+              <li>
+                <span class="mock-list-icon admin-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </span>
+                <span class="mock-list-text">Manage users and roles</span>
+              </li>
+              <li>
+                <span class="mock-list-icon admin-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                </span>
+                <span class="mock-list-text">View reports and analytics</span>
+              </li>
+              <li>
+                <span class="mock-list-icon admin-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </span>
+                <span class="mock-list-text">System settings and config</span>
+              </li>
+            </ul>
+            
+            <a href="/login.html?role=hod" class="mock-btn-continue btn-admin-color">
+              <span>Continue</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+          </div>
+
+          <!-- Card 2: Faculty -->
+          <div class="mock-role-card mock-faculty-card">
+            <!-- Central Emblem -->
+            <div class="mock-emblem-wrapper faculty-theme">
+              <div class="mock-emblem-circle">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Outer Badge Circle -->
+                  <circle cx="50" cy="50" r="40" fill="#E6F6ED"/>
+                  <!-- Blackboard background -->
+                  <rect x="36" y="32" width="28" height="20" rx="2" fill="#0F9D58" stroke="#FFFFFF" stroke-width="2"/>
+                  <!-- Teacher figure -->
+                  <circle cx="43" cy="62" r="5" fill="#0F9D58"/>
+                  <path d="M35 73C35 68 39 67 43 67C47 67 51 68 51 73" stroke="#0F9D58" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Pointer stick -->
+                  <line x1="48" y1="46" x2="38" y2="38" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Mini student desks -->
+                  <circle cx="59" cy="63" r="3" fill="#0F9D58"/>
+                  <path d="M55 70C55 67 57 66 59 66C61 66 63 67 63 70" stroke="#0F9D58" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="mock-card-header text-center">
+              <h3 class="mock-role-name faculty-text">FACULTY</h3>
+              <p class="mock-role-subtitle">Teacher / Lecturer</p>
+            </div>
+            
+            <div class="mock-card-divider"></div>
+            
+            <ul class="mock-features-list">
+              <li>
+                <span class="mock-list-icon faculty-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </span>
+                <span class="mock-list-text">Manage classes and students</span>
+              </li>
+              <li>
+                <span class="mock-list-icon faculty-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><polyline points="8 14 10 16 14 12"></polyline></svg>
+                </span>
+                <span class="mock-list-text">Mark attendance</span>
+              </li>
+              <li>
+                <span class="mock-list-icon faculty-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </span>
+                <span class="mock-list-text">Enter marks and grades</span>
+              </li>
+            </ul>
+            
+            <a href="/login.html?role=faculty" class="mock-btn-continue btn-faculty-color">
+              <span>Continue</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+          </div>
+
+          <!-- Card 3: Student -->
+          <div class="mock-role-card mock-student-card">
+            <!-- Central Emblem -->
+            <div class="mock-emblem-wrapper student-theme">
+              <div class="mock-emblem-circle">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Outer Badge Circle -->
+                  <circle cx="50" cy="50" r="40" fill="#F1E8FB"/>
+                  <!-- Graduation hat board -->
+                  <path d="M50 30L26 40L50 50L74 40L50 30Z" fill="#6A1B9A"/>
+                  <path d="M34 44.5V57C34 62 42 66 50 66C58 66 66 62 66 57V44.5" fill="#6A1B9A" stroke="#FFFFFF" stroke-width="2"/>
+                  <!-- Hanging tassel -->
+                  <path d="M70 41.5V53.5L72 55.5" stroke="#6A1B9A" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Mini student bust in front -->
+                  <circle cx="50" cy="53" r="7" fill="#FFFFFF" stroke="#6A1B9A" stroke-width="2"/>
+                  <path d="M41 62.5C41 59 44 58 50 58C56 58 59 59 59 62.5" stroke="#6A1B9A" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="mock-card-header text-center">
+              <h3 class="mock-role-name student-text">STUDENT</h3>
+              <p class="mock-role-subtitle">Learner / Student</p>
+            </div>
+            
+            <div class="mock-card-divider"></div>
+            
+            <ul class="mock-features-list">
+              <li>
+                <span class="mock-list-icon student-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </span>
+                <span class="mock-list-text">View profile and timetable</span>
+              </li>
+              <li>
+                <span class="mock-list-icon student-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                </span>
+                <span class="mock-list-text">View attendance and results</span>
+              </li>
+              <li>
+                <span class="mock-list-icon student-theme">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </span>
+                <span class="mock-list-text">Apply for leave</span>
+              </li>
+            </ul>
+            
+            <a href="/login.html?role=student" class="mock-btn-continue btn-student-color">
+              <span>Continue</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Security Badge Notice -->
+        <div class="mock-security-notice">
+          <div class="security-card glassmorphism">
+            <span class="security-shield-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 11 11 13 15 9"></polyline>
+              </svg>
+            </span>
+            <div class="security-card-text">
+              <p class="sec-p-1">Your data is secure with us.</p>
+              <p class="sec-p-2">Please choose the role that best describes you.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer dark-footer" id="contact">
+      <div class="container footer-container">
+        <!-- Logo block -->
+        <div class="footer-col footer-info">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">SMS</h4>
+              <span class="logo-subtitle">Student Management System</span>
+            </div>
+          </div>
+          <p class="footer-desc">
+            A comprehensive, digital academic management portal designed for students, faculty, and administrators.
+          </p>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="footer-col footer-links">
+          <h4 class="footer-col-title">Quick Links</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#features">Features</a></li>
+            <li><a href="/role_selection.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <!-- Contact details -->
+        <div class="footer-col footer-contact">
+          <h4 class="footer-col-title">Contact Us</h4>
+          <ul class="contact-details">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>info@sms.com</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+91 98765 43210</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>Chennai, Tamil Nadu, India</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Follow us social links -->
+        <div class="footer-col footer-socials">
+          <h4 class="footer-col-title">Follow Us</h4>
+          <div class="social-icons">
+            <a href="#" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="#" aria-label="Twitter">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="#" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 SMS. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Script loading -->
+    <script type="module" src="/src/role_selection.js"></script>
+  </body>
+</html>

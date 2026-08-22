@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SMS | Student Management System</title>
+    <!-- Google Fonts & Main Stylesheet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+  <body>
+    <!-- Top Navigation Header -->
+    <header class="header" id="header">
+      <div class="header-container">
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #0F172A;">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <a href="#home" class="logo-group">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#blue-gradient)" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="blue-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2563EB"/>
+                  <stop offset="1" stop-color="#1E3A8A"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1 class="logo-title">SMS</h1>
+            <span class="logo-subtitle">Student Management System</span>
+          </div>
+        </a>
+        
+        <nav class="nav-menu" id="nav-menu">
+          <ul>
+            <li><a href="#home" class="nav-link active">Home</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="nav-actions">
+          <a href="/role_selection.html" class="btn btn-login" id="login-trigger-btn">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;">
+              <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Login</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero-section" id="home">
+        <div class="section-bg-blobs">
+          <div class="blob blob-1"></div>
+          <div class="blob blob-2"></div>
+        </div>
+        <div class="container hero-container">
+          <div class="hero-content">
+            <span class="hero-badge">
+              • SMART • SECURE • EFFICIENT
+            </span>
+            <h2 class="hero-title">
+              Empowering the<br>
+              <span class="highlight-text">Computer Science &amp; Engineering</span><br>
+              Department
+            </h2>
+            <p class="hero-desc">
+              Manage students, faculty, attendance, internal marks, announcements, and academic activities through one intelligent department portal.
+            </p>
+            <div class="hero-buttons">
+              <a href="/role_selection.html" class="btn btn-primary">
+                <span>Get Started</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+              <a href="#features" class="btn btn-secondary">Explore Features</a>
+            </div>
+          </div>
+          
+          <div class="hero-visual">
+            <div class="visual-wrapper">
+              <img src="/hero_illustration.jpg" alt="CSE Department Dashboard illustration" class="hero-img">
+            </div>
+          </div>
+
+          <!-- 3 Mini Stats Cards Row Grid -->
+          <div class="hero-quick-stats">
+            <div class="stat-mini-card">
+              <div class="stat-icon-bubble blue">👥</div>
+              <div class="stat-txt-wrap">
+                <span class="stat-num" data-target="1200">1200+</span>
+                <span class="stat-lbl">Students Managed</span>
+              </div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="stat-icon-bubble green">🎓</div>
+              <div class="stat-txt-wrap">
+                <span class="stat-num" data-target="45">45+</span>
+                <span class="stat-lbl">Faculty Members</span>
+              </div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="stat-icon-bubble purple">📊</div>
+              <div class="stat-txt-wrap">
+                <span class="stat-num" data-target="98">98%</span>
+                <span class="stat-lbl">Attendance Accuracy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="features-section" id="features">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-subtitle">Features</span>
+            <h3 class="section-title">Department Features</h3>
+            <div class="title-bar"></div>
+          </div>
+          
+          <div class="features-grid">
+            <!-- Card 1 -->
+            <div class="feature-card glassmorphism">
+              <div class="feature-icon-wrapper std-icon">
+                <span class="feature-icon">👨‍🎓</span>
+              </div>
+              <h4 class="feature-card-title">Student Management</h4>
+              <p class="feature-card-desc">
+                Streamline enrollment, profile updates, academic history, and comprehensive student lifecycle tracking in one secure module.
+              </p>
+              <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="feature-card glassmorphism">
+              <div class="feature-icon-wrapper fac-icon">
+                <span class="feature-icon">👨‍🏫</span>
+              </div>
+              <h4 class="feature-card-title">Faculty Management</h4>
+              <p class="feature-card-desc">
+                Organize teaching assignments, research profiles, faculty directory, workload schedules, and professional accomplishments efficiently.
+              </p>
+              <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="feature-card glassmorphism">
+              <div class="feature-icon-wrapper att-icon">
+                <span class="feature-icon">📅</span>
+              </div>
+              <h4 class="feature-card-title">Attendance Tracking</h4>
+              <p class="feature-card-desc">
+                Digitalize daily check-ins, automate percentage alerts, generate custom reports, and keep parents updated via SMS/Email integrations.
+              </p>
+              <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Card 4 -->
+            <div class="feature-card glassmorphism">
+              <div class="feature-icon-wrapper mrk-icon">
+                <span class="feature-icon">📊</span>
+              </div>
+              <h4 class="feature-card-title">Internal Marks</h4>
+              <p class="feature-card-desc">
+                Seamless mark entry, GPA calculations, performance analytics, progress charts, and transparent mark distribution for students.
+              </p>
+              <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Card 5 -->
+            <div class="feature-card glassmorphism">
+              <div class="feature-icon-wrapper ann-icon">
+                <span class="feature-icon">📢</span>
+              </div>
+              <h4 class="feature-card-title">Announcements</h4>
+              <p class="feature-card-desc">
+                Broadcast instant circulars, event details, exam schedules, and department bulletins to target audiences instantly.
+              </p>
+              <div class="card-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section class="about-section" id="about">
+        <div class="container about-container">
+          <div class="about-visual">
+            <div class="about-visual-wrapper">
+              <img src="/about_building.jpg" alt="University engineering department building illustration" class="about-img">
+
+            </div>
+          </div>
+          
+          <div class="about-content">
+            <span class="section-subtitle">Overview</span>
+            <h3 class="section-title">About Our Department Portal</h3>
+            <div class="title-bar left-align"></div>
+            <p class="about-text">
+              The Computer Science & Engineering Department Portal is a state-of-the-art educational management ecosystem designed to consolidate academic operations. By offering a single central hub for administrators, educators, and students, the portal streamlines communication, reduces manual record-keeping errors, and enhances overall department efficiency.
+            </p>
+            <p class="about-text">
+              From secure database architectures for records management to real-time analytics for student performance metrics, our platform is built on modern technology stacks designed to support the academic rigor of engineering studies.
+            </p>
+            <a href="#features" class="btn btn-primary learn-more-btn">
+              <span>Learn More</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+      <div class="container footer-container">
+        <!-- Footer Info -->
+        <div class="footer-col footer-info">
+          <div class="logo-group light">
+            <div class="logo-icon light">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#EFF6FF" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#EFF6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h4 class="logo-title">CSE Department Portal</h4>
+              <span class="logo-subtitle">Academic Management System</span>
+            </div>
+          </div>
+          <p class="footer-desc">
+            A comprehensive, digital academic management portal designed for Computer Science & Engineering students and faculty.
+          </p>
+        </div>
+        
+        <!-- Footer Links -->
+        <div class="footer-col footer-links">
+          <h4 class="footer-col-title">Quick Links</h4>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        
+        <!-- Footer Contact -->
+        <div class="footer-col footer-contact">
+          <h4 class="footer-col-title">Contact Us</h4>
+          <ul class="contact-details">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>cse.support@university.edu</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+1 234 567 890</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>Main Block, Campus Road, NY</span>
+            </li>
+          </ul>
+          
+          <div class="social-icons">
+            <a href="#" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="#" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+            <a href="#" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2026 CSE Department Portal. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Interactive Login Modal -->
+    <div class="modal-overlay" id="login-modal">
+      <div class="modal-card glassmorphism">
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+        <div class="modal-header">
+          <div class="modal-logo">🎓</div>
+          <h3>CSE Department Portal</h3>
+          <p>Access your academic dashboard</p>
+        </div>
+        <form class="login-form" onsubmit="event.preventDefault(); alert('Login submitted (Demo Portal)');">
+          <div class="form-group">
+            <label for="username">Username / Roll No</label>
+            <input type="text" id="username" placeholder="e.g., CSE2026045" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+          </div>
+          <div class="form-options">
+            <label class="checkbox-container">
+              <input type="checkbox">
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a href="#" class="forgot-pass">Forgot Password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        </form>
+        <div class="modal-footer">
+          <p>Need support? Contact <a href="mailto:cse.support@university.edu">HOD Desk</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script loading -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
