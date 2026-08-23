@@ -1,5 +1,25 @@
 import './style.css';
 
+/* ==========================================
+   GLOBAL PRODUCTION API ROUTER
+   Automatically routes relative /api requests to Railway backend on Cloudflare
+   ========================================== */
+const RAILWAY_BACKEND_URL = 'https://student-management-system-production-070e.up.railway.app';
+if (typeof window !== 'undefined') {
+  const isCloudflare = window.location.hostname.includes('workers.dev') || window.location.hostname.includes('pages.dev');
+  if (isCloudflare) {
+    const rawFetch = window.fetch;
+    window.fetch = function (resource, options) {
+      if (typeof resource === 'string' && resource.startsWith('/api')) {
+        resource = RAILWAY_BACKEND_URL + resource;
+      } else if (resource && typeof resource === 'object' && resource.url && resource.url.startsWith('/api')) {
+        resource = new Request(RAILWAY_BACKEND_URL + resource.url, resource);
+      }
+      return rawFetch.call(this, resource, options);
+    };
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ==========================================
