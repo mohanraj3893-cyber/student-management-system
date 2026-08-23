@@ -379,10 +379,15 @@ document.addEventListener('DOMContentLoaded', () => {
   async function initRegisterPage() {
     try {
       const response = await fetch('/api/auth/admin-exists');
-      const data = await response.json();
-      const adminExists = data.exists;
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (err) {
+        data = {};
+      }
+      const adminExists = !!data.exists;
 
-      if (!adminExists) {
+      if (!adminExists && data.exists !== undefined) {
         role = 'admin';
         setupFormWithConfig('admin');
         showAlert('System Setup: Register the initial HOD account to initialize the CSE Portal.', 'success');
@@ -799,10 +804,15 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
 
-        const data = await response.json();
+        let data = {};
+        try {
+          data = await response.json();
+        } catch (err) {
+          data = {};
+        }
 
         if (!response.ok) {
-          throw new Error(data.message || 'Registration failed.');
+          throw new Error(data.message || `Registration failed (${response.status}). Ensure backend API server is running.`);
         }
 
         const msg = data.message || 'Registration submitted successfully. Your account is waiting for HOD approval.';
