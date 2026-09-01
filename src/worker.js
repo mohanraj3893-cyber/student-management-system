@@ -155,11 +155,12 @@ async function handleApiRequest(request, env) {
       const passwordHash = await hashPassword(password);
       const isApproved = normalizedRole === 'admin' ? 1 : 0; // Initial HOD auto-approved
 
-      const insertUser = await db.prepare(
+      await db.prepare(
         'INSERT INTO users (username, email, password_hash, role_id, is_approved, is_active) VALUES (?, ?, ?, ?, ?, 1)'
       ).bind(username, email, passwordHash, roleRow.id, isApproved).run();
 
-      const userId = insertUser.meta.last_row_id;
+      const userRow = await db.prepare('SELECT id FROM users WHERE username = ?').bind(username).first();
+      const userId = userRow ? userRow.id : null;
       const targetDept = department || extraData?.department || 'Computer Science & Engineering';
 
       if (normalizedRole === 'student') {
@@ -168,9 +169,9 @@ async function handleApiRequest(request, env) {
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
           userId,
-          name,
-          username,
-          targetDept,
+          name || '',
+          username || '',
+          targetDept || '',
           extraData?.year || 'I-Year',
           extraData?.semester || 'I',
           extraData?.section || 'A',
@@ -185,10 +186,10 @@ async function handleApiRequest(request, env) {
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
           userId,
-          name,
-          username,
+          name || '',
+          username || '',
           extraData?.designation || (normalizedRole === 'admin' ? 'Head of Department' : 'Assistant Professor'),
-          targetDept,
+          targetDept || '',
           extraData?.phone || '',
           photo || '',
           extraData?.qualification || 'M.Tech / Ph.D'
