@@ -8,9 +8,16 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+**/node_modules/**
 dist
 dist-ssr
 *.local
+.env
+server/.env
+mysql_data
+.mysql_data*
+scratch/
+*.pid
 
 # Editor directories and files
 .vscode/*

@@ -1,3 +1,4 @@
+import './api_config.js';
 import './style.css';
 
 document.addEventListener('DOMContentLoaded', () => {
