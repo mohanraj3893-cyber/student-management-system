@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to load assessment logs.');
-      const list = await res.json();
+      const rawData = await res.json();
+      const list = Array.isArray(rawData) ? rawData : (rawData.logs || []);
       
       tbody.innerHTML = '';
 
@@ -86,19 +87,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       list.forEach(m => {
         const tr = document.createElement('tr');
-        const percentage = ((m.marksObtained / m.maxMarks) * 100).toFixed(1);
+        const obtained = m.marks_obtained ?? m.marksObtained ?? 0;
+        const max = m.max_marks ?? m.maxMarks ?? 100;
+        const percentage = ((obtained / max) * 100).toFixed(1);
         const isPass = parseFloat(percentage) >= 50;
+        const regNo = m.register_number || m.registerNumber || 'N/A';
+        const studentName = m.student_name || m.studentName || 'Student';
+        const subCode = m.subject_code || m.subjectCode || '';
+        const subName = m.subject_name || m.subjectName || '';
+        const facultyName = m.faculty_name || m.facultyName || 'Staff';
+        const examType = m.exam_type || m.examType || 'CIA-1';
 
         tr.innerHTML = `
-          <td><strong>${m.registerNumber}</strong></td>
-          <td>${m.studentName}</td>
+          <td><strong>${regNo}</strong></td>
+          <td>${studentName}</td>
           <td>
-            <strong>${m.subjectCode}</strong>
-            <span style="font-size: 0.78rem; color: #64748b; display: block;">${m.subjectName}</span>
+            <strong>${subCode}</strong>
+            <span style="font-size: 0.78rem; color: #64748b; display: block;">${subName}</span>
           </td>
-          <td>${m.facultyName}</td>
-          <td><span class="badge-pill bg-blue-light">${m.examType}</span></td>
-          <td><strong style="color: #0F172A;">${m.marksObtained}</strong> / ${m.maxMarks}</td>
+          <td>${facultyName}</td>
+          <td><span class="badge-pill bg-blue-light">${examType}</span></td>
+          <td><strong style="color: #0F172A;">${obtained}</strong> / ${max}</td>
           <td><span class="badge-pill ${isPass ? 'bg-green-light' : 'bg-red-light'}">${percentage}%</span></td>
         `;
         tbody.appendChild(tr);

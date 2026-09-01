@@ -22,30 +22,28 @@ document.addEventListener('DOMContentLoaded', () => {
           const res = await fetch('/api/attendance/history', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          const data = await res.json();
+          const rawData = await res.json();
+          const list = Array.isArray(rawData) ? rawData : (rawData.records || []);
           
-          if (!res.ok) throw new Error(data.message || 'Failed to fetch attendance reports.');
+          if (!res.ok) throw new Error(rawData.message || 'Failed to fetch attendance reports.');
 
           // Generate CSV
-          const headers = ['Session ID', 'Date', 'Period', 'Subject Code', 'Subject Name', 'Faculty Name', 'Section', 'Semester', 'Student Name', 'Register Number', 'Status'];
+          const headers = ['Student ID', 'Register Number', 'Student Name', 'Department', 'Year', 'Semester', 'Section', 'Total Days', 'Present Days', 'Attendance %'];
           const rows = [];
           
-          data.forEach(s => {
-            s.records.forEach(r => {
-              rows.push([
-                s.id,
-                s.date,
-                s.period,
-                s.subjectCode,
-                s.subjectName,
-                s.facultyName,
-                s.section,
-                s.semester,
-                r.studentName,
-                r.registerNumber,
-                r.status
-              ]);
-            });
+          list.forEach(s => {
+            rows.push([
+              s.id || '',
+              s.register_number || s.registerNumber || '',
+              s.name || s.studentName || '',
+              s.department || '',
+              s.year || '',
+              s.semester || '',
+              s.section || '',
+              s.total_days ?? s.totalDays ?? 0,
+              s.present_days ?? s.presentDays ?? 0,
+              `${s.percentage ?? 0}%`
+            ]);
           });
 
           downloadCSV('attendance_report.csv', headers, rows);
@@ -55,25 +53,25 @@ document.addEventListener('DOMContentLoaded', () => {
           const res = await fetch('/api/marks/logs', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          const data = await res.json();
+          const rawData = await res.json();
+          const list = Array.isArray(rawData) ? rawData : (rawData.logs || []);
 
-          if (!res.ok) throw new Error(data.message || 'Failed to fetch marks reports.');
+          if (!res.ok) throw new Error(rawData.message || 'Failed to fetch marks reports.');
 
           // Generate CSV
-          const headers = ['ID', 'Register Number', 'Student Name', 'Subject Code', 'Subject Name', 'Staff Advisor', 'Assessment Block', 'Marks Obtained', 'Max Marks'];
+          const headers = ['ID', 'Register Number', 'Student Name', 'Subject Code', 'Subject Name', 'Exam Type', 'Marks Obtained', 'Max Marks'];
           const rows = [];
 
-          data.forEach(m => {
+          list.forEach(m => {
             rows.push([
-              m.id,
-              m.registerNumber,
-              m.studentName,
-              m.subjectCode,
-              m.subjectName,
-              m.facultyName,
-              m.examType,
-              m.marksObtained,
-              m.maxMarks
+              m.id || '',
+              m.register_number || m.registerNumber || '',
+              m.student_name || m.studentName || '',
+              m.subject_code || m.subjectCode || '',
+              m.subject_name || m.subjectName || '',
+              m.exam_type || m.examType || '',
+              m.marks_obtained ?? m.marksObtained ?? '',
+              m.max_marks ?? m.maxMarks ?? ''
             ]);
           });
 

@@ -75,12 +75,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch('/api/announcements', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      const list = await res.json();
+      const rawData = await res.json();
+      const list = Array.isArray(rawData) ? rawData : (rawData.announcements || []);
       const feedContainer = document.getElementById('announcements-feed-container');
       if (!feedContainer) return;
 
       feedContainer.innerHTML = '';
-      if (!Array.isArray(list) || list.length === 0) {
+      if (list.length === 0) {
         feedContainer.innerHTML = `
           <div style="text-align: center; padding: 3rem 1.5rem; color: #64748B;">
             <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">📢</span>

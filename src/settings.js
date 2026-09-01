@@ -66,18 +66,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const profile = await res.json();
 
       // Populate form
-      document.getElementById('set-hod-name').value = profile.name || '';
-      document.getElementById('set-hod-email').value = profile.email || '';
-      document.getElementById('set-hod-phone').value = profile.phone || '';
-      document.getElementById('set-hod-emp-id').value = profile.employeeId || profile.username || '';
-      document.getElementById('set-hod-designation').value = profile.designation || 'Head of Department (HOD)';
-      document.getElementById('set-dept-name').value = profile.department || 'Computer Science & Engineering';
+      const nameInput = document.getElementById('set-hod-name');
+      if (nameInput) nameInput.value = profile.name || '';
+      const emailInput = document.getElementById('set-hod-email');
+      if (emailInput) emailInput.value = profile.email || '';
+      const phoneInput = document.getElementById('set-hod-phone');
+      if (phoneInput) phoneInput.value = profile.phone || '';
+      const empIdInput = document.getElementById('set-hod-emp-id');
+      if (empIdInput) empIdInput.value = profile.employee_id || profile.employeeId || profile.username || '';
+      const desigInput = document.getElementById('set-hod-designation');
+      if (desigInput) desigInput.value = profile.designation || 'Head of Department (HOD)';
+      const deptInput = document.getElementById('set-dept-name');
+      if (deptInput) deptInput.value = profile.department || 'Computer Science & Engineering';
 
       // Photo
       const photoPreview = document.getElementById('profile-photo-preview');
-      const avatarSrc = (window.getAvatarUrl ? window.getAvatarUrl(profile.name, profile.photoPath) : (profile.photoPath || ''));
+      const photoPath = profile.photo_path || profile.photoPath || '';
+      const avatarSrc = (window.getAvatarUrl ? window.getAvatarUrl(profile.name, photoPath) : (photoPath || ''));
       if (photoPreview) photoPreview.src = avatarSrc;
-      if (removeBtn) removeBtn.style.display = (profile.photoPath && profile.photoPath.trim()) ? 'inline-block' : 'none';
+      if (typeof removeBtn !== 'undefined' && removeBtn) removeBtn.style.display = (photoPath && photoPath.trim()) ? 'inline-block' : 'none';
       document.querySelectorAll('.nav-profile-avatar img, .profile-widget-avatar img').forEach(img => {
         img.src = avatarSrc;
       });
