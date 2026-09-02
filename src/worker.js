@@ -1085,28 +1085,197 @@ async function handleApiRequest(request, env) {
     // 8. SUBJECTS MODULE
     // =============================================================
     if (path === '/api/subjects' && method === 'GET') {
-      const results = await db.prepare(`
-        SELECT s.*, f.name as faculty_name
+      const authUser = await getUserFromRequest(request, env);
+      let deptFilter = url.searchParams.get('department');
+
+      if (authUser && (authUser.role === 'admin' || authUser.role === 'hod')) {
+        const adminUser = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        if (adminUser?.department) {
+          deptFilter = adminUser.department;
+        }
+      }
+
+      let query = `
+        SELECT s.*,
+               f.name as faculty_name,
+               f.name as full_name,
+               f.employee_id,
+               f.photo_path as faculty_photo_path
         FROM subjects s
         LEFT JOIN faculty f ON s.faculty_id = f.id
-        ORDER BY s.semester, s.code
-      `).all();
-      return jsonResponse({ success: true, subjects: results.results });
+      `;
+      const params = [];
+      if (deptFilter) {
+        query += ` WHERE s.department = ?`;
+        params.push(deptFilter);
+      }
+      query += ` ORDER BY s.semester, s.code`;
+
+      const results = params.length > 0
+        ? await db.prepare(query).bind(...params).all()
+        : await db.prepare(query).all();
+
+      const formattedSubjects = (results.results || []).map(s => {
+        const facName = s.faculty_name || s.full_name || null;
+        return {
+          id: s.id,
+          code: s.code,
+          subject_code: s.code,
+          subjectCode: s.code,
+          name: s.name,
+          subject_name: s.name,
+          subjectName: s.name,
+          credits: s.credits || 3,
+          semester: s.semester,
+          year: s.year || 'III-Year',
+          section: s.section || 'A',
+          department: s.department,
+          faculty_id: s.faculty_id || null,
+          facultyId: s.faculty_id || null,
+          faculty_name: facName || 'Unassigned',
+          facultyName: facName || 'Unassigned',
+          assigned_faculty_name: facName || 'Unassigned',
+          assignedFaculty: facName || 'Unassigned',
+          assigned_faculty: facName || 'Unassigned',
+          employee_id: s.employee_id || null,
+          photo_path: s.faculty_photo_path || null,
+          photoPath: s.faculty_photo_path || null
+        };
+      });
+
+      return jsonResponse({ success: true, subjects: formattedSubjects, data: formattedSubjects });
     }
 
     if (path === '/api/subjects' && method === 'POST') {
       const authUser = await getUserFromRequest(request, env);
-      if (!authUser || authUser.role !== 'admin') return jsonResponse({ message: 'Forbidden' }, 403);
+      if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'hod')) {
+        return jsonResponse({ message: 'Forbidden' }, 403);
+      }
 
-      const body = await request.json();
-      const { code, name, credits, semester, year, section, department, facultyId } = body;
+      const body = await request.json().catch(() => ({}));
+      const code = body.code || body.subject_code || body.subjectCode;
+      const name = body.name || body.subject_name || body.subjectName;
+      const credits = parseInt(body.credits, 10) || 3;
+      const semester = body.semester;
+      const year = body.year || 'III-Year';
+      const section = body.section || 'A';
+      let department = body.department || 'Computer Science & Engineering';
+      let facultyId = body.facultyId !== undefined ? body.facultyId : body.faculty_id;
+      facultyId = facultyId ? parseInt(facultyId, 10) : null;
+
+      const adminUser = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      if (adminUser?.department) {
+        department = adminUser.department;
+      }
+
+      if (!code || !name || !semester) {
+        return jsonResponse({ message: 'Subject code, name, and semester are required.' }, 400);
+      }
+
+      if (facultyId) {
+        const fac = await db.prepare('SELECT id, department, name FROM faculty WHERE id = ?').bind(facultyId).first();
+        if (!fac) {
+          return jsonResponse({ message: 'Selected faculty not found.' }, 404);
+        }
+        if (fac.department !== department) {
+          return jsonResponse({ message: 'Cannot assign faculty from another department.' }, 403);
+        }
+      }
 
       await db.prepare(`
         INSERT INTO subjects (code, name, credits, semester, year, section, department, faculty_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(code, name, credits || 3, semester, year || 'III-Year', section || 'A', department || 'Computer Science & Engineering', facultyId || null).run();
+      `).bind(code, name, credits, semester, year, section, department, facultyId).run();
 
       return jsonResponse({ success: true, message: 'Subject created successfully.' });
+    }
+
+    const subjectIdMatch = path.match(/^\/api\/subjects\/(\d+)$/);
+    if (subjectIdMatch && (method === 'PUT' || method === 'POST')) {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'hod')) {
+        return jsonResponse({ message: 'Forbidden' }, 403);
+      }
+
+      const subjectId = subjectIdMatch[1];
+      const existing = await db.prepare('SELECT * FROM subjects WHERE id = ?').bind(subjectId).first();
+      if (!existing) return jsonResponse({ message: 'Subject not found.' }, 404);
+
+      const adminUser = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      if (adminUser?.department && existing.department !== adminUser.department) {
+        return jsonResponse({ message: 'Forbidden: Cannot edit subjects outside your department.' }, 403);
+      }
+
+      const body = await request.json().catch(() => ({}));
+      const name = (body.name || body.subject_name || body.subjectName || existing.name);
+      const credits = body.credits !== undefined ? parseInt(body.credits, 10) : existing.credits;
+      const semester = (body.semester || existing.semester);
+      const year = (body.year || existing.year);
+      const section = (body.section || existing.section);
+      let facultyId = body.facultyId !== undefined ? body.facultyId : body.faculty_id;
+      facultyId = facultyId ? parseInt(facultyId, 10) : null;
+
+      if (facultyId) {
+        const fac = await db.prepare('SELECT id, department, name FROM faculty WHERE id = ?').bind(facultyId).first();
+        if (!fac) {
+          return jsonResponse({ message: 'Selected faculty not found.' }, 404);
+        }
+        if (fac.department !== existing.department) {
+          return jsonResponse({ message: 'Cannot assign faculty from another department.' }, 403);
+        }
+      }
+
+      await db.prepare(`
+        UPDATE subjects
+        SET name = ?, credits = ?, semester = ?, year = ?, section = ?, faculty_id = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).bind(name, credits, semester, year, section, facultyId, subjectId).run();
+
+      const updated = await db.prepare(`
+        SELECT s.*, f.name as faculty_name
+        FROM subjects s
+        LEFT JOIN faculty f ON s.faculty_id = f.id
+        WHERE s.id = ?
+      `).bind(subjectId).first();
+
+      return jsonResponse({
+        success: true,
+        message: 'Subject updated successfully.',
+        subject: {
+          id: updated.id,
+          code: updated.code,
+          name: updated.name,
+          credits: updated.credits,
+          semester: updated.semester,
+          year: updated.year,
+          section: updated.section,
+          department: updated.department,
+          faculty_id: updated.faculty_id,
+          facultyId: updated.faculty_id,
+          faculty_name: updated.faculty_name || 'Unassigned',
+          facultyName: updated.faculty_name || 'Unassigned',
+          assigned_faculty_name: updated.faculty_name || 'Unassigned'
+        }
+      });
+    }
+
+    if (subjectIdMatch && method === 'DELETE') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'hod')) {
+        return jsonResponse({ message: 'Forbidden' }, 403);
+      }
+
+      const subjectId = subjectIdMatch[1];
+      const existing = await db.prepare('SELECT * FROM subjects WHERE id = ?').bind(subjectId).first();
+      if (!existing) return jsonResponse({ message: 'Subject not found.' }, 404);
+
+      const adminUser = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      if (adminUser?.department && existing.department !== adminUser.department) {
+        return jsonResponse({ message: 'Forbidden: Cannot delete subjects outside your department.' }, 403);
+      }
+
+      await db.prepare('DELETE FROM subjects WHERE id = ?').bind(subjectId).run();
+      return jsonResponse({ success: true, message: 'Subject deleted successfully.' });
     }
 
     if (path === '/api/subjects/my-subjects' && method === 'GET') {
@@ -1128,22 +1297,35 @@ async function handleApiRequest(request, env) {
       if (!student) return jsonResponse({ success: true, subjects: [] });
 
       const subjects = await db.prepare(`
-        SELECT s.*, f.name as faculty_name
+        SELECT s.*, f.name as faculty_name, f.photo_path as faculty_photo_path
         FROM subjects s
         LEFT JOIN faculty f ON s.faculty_id = f.id
         WHERE s.department = ? AND s.year = ? AND s.semester = ? AND (s.section = ? OR s.section = 'ALL')
         ORDER BY s.code
       `).bind(student.department, student.year, student.semester, student.section).all();
 
-      return jsonResponse({ success: true, subjects: subjects.results });
-    }
+      const formatted = (subjects.results || []).map(s => ({
+        id: s.id,
+        code: s.code,
+        subjectCode: s.code,
+        subject_code: s.code,
+        name: s.name,
+        subjectName: s.name,
+        subject_name: s.name,
+        credits: s.credits,
+        semester: s.semester,
+        year: s.year,
+        section: s.section,
+        department: s.department,
+        facultyId: s.faculty_id,
+        faculty_id: s.faculty_id,
+        facultyName: s.faculty_name || 'Not Assigned',
+        faculty_name: s.faculty_name || 'Not Assigned',
+        assigned_faculty_name: s.faculty_name || 'Not Assigned',
+        photoPath: s.faculty_photo_path || null
+      }));
 
-    const subjectIdMatch = path.match(/^\/api\/subjects\/(\d+)$/);
-    if (subjectIdMatch && method === 'DELETE') {
-      const authUser = await getUserFromRequest(request, env);
-      if (!authUser || authUser.role !== 'admin') return jsonResponse({ message: 'Forbidden' }, 403);
-      await db.prepare('DELETE FROM subjects WHERE id = ?').bind(subjectIdMatch[1]).run();
-      return jsonResponse({ success: true, message: 'Subject deleted.' });
+      return jsonResponse({ success: true, subjects: formatted });
     }
 
     // =============================================================

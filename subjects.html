@@ -526,13 +526,15 @@
           safeList.forEach(sub => {
             const tr = document.createElement('tr');
 
+            const facId = sub.facultyId || sub.faculty_id;
+            const facName = sub.assigned_faculty_name || sub.facultyName || sub.faculty_name || sub.assignedFaculty || sub.assigned_faculty;
+
             let facultyColumnMarkup = '<span class="badge-pill bg-red-light">Unassigned</span>';
-            if (sub.facultyId && sub.facultyName !== 'Not Assigned') {
-              const facName = sub.facultyName || 'Faculty';
+            if (facId && facName && facName !== 'Unassigned' && facName !== 'Not Assigned') {
               const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230056D2'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E"));
 
-              const matchedFac = facultyList.find(f => f.id === sub.facultyId || f.userId === sub.facultyId);
-              const avatarUrl = getAvatar(facName, matchedFac ? matchedFac.photoPath : null);
+              const matchedFac = facultyList.find(f => f.id === facId || f.userId === facId || f.name === facName);
+              const avatarUrl = getAvatar(facName, (matchedFac ? (matchedFac.photoPath || matchedFac.photo_path) : (sub.photoPath || sub.photo_path)));
 
               facultyColumnMarkup = `
                 <div class="table-faculty-badge">
@@ -543,8 +545,8 @@
             }
 
             tr.innerHTML = `
-              <td><strong>${sub.code}</strong></td>
-              <td>${sub.name}</td>
+              <td><strong>${sub.code || sub.subject_code || sub.subjectCode}</strong></td>
+              <td>${sub.name || sub.subject_name || sub.subjectName}</td>
               <td>${sub.credits} Credits</td>
               <td>${sub.department || currentHodDept}</td>
               <td>${normalizeSemester(sub.semester)}</td>
@@ -562,7 +564,7 @@
 
             // Delete Action
             tr.querySelector('.btn-delete-subject').addEventListener('click', async () => {
-              if (confirm(`Are you sure you want to delete subject ${sub.code}?`)) {
+              if (confirm(`Are you sure you want to delete subject ${sub.code || sub.subject_code}?`)) {
                 await deleteSubject(sub.id);
               }
             });
@@ -622,14 +624,14 @@
           if (sub) {
             modalTitle.textContent = 'Edit Subject';
             pkInput.value = sub.id;
-            codeInput.value = sub.code;
+            codeInput.value = sub.code || sub.subject_code || sub.subjectCode || '';
             codeInput.disabled = true;
-            nameInput.value = sub.name;
-            creditsInput.value = sub.credits;
-            semInput.value = sub.semester;
+            nameInput.value = sub.name || sub.subject_name || sub.subjectName || '';
+            creditsInput.value = sub.credits || 3;
+            semInput.value = sub.semester || '';
             if (yearSelect) yearSelect.value = sub.year || 'III-Year';
             if (sectionSelect) sectionSelect.value = sub.section || 'A';
-            facDropdown.value = sub.facultyId || '';
+            facDropdown.value = (sub.facultyId || sub.faculty_id || '');
           } else {
             modalTitle.textContent = 'Add New Subject';
             pkInput.value = '';
