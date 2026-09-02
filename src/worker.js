@@ -742,7 +742,18 @@ async function handleApiRequest(request, env) {
     // 5. STUDENTS MODULE
     // =============================================================
     if (path === '/api/students' && method === 'GET') {
-      const department = url.searchParams.get('department');
+      const authUser = await getUserFromRequest(request, env);
+      const isHod = authUser && (String(authUser.role).toLowerCase() === 'admin' || String(authUser.role).toLowerCase() === 'hod');
+
+      let department = url.searchParams.get('department');
+      // If caller is HOD, ALWAYS enforce their verified department from D1 as single source of truth
+      if (isHod) {
+        const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        if (hodFac?.department) {
+          department = hodFac.department;
+        }
+      }
+
       const year = url.searchParams.get('year');
       const semester = url.searchParams.get('semester');
       const section = url.searchParams.get('section');
@@ -755,16 +766,28 @@ async function handleApiRequest(request, env) {
       if (semester && semester !== 'ALL') { query += ' AND s.semester = ?'; params.push(semester); }
       if (section && section !== 'ALL') { query += ' AND s.section = ?'; params.push(section); }
 
-      query += ' ORDER BY s.name ASC';
+      query += ' ORDER BY s.year ASC, s.semester ASC, s.name ASC';
       const results = await db.prepare(query).bind(...params).all();
-      return jsonResponse({ success: true, count: results.results.length, students: results.results });
+      const mapped = (results.results || []).map(s => ({
+        ...s,
+        registerNumber: s.register_number || s.registerNumber,
+        photoPath: s.photo_path || s.photoPath
+      }));
+      return jsonResponse({ success: true, count: mapped.length, students: mapped });
     }
 
     const studentIdMatch = path.match(/^\/api\/students\/(\d+)$/);
     if (studentIdMatch && method === 'GET') {
       const student = await db.prepare('SELECT s.*, u.email FROM students s JOIN users u ON s.user_id = u.id WHERE s.id = ?').bind(studentIdMatch[1]).first();
       if (!student) return jsonResponse({ message: 'Student not found' }, 404);
-      return jsonResponse({ success: true, student });
+      return jsonResponse({
+        success: true,
+        student: {
+          ...student,
+          registerNumber: student.register_number || student.registerNumber,
+          photoPath: student.photo_path || student.photoPath
+        }
+      });
     }
 
     if (studentIdMatch && method === 'PUT') {
@@ -778,7 +801,8 @@ async function handleApiRequest(request, env) {
 
     if (studentIdMatch && method === 'DELETE') {
       const authUser = await getUserFromRequest(request, env);
-      if (!authUser || authUser.role !== 'admin') return jsonResponse({ message: 'Forbidden' }, 403);
+      const isHod = authUser && (String(authUser.role).toLowerCase() === 'admin' || String(authUser.role).toLowerCase() === 'hod');
+      if (!isHod) return jsonResponse({ message: 'Forbidden. HOD access required.' }, 403);
       const student = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(studentIdMatch[1]).first();
       if (student) {
         await db.prepare('DELETE FROM students WHERE id = ?').bind(studentIdMatch[1]).run();

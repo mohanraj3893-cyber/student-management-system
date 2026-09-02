@@ -234,16 +234,11 @@
               </div>
               <div class="toolbar-right-actions">
                 <select id="student-filter-year" class="toolbar-select" aria-label="Filter by Academic Year">
-                  <option value="I-Year" selected>I-Year</option>
+                  <option value="all" selected>All Years</option>
+                  <option value="I-Year">I-Year</option>
                   <option value="II-Year">II-Year</option>
                   <option value="III-Year">III-Year</option>
                   <option value="IV-Year">IV-Year</option>
-                  <option value="all">All Years</option>
-                </select>
-                <select id="student-filter-status" class="toolbar-select">
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="pending">Pending Approval</option>
                 </select>
                 <button class="btn btn-secondary" onclick="alert('Importing spreadsheet logs')">Import Excel</button>
                 <button class="btn btn-secondary" onclick="alert('Exporting spreadsheet logs')">Export Excel</button>
@@ -256,14 +251,11 @@
               <table class="sms-data-table" id="student-table-elem">
                 <thead>
                   <tr>
-                    <th>Photo</th>
+                    <th style="width: 70px;">Photo</th>
                     <th>Register Number</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Attendance</th>
-                    <th>Status</th>
-                    <th class="text-right">Actions</th>
+                    <th>Student Name</th>
+                    <th>Year / Semester</th>
+                    <th class="text-right" style="width: 180px;">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="student-table-body">
@@ -494,6 +486,46 @@
           return yearStr.trim();
         }
 
+        // Year / Semester Formatter (e.g., 'III Year / Sem V')
+        function formatYearSem(year, semester) {
+          let yStr = '';
+          const yRaw = String(year || '').toLowerCase().trim();
+          if (/^1(st)?(\s*year)?$/i.test(yRaw) || /^i(-year)?$/i.test(yRaw) || yRaw === '1') {
+            yStr = 'I Year';
+          } else if (/^2(nd)?(\s*year)?$/i.test(yRaw) || /^ii(-year)?$/i.test(yRaw) || yRaw === '2') {
+            yStr = 'II Year';
+          } else if (/^3(rd)?(\s*year)?$/i.test(yRaw) || /^iii(-year)?$/i.test(yRaw) || yRaw === '3') {
+            yStr = 'III Year';
+          } else if (/^4(th)?(\s*year)?$/i.test(yRaw) || /^iv(-year)?$/i.test(yRaw) || yRaw === '4') {
+            yStr = 'IV Year';
+          } else if (year) {
+            yStr = String(year).trim();
+          } else {
+            yStr = 'I Year';
+          }
+
+          let sStr = '';
+          const sRaw = String(semester || '').toLowerCase().trim();
+          if (sRaw === '1' || sRaw === 'i' || sRaw === 'sem 1' || sRaw === 'sem i') sStr = 'Sem I';
+          else if (sRaw === '2' || sRaw === 'ii' || sRaw === 'sem 2' || sRaw === 'sem ii') sStr = 'Sem II';
+          else if (sRaw === '3' || sRaw === 'iii' || sRaw === 'sem 3' || sRaw === 'sem iii') sStr = 'Sem III';
+          else if (sRaw === '4' || sRaw === 'iv' || sRaw === 'sem 4' || sRaw === 'sem iv') sStr = 'Sem IV';
+          else if (sRaw === '5' || sRaw === 'v' || sRaw === 'sem 5' || sRaw === 'sem v') sStr = 'Sem V';
+          else if (sRaw === '6' || sRaw === 'vi' || sRaw === 'sem 6' || sRaw === 'sem vi') sStr = 'Sem VI';
+          else if (sRaw === '7' || sRaw === 'vii' || sRaw === 'sem 7' || sRaw === 'sem vii') sStr = 'Sem VII';
+          else if (sRaw === '8' || sRaw === 'viii' || sRaw === 'sem 8' || sRaw === 'sem viii') sStr = 'Sem VIII';
+          else if (semester) sStr = `Sem ${semester}`;
+          else {
+            if (yStr === 'I Year') sStr = 'Sem I';
+            else if (yStr === 'II Year') sStr = 'Sem III';
+            else if (yStr === 'III Year') sStr = 'Sem V';
+            else if (yStr === 'IV Year') sStr = 'Sem VII';
+            else sStr = 'Sem I';
+          }
+
+          return `${yStr} / ${sStr}`;
+        }
+
         // Render table
         function renderStudentsTable(list, activeYearFilter) {
           const tbody = document.getElementById('student-table-body');
@@ -511,7 +543,7 @@
             const yearMsg = activeYearFilter && activeYearFilter !== 'all' ? ` for ${activeYearFilter}` : '';
             tbody.innerHTML = `
               <tr>
-                <td colspan="8" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 0.92rem;">
+                <td colspan="5" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 0.92rem;">
                   <div style="font-size: 1.6rem; margin-bottom: 0.35rem;">🎓</div>
                   <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">No students found${yearMsg}</div>
                   <div>Select another academic year or adjust your search filter.</div>
@@ -528,11 +560,9 @@
             tr.setAttribute('data-id', student.id);
 
             const studName = student.name || 'Student';
-            const initials = studName.trim().split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2) || 'ST';
-            const colors = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
-            const color = colors[initials.charCodeAt(0) % colors.length];
             const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
             const avatarUrl = getAvatar(studName, student.photoPath);
+            const yearSemFormatted = formatYearSem(student.year, student.semester);
 
             tr.innerHTML = `
               <td>
@@ -540,20 +570,12 @@
                   <img src="${avatarUrl}" alt="${studName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
                 </div>
               </td>
-              <td><strong>${student.registerNumber}</strong></td>
-              <td>${student.name}</td>
-              <td>${student.phone || 'N/A'}</td>
-              <td>${student.email}</td>
-              <td>
-                ${student.attendancePercentage !== null ? `
-                  <span class="table-percent-txt">${student.attendancePercentage}%</span>
-                  <div class="table-progress-bar"><div class="progress-fill ${student.attendancePercentage >= 75 ? 'success-bg' : 'danger-bg'}" style="width: ${student.attendancePercentage}%"></div></div>
-                ` : `<span class="table-percent-txt" style="color:#9CA3AF;">N/A</span>`}
-              </td>
-              <td><span class="status-pill active-badge">${student.isActive ? 'Active' : 'Inactive'}</span></td>
+              <td><strong>${student.registerNumber || student.username}</strong></td>
+              <td>${student.name || '--'}</td>
+              <td><span class="badge-pill bg-blue-light" style="font-weight: 600; color: #0056D2; font-size: 0.82rem;">${yearSemFormatted}</span></td>
               <td class="text-right" onclick="event.stopPropagation();">
                 <div style="display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end; white-space: nowrap;">
-                  <a href="student_profile.html?id=${student.registerNumber}" class="action-tbl-btn bg-blue-light" style="text-decoration: none; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center;">View</a>
+                  <a href="student_profile.html?id=${student.registerNumber || student.username}" class="action-tbl-btn bg-blue-light" style="text-decoration: none; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center;">View</a>
                   <button class="action-tbl-btn bg-green-light btn-edit-student" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer;">Edit</button>
                   <button class="action-tbl-btn bg-red-light btn-delete-student" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer;">Delete</button>
                 </div>
@@ -574,7 +596,7 @@
 
             // Redirect to Profile
             tr.addEventListener('click', () => {
-              window.location.href = `student_profile.html?id=${student.registerNumber}`;
+              window.location.href = `student_profile.html?id=${student.registerNumber || student.username}`;
             });
 
             tbody.appendChild(tr);
@@ -744,37 +766,29 @@
           }
         });
 
-        // Unified Multi-Filter System (Search + Year + Status)
+        // Unified Filter System (Search + Year)
         function applyFilters() {
           const searchInput = document.getElementById('student-search-input');
           const yearSelect = document.getElementById('student-filter-year');
-          const statusSelect = document.getElementById('student-filter-status');
 
           const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-          const selectedYear = yearSelect ? yearSelect.value : 'I-Year';
-          const selectedStatus = statusSelect ? statusSelect.value : 'all';
+          const selectedYear = yearSelect ? yearSelect.value : 'all';
 
-          const filtered = studentsList.filter(student => {
+          const safeList = Array.isArray(studentsList) ? studentsList : [];
+
+          const filtered = safeList.filter(student => {
             // 1. Search Filter
             const matchesSearch = !query || (
               (student.name && student.name.toLowerCase().includes(query)) ||
               (student.registerNumber && student.registerNumber.toLowerCase().includes(query)) ||
-              (student.email && student.email.toLowerCase().includes(query))
+              (student.username && student.username.toLowerCase().includes(query))
             );
 
             // 2. Year Filter
             const normalizedStudYear = normalizeYear(student.year);
             const matchesYear = (selectedYear === 'all') || (normalizedStudYear === selectedYear);
 
-            // 3. Status Filter
-            let matchesStatus = true;
-            if (selectedStatus === 'active') {
-              matchesStatus = student.isActive === true;
-            } else if (selectedStatus === 'pending') {
-              matchesStatus = student.isActive === false;
-            }
-
-            return matchesSearch && matchesYear && matchesStatus;
+            return matchesSearch && matchesYear;
           });
 
           renderStudentsTable(filtered, selectedYear);
@@ -782,11 +796,9 @@
 
         const searchInput = document.getElementById('student-search-input');
         const yearSelect = document.getElementById('student-filter-year');
-        const statusSelect = document.getElementById('student-filter-status');
 
         if (searchInput) searchInput.addEventListener('input', applyFilters);
         if (yearSelect) yearSelect.addEventListener('change', applyFilters);
-        if (statusSelect) statusSelect.addEventListener('change', applyFilters);
 
         // Load initially
         fetchStudents();
