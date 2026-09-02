@@ -882,7 +882,8 @@ async function handleApiRequest(request, env) {
 
     if ((path === '/api/class-incharge/assign' || path === '/api/class-incharges/assign' || path === '/api/admin/class-incharges/assign' || path === '/api/admin/class-incharge/assign') && method === 'POST') {
       const authUser = await getUserFromRequest(request, env);
-      if (!authUser || authUser.role !== 'admin') {
+      const isHod = authUser && (String(authUser.role).toLowerCase() === 'admin' || String(authUser.role).toLowerCase() === 'hod');
+      if (!isHod) {
         return jsonResponse({ message: 'Forbidden. HOD access required.' }, 403);
       }
 
@@ -893,40 +894,60 @@ async function handleApiRequest(request, env) {
         return jsonResponse({ message: 'Year, semester, and facultyId are required.' }, 400);
       }
 
-      // Determine department from request body or HOD profile
+      // Verify faculty exists
+      let targetFaculty = await db.prepare('SELECT id, name, department, user_id FROM faculty WHERE id = ? OR user_id = ?').bind(facultyId, facultyId).first();
+      if (!targetFaculty) {
+        const userFac = await db.prepare('SELECT id, username as name FROM users WHERE id = ?').bind(facultyId).first();
+        if (userFac) {
+          targetFaculty = { id: userFac.id, name: userFac.name, department: 'Computer Science & Engineering' };
+        }
+      }
+
+      if (!targetFaculty) {
+        return jsonResponse({ message: 'Selected faculty member not found in database.' }, 404);
+      }
+
+      // Determine department from request body or HOD profile or target faculty
       let department = body.department;
       if (!department) {
         const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-        department = hodFac?.department || 'Computer Science & Engineering';
+        department = hodFac?.department || targetFaculty?.department || 'Computer Science & Engineering';
       }
 
-      // Verify faculty exists
-      const targetFaculty = await db.prepare('SELECT id, name FROM faculty WHERE id = ?').bind(facultyId).first();
-      if (!targetFaculty) {
-        return jsonResponse({ message: 'Selected faculty member not found.' }, 404);
+      try {
+        // Remove existing assignment for this class to prevent duplicates
+        await db.prepare(`
+          DELETE FROM class_incharges 
+          WHERE department = ? AND year = ? AND semester = ? AND section = ?
+        `).bind(department, year, semester, section || 'A').run().catch(() => {});
+
+        // Insert new assignment with fallback
+        try {
+          await db.prepare(`
+            INSERT INTO class_incharges (department, year, semester, section, faculty_id, assigned_by, assigned_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          `).bind(department, year, semester, section || 'A', targetFaculty.id, authUser.id).run();
+        } catch (insertErr) {
+          await db.prepare(`
+            INSERT OR REPLACE INTO class_incharges (department, year, semester, section, faculty_id, updated_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          `).bind(department, year, semester, section || 'A', targetFaculty.id).run();
+        }
+
+        return jsonResponse({
+          success: true,
+          message: `Assigned ${targetFaculty.name} as Class Incharge for ${year} (Sem ${semester} - Sec ${section || 'A'}).`
+        });
+      } catch (err) {
+        console.error('[Worker Class Incharge Assign Error]', err);
+        return jsonResponse({ message: `Database error: ${err.message}` }, 500);
       }
-
-      // Remove existing assignment for this class to prevent duplicates
-      await db.prepare(`
-        DELETE FROM class_incharges 
-        WHERE department = ? AND year = ? AND semester = ? AND section = ?
-      `).bind(department, year, semester, section || 'A').run().catch(() => {});
-
-      // Insert new assignment
-      await db.prepare(`
-        INSERT INTO class_incharges (department, year, semester, section, faculty_id, assigned_by, assigned_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `).bind(department, year, semester, section || 'A', facultyId, authUser.id).run();
-
-      return jsonResponse({
-        success: true,
-        message: `Assigned ${targetFaculty.name} as Class Incharge for ${year} (Sem ${semester} - Sec ${section || 'A'}).`
-      });
     }
 
     if ((path === '/api/class-incharge/remove' || path === '/api/class-incharges/remove' || path === '/api/admin/class-incharges/remove' || path === '/api/admin/class-incharge/remove') && method === 'POST') {
       const authUser = await getUserFromRequest(request, env);
-      if (!authUser || authUser.role !== 'admin') {
+      const isHod = authUser && (String(authUser.role).toLowerCase() === 'admin' || String(authUser.role).toLowerCase() === 'hod');
+      if (!isHod) {
         return jsonResponse({ message: 'Forbidden. HOD access required.' }, 403);
       }
 
@@ -937,18 +958,23 @@ async function handleApiRequest(request, env) {
         department = hodFac?.department || 'Computer Science & Engineering';
       }
 
-      if (body.id) {
-        await db.prepare('DELETE FROM class_incharges WHERE id = ?').bind(body.id).run();
-      } else if (body.year && body.semester) {
-        await db.prepare(`
-          DELETE FROM class_incharges 
-          WHERE department = ? AND year = ? AND semester = ? AND section = ?
-        `).bind(department, body.year, body.semester, body.section || 'A').run();
-      } else {
-        return jsonResponse({ message: 'Assignment ID or class specifications (year, semester, section) required.' }, 400);
-      }
+      try {
+        if (body.id) {
+          await db.prepare('DELETE FROM class_incharges WHERE id = ?').bind(body.id).run();
+        } else if (body.year && body.semester) {
+          await db.prepare(`
+            DELETE FROM class_incharges 
+            WHERE department = ? AND year = ? AND semester = ? AND section = ?
+          `).bind(department, body.year, body.semester, body.section || 'A').run();
+        } else {
+          return jsonResponse({ message: 'Assignment ID or class specifications (year, semester, section) required.' }, 400);
+        }
 
-      return jsonResponse({ success: true, message: 'Class Incharge assignment removed successfully.' });
+        return jsonResponse({ success: true, message: 'Class Incharge assignment removed successfully.' });
+      } catch (err) {
+        console.error('[Worker Class Incharge Remove Error]', err);
+        return jsonResponse({ message: `Database error: ${err.message}` }, 500);
+      }
     }
 
     if ((path === '/api/class-incharge/my-assignments' || path === '/api/class-incharges/my-assignments' || path === '/api/admin/class-incharges/my-assignments') && method === 'GET') {

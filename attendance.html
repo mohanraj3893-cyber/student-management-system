@@ -621,7 +621,7 @@
     <script type="module">
       document.addEventListener('DOMContentLoaded', () => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
 
         if (!token) {
           window.location.href = '/login.html';
@@ -834,21 +834,28 @@
                   saveBtn.innerHTML = '<span>⏳</span> Assigning...';
 
                   try {
+                    const payload = {
+                      year: c.year,
+                      semester: c.semester,
+                      section: c.section,
+                      facultyId: parseInt(facId)
+                    };
+                    console.log('[SMS Class Incharge Assigning]', payload);
+
                     const assignRes = await fetch('/api/admin/class-incharges/assign', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                       },
-                      body: JSON.stringify({
-                        year: c.year,
-                        semester: c.semester,
-                        section: c.section,
-                        facultyId: parseInt(facId)
-                      })
+                      body: JSON.stringify(payload)
                     });
                     const assignData = await assignRes.json().catch(() => ({}));
-                    if (!assignRes.ok) throw new Error(assignData.message || 'Failed to assign class incharge.');
+                    console.log('[SMS Class Incharge Assign Result]', assignRes.status, assignData);
+
+                    if (!assignRes.ok) {
+                      throw new Error(assignData.message || `Assignment failed with HTTP ${assignRes.status}`);
+                    }
 
                     showToast(assignData.message || 'Class Incharge assigned successfully!', true);
                     await loadClassInchargeAssignments();
