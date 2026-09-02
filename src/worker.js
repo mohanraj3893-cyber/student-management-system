@@ -819,11 +819,32 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
+      const isHod = String(authUser.role).toLowerCase() === 'admin' || String(authUser.role).toLowerCase() === 'hod';
+
+      if (isHod) {
+        const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        const dept = hodFac?.department;
+        let query = 'SELECT s.*, u.email FROM students s JOIN users u ON s.user_id = u.id WHERE u.is_approved = 1';
+        const params = [];
+        if (dept) {
+          query += ' AND s.department = ?';
+          params.push(dept);
+        }
+        query += ' ORDER BY s.name ASC';
+        const results = await db.prepare(query).bind(...params).all();
+        const mapped = (results.results || []).map(s => ({
+          ...s,
+          registerNumber: s.register_number || s.registerNumber,
+          photoPath: s.photo_path || s.photoPath
+        }));
+        return jsonResponse({ success: true, count: mapped.length, students: mapped });
+      }
+
       const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (!faculty) return jsonResponse({ success: true, students: [] });
+      if (!faculty) return jsonResponse({ success: true, count: 0, students: [] });
 
       // Students from classes assigned to this faculty as Incharge OR enrolled in their subjects
-      const students = await db.prepare(`
+      let students = await db.prepare(`
         SELECT DISTINCT s.*, u.email
         FROM students s
         JOIN users u ON s.user_id = u.id
@@ -833,7 +854,27 @@ async function handleApiRequest(request, env) {
         ORDER BY s.name ASC
       `).bind(faculty.id, faculty.id).all();
 
-      return jsonResponse({ success: true, students: students.results });
+      let studentList = students.results || [];
+
+      // Fallback: If faculty has no specific class/subject assignments yet, return department students
+      if (studentList.length === 0 && faculty.department) {
+        const deptStudents = await db.prepare(`
+          SELECT s.*, u.email
+          FROM students s
+          JOIN users u ON s.user_id = u.id
+          WHERE s.department = ? AND u.is_approved = 1
+          ORDER BY s.name ASC
+        `).bind(faculty.department).all();
+        studentList = deptStudents.results || [];
+      }
+
+      const mapped = studentList.map(s => ({
+        ...s,
+        registerNumber: s.register_number || s.registerNumber,
+        photoPath: s.photo_path || s.photoPath
+      }));
+
+      return jsonResponse({ success: true, count: mapped.length, students: mapped });
     }
 
     const facultyIdMatch = path.match(/^\/api\/faculty\/(\d+)$/);
