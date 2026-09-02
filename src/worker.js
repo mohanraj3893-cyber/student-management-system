@@ -1388,13 +1388,33 @@ async function handleApiRequest(request, env) {
       const allRows = filteredLeaves.map(r => ({
         ...r,
         studentName: r.student_name,
+        name: r.student_name,
         registerNumber: r.register_number,
-        startDate: r.from_date,
-        endDate: r.to_date,
-        numberOfDays: r.number_of_days,
-        days: r.number_of_days,
-        photoPath: r.photo_path,
-        rejectionReason: r.rejection_reason
+        leaveType: r.leave_type || r.leaveType || r.type || 'Medical Leave',
+        leave_type: r.leave_type || r.leaveType || r.type || 'Medical Leave',
+        fromDate: r.from_date || r.fromDate,
+        from_date: r.from_date || r.fromDate,
+        toDate: r.to_date || r.toDate,
+        to_date: r.to_date || r.toDate,
+        startDate: r.from_date || r.startDate,
+        endDate: r.to_date || r.endDate,
+        numberOfDays: r.number_of_days || r.numberOfDays || r.days || 1,
+        number_of_days: r.number_of_days || r.numberOfDays || r.days || 1,
+        days: r.number_of_days || r.numberOfDays || r.days || 1,
+        photoPath: r.photo_path || r.photoPath,
+        rejectionReason: r.rejection_reason || r.rejectionReason,
+        hodRemarks: r.hod_remarks || r.hodRemarks || '',
+        student: {
+          id: r.student_id,
+          name: r.student_name,
+          registerNumber: r.register_number,
+          department: r.department,
+          year: r.year,
+          semester: r.semester,
+          section: r.section,
+          phone: r.phone,
+          photoPath: r.photo_path || ''
+        }
       }));
 
       const pending = allRows.filter(r => String(r.status || '').toUpperCase().includes('PENDING'));
@@ -1426,47 +1446,50 @@ async function handleApiRequest(request, env) {
       if (contentType.includes('application/json')) {
         body = await request.json().catch(() => ({}));
       } else if (contentType.includes('multipart/form-data') || contentType.includes('application/x-www-form-urlencoded')) {
-        const formData = await request.formData().catch(() => new FormData());
-        for (const [key, value] of formData.entries()) {
-          body[key] = value;
+        try {
+          const formData = await request.formData();
+          for (const [key, value] of formData.entries()) {
+            body[key] = value;
+          }
+        } catch (e) {
+          body = {};
         }
-      } else {
-        body = await request.json().catch(() => ({}));
       }
 
-      const student = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(authUser.id).first();
-      if (!student) return jsonResponse({ message: 'Student record not found.' }, 400);
-
-      const leaveType = body.leaveType || body.type || 'Casual Leave';
-      const fromDate = body.fromDate || body.startDate || '';
-      const toDate = body.toDate || body.endDate || fromDate;
-      const numberOfDays = Number(body.numberOfDays || body.days || 1);
-      const reason = body.reason || 'Personal Leave';
-      const supportingDoc = body.supportingDocument || body.supportingDoc || '';
+      const leaveType = body.leaveType || body.leave_type || 'General Leave';
+      const fromDate = body.fromDate || body.from_date || body.startDate;
+      const toDate = body.toDate || body.to_date || body.endDate;
+      const numberOfDays = parseInt(body.numberOfDays || body.days || body.daysCount || 1, 10);
+      const reason = body.reason || '';
+      const supportingDoc = body.supportingDocument || body.document || '';
 
       if (!fromDate || !toDate) {
         return jsonResponse({ message: 'From Date and To Date are required.' }, 400);
       }
 
-      // Query all class incharges with faculty records
+      const student = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(authUser.id).first();
+      if (!student) {
+        return jsonResponse({ message: 'Student profile not found. Please contact administration.' }, 404);
+      }
+
+      // Find Assigned Class Incharge
       const allIncharges = await db.prepare(`
-        SELECT ci.*, f.user_id as faculty_user_id, f.name as faculty_name
+        SELECT ci.*, f.user_id as faculty_user_id, f.name as faculty_name, f.department as faculty_department
         FROM class_incharges ci
         JOIN faculty f ON ci.faculty_id = f.id
-        JOIN users u ON f.user_id = u.id
-        WHERE u.is_approved = 1
       `).all();
 
-      const matchingIncharges = (allIncharges.results || []).filter(c => {
-        const dMatch = isDepartmentMatch(c.department, student.department);
-        const yMatch = isYearMatch(c.year, student.year);
-        const sMatch = isSemesterMatch(c.semester, student.semester);
-        const secMatch = isSectionMatch(c.section, student.section);
-        return dMatch && yMatch && sMatch && secMatch;
+      const matchingIncharges = (allIncharges.results || []).filter(ci => {
+        return isDepartmentMatch(ci.department, student.department) &&
+               isYearMatch(ci.year, student.year) &&
+               isSemesterMatch(ci.semester, student.semester) &&
+               isSectionMatch(ci.section, student.section);
       });
 
       if (matchingIncharges.length === 0) {
-        return jsonResponse({ message: 'No Class Incharge has been assigned for this class.' }, 400);
+        return jsonResponse({
+          message: `No Class Incharge has been assigned for your class (${student.year || 'Year'} - Sem ${student.semester || 'Sem'} - Sec ${student.section || 'A'}). Please contact your Department HOD.`
+        }, 400);
       }
 
       const assignedIncharge = matchingIncharges[0];
@@ -1501,16 +1524,120 @@ async function handleApiRequest(request, env) {
       return jsonResponse({ success: true, leaves: leaves.results });
     }
 
-    const leaveApproveMatch = path.match(/^\/api\/leaves(?:\/requests)?\/(\d+)\/approve$/);
+    const singleLeaveMatch = path.match(/^\/api\/(?:admin\/)?leaves?\/(\d+)$/);
+    if (singleLeaveMatch && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const leaveId = singleLeaveMatch[1];
+      const leave = await db.prepare(`
+        SELECT l.*, s.name as student_name, s.register_number, s.department, s.year, s.semester, s.section, s.phone, s.photo_path
+        FROM leave_requests l
+        JOIN students s ON l.student_id = s.id
+        WHERE l.id = ?
+      `).bind(leaveId).first();
+
+      if (!leave) {
+        return jsonResponse({ message: 'Leave request not found.' }, 404);
+      }
+
+      // Department & Role Authorization Checks
+      if (authUser.role === 'student') {
+        const student = await db.prepare('SELECT id FROM students WHERE user_id = ?').bind(authUser.id).first();
+        if (!student || student.id !== leave.student_id) {
+          return jsonResponse({ message: 'Forbidden. You cannot access this leave request.' }, 403);
+        }
+      } else if (authUser.role === 'admin' || authUser.role === 'hod') {
+        const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        if (hodFac?.department && !isDepartmentMatch(leave.department, hodFac.department)) {
+          return jsonResponse({ message: 'Forbidden. This student belongs to another department.' }, 403);
+        }
+      }
+
+      const formattedLeave = {
+        id: leave.id,
+        studentId: leave.student_id,
+        studentName: leave.student_name,
+        name: leave.student_name,
+        registerNumber: leave.register_number,
+        department: leave.department,
+        year: leave.year,
+        semester: leave.semester,
+        section: leave.section,
+        leaveType: leave.leave_type || leave.type || 'Medical Leave',
+        leave_type: leave.leave_type || leave.type || 'Medical Leave',
+        reason: leave.reason || '',
+        fromDate: leave.from_date,
+        from_date: leave.from_date,
+        toDate: leave.to_date,
+        to_date: leave.to_date,
+        startDate: leave.from_date,
+        endDate: leave.to_date,
+        numberOfDays: leave.number_of_days || 1,
+        number_of_days: leave.number_of_days || 1,
+        days: leave.number_of_days || 1,
+        status: leave.status,
+        supportingDocument: leave.supporting_document || null,
+        hodRemarks: leave.hod_remarks || '',
+        rejectionReason: leave.rejection_reason || '',
+        submittedAt: leave.created_at,
+        createdAt: leave.created_at,
+        updatedAt: leave.updated_at,
+        photoPath: leave.photo_path || '',
+        student: {
+          id: leave.student_id,
+          name: leave.student_name,
+          registerNumber: leave.register_number,
+          department: leave.department,
+          year: leave.year,
+          semester: leave.semester,
+          section: leave.section,
+          phone: leave.phone,
+          photoPath: leave.photo_path || ''
+        }
+      };
+
+      return jsonResponse({
+        success: true,
+        leave: formattedLeave,
+        data: formattedLeave,
+        ...formattedLeave
+      });
+    }
+
+    if (singleLeaveMatch && method === 'DELETE') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const leaveId = singleLeaveMatch[1];
+      const leave = await db.prepare('SELECT * FROM leave_requests WHERE id = ?').bind(leaveId).first();
+      if (!leave) return jsonResponse({ message: 'Leave request not found.' }, 404);
+
+      if (authUser.role === 'student') {
+        const student = await db.prepare('SELECT id FROM students WHERE user_id = ?').bind(authUser.id).first();
+        if (!student || student.id !== leave.student_id) {
+          return jsonResponse({ message: 'Forbidden' }, 403);
+        }
+      }
+
+      await db.prepare('DELETE FROM leave_requests WHERE id = ?').bind(leaveId).run();
+      return jsonResponse({ success: true, message: 'Leave request cancelled successfully.' });
+    }
+
+    const leaveApproveMatch = path.match(/^\/api\/(?:admin\/)?leaves?(?:\/requests)?\/(\d+)\/approve$/);
     if (leaveApproveMatch && (method === 'POST' || method === 'PUT')) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
+      const body = await request.json().catch(() => ({}));
       const leaveId = leaveApproveMatch[1];
-      const nextStatus = authUser.role === 'admin' ? 'APPROVED' : 'PENDING_HOD';
+      const nextStatus = (authUser.role === 'admin' || authUser.role === 'hod') ? 'APPROVED' : 'PENDING_HOD';
 
-      await db.prepare('UPDATE leave_requests SET status = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-        .bind(nextStatus, authUser.id, leaveId).run();
+      await db.prepare('UPDATE leave_requests SET status = ?, hod_remarks = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(nextStatus, body.hodRemarks || body.remarks || '', authUser.id, leaveId).run().catch(async () => {
+          await db.prepare('UPDATE leave_requests SET status = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+            .bind(nextStatus, authUser.id, leaveId).run();
+        });
 
       const leaveRecord = await db.prepare(`
         SELECT l.*, s.name as student_name, s.department, s.user_id as student_user_id
@@ -1557,7 +1684,7 @@ async function handleApiRequest(request, env) {
       return jsonResponse({ success: true, message: `Leave ${nextStatus === 'APPROVED' ? 'approved' : 'forwarded to HOD'}.` });
     }
 
-    const leaveRejectMatch = path.match(/^\/api\/leaves(?:\/requests)?\/(\d+)\/reject$/);
+    const leaveRejectMatch = path.match(/^\/api\/(?:admin\/)?leaves?(?:\/requests)?\/(\d+)\/reject$/);
     if (leaveRejectMatch && (method === 'POST' || method === 'PUT')) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
@@ -1590,7 +1717,6 @@ async function handleApiRequest(request, env) {
 
     // =============================================================
     // 12. ANNOUNCEMENTS MODULE
-    // =============================================================
     if (path === '/api/announcements' && method === 'GET') {
       const results = await db.prepare(`
         SELECT a.*, u.username as author
