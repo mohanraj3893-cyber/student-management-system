@@ -194,6 +194,31 @@ async function handleApiRequest(request, env) {
         ).run();
       }
 
+      if (normalizedRole !== 'admin') {
+        const hod = await db.prepare(`
+          SELECT u.id 
+          FROM users u
+          JOIN roles r ON u.role_id = r.id
+          JOIN faculty f ON f.user_id = u.id
+          WHERE (r.name = 'admin' OR r.name = 'hod') 
+            AND f.department = ? 
+            AND u.is_approved = 1
+          LIMIT 1
+        `).bind(targetDept).first();
+
+        if (hod && hod.id) {
+          const notifType = normalizedRole === 'student' ? 'NEW_STUDENT_REGISTRATION' : 'NEW_FACULTY_REGISTRATION';
+          const notifMessage = normalizedRole === 'student'
+            ? `A new ${extraData?.year || 'I-Year'} ${targetDept} student (${name || username}) is waiting for approval.`
+            : `A new faculty member (${name || username}) has registered for ${targetDept} and is waiting for approval.`;
+
+          await db.prepare(`
+            INSERT INTO notifications (user_id, message, is_read, type, related_id)
+            VALUES (?, ?, 0, ?, ?)
+          `).bind(hod.id, notifMessage, notifType, userId).run();
+        }
+      }
+
       const successMsg = normalizedRole === 'admin' 
         ? 'HOD account created successfully! You can now log in.' 
         : 'Registration submitted successfully. Waiting for HOD approval.';
@@ -352,21 +377,53 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser || authUser.role !== 'admin') return jsonResponse({ message: 'Forbidden' }, 403);
 
-      const pendingUsers = await db.prepare(`
-        SELECT u.id as user_id, u.username, u.email, u.created_at, r.name as role_name,
+      // Extract verified HOD department from database record
+      const hodFaculty = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const hodDept = hodFaculty?.department || authUser.department;
+
+      let query = `
+        SELECT u.id as user_id, u.id as id, u.username, u.email, u.created_at, r.name as role_name,
                COALESCE(s.name, f.name) as name,
                COALESCE(s.department, f.department) as department,
-               s.register_number, s.year, s.semester, s.section, s.phone,
-               f.employee_id, f.designation
+               s.register_number, s.year, s.semester, s.section, s.phone, s.photo_path,
+               f.employee_id, f.designation, f.photo_path as faculty_photo
         FROM users u
         JOIN roles r ON u.role_id = r.id
         LEFT JOIN students s ON s.user_id = u.id
         LEFT JOIN faculty f ON f.user_id = u.id
         WHERE u.is_approved = 0 AND r.name != 'admin'
-        ORDER BY u.created_at DESC
-      `).all();
+      `;
+      const params = [];
+      if (hodDept) {
+        query += ' AND COALESCE(s.department, f.department) = ?';
+        params.push(hodDept);
+      }
+      query += ' ORDER BY u.created_at DESC';
 
-      return jsonResponse({ success: true, registrations: pendingUsers.results, count: pendingUsers.results.length });
+      const pendingUsers = await db.prepare(query).bind(...params).all();
+      const allList = pendingUsers.results || [];
+      const students = allList.filter(u => u.role_name === 'student').map(u => ({
+        ...u,
+        userId: u.user_id,
+        registerNumber: u.register_number,
+        photoPath: u.photo_path,
+        createdAt: u.created_at
+      }));
+      const faculty = allList.filter(u => u.role_name === 'faculty').map(u => ({
+        ...u,
+        userId: u.user_id,
+        employeeId: u.employee_id,
+        photoPath: u.faculty_photo || u.photo_path,
+        createdAt: u.created_at
+      }));
+
+      return jsonResponse({
+        success: true,
+        registrations: allList,
+        students,
+        faculty,
+        count: allList.length
+      });
     }
 
     // Approve Registration
@@ -377,6 +434,8 @@ async function handleApiRequest(request, env) {
 
       const targetUserId = approveMatch[1];
       await db.prepare('UPDATE users SET is_approved = 1 WHERE id = ?').bind(targetUserId).run();
+      await db.prepare("UPDATE notifications SET is_read = 1 WHERE related_id = ? AND (type = 'NEW_STUDENT_REGISTRATION' OR type = 'NEW_FACULTY_REGISTRATION' OR type = 'NEW_REGISTRATION')")
+        .bind(targetUserId).run();
       return jsonResponse({ success: true, message: 'User approved successfully.' });
     }
 
@@ -390,6 +449,8 @@ async function handleApiRequest(request, env) {
       await db.prepare('DELETE FROM students WHERE user_id = ?').bind(targetUserId).run();
       await db.prepare('DELETE FROM faculty WHERE user_id = ?').bind(targetUserId).run();
       await db.prepare('DELETE FROM users WHERE id = ?').bind(targetUserId).run();
+      await db.prepare("DELETE FROM notifications WHERE related_id = ? AND (type = 'NEW_STUDENT_REGISTRATION' OR type = 'NEW_FACULTY_REGISTRATION' OR type = 'NEW_REGISTRATION')")
+        .bind(targetUserId).run();
       return jsonResponse({ success: true, message: 'Registration rejected and removed.' });
     }
 
@@ -1012,12 +1073,20 @@ async function handleApiRequest(request, env) {
     // =============================================================
     if (path === '/api/notifications' && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
-      if (!authUser) return jsonResponse({ notifications: [] });
+      if (!authUser) return jsonResponse({ notifications: [], unreadCount: 0 });
 
-      const results = await db.prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 20')
+      const results = await db.prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 30')
         .bind(authUser.id).all();
 
-      return jsonResponse({ success: true, notifications: results.results });
+      const notifs = (results.results || []).map(n => ({
+        ...n,
+        isRead: Boolean(n.is_read),
+        createdAt: n.created_at
+      }));
+
+      const unreadCount = notifs.filter(n => !n.isRead).length;
+
+      return jsonResponse({ success: true, notifications: notifs, unreadCount });
     }
 
     if (path === '/api/notifications/read-all' && (method === 'POST' || method === 'PUT')) {
