@@ -1,5 +1,14 @@
 import './api_config.js';
 import './style.css';
+import { initPushNotifications } from './push_notifications.js';
+
+// Ensure PWA Manifest link exists in document head
+if (!document.querySelector('link[rel="manifest"]')) {
+  const manifestLink = document.createElement('link');
+  manifestLink.rel = 'manifest';
+  manifestLink.href = '/manifest.webmanifest';
+  document.head.appendChild(manifestLink);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -1297,10 +1306,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Initialize notification system immediately on page load
+  // Initialize notification and push system immediately on page load
   const initialToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (initialToken) {
     initNotificationSystem(initialToken, 'user');
+    initPushNotifications(initialToken);
   }
 
   loadDashboardData();
