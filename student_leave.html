@@ -1278,14 +1278,15 @@
             // Document link
             const docContainer = document.getElementById('modal-doc-container');
             const docLink = document.getElementById('modal-doc-link');
-            if (data.supportingDocument) {
+            if (data.supportingDocument || data.supporting_document) {
               docContainer.style.display = 'block';
-              docLink.href = `${data.supportingDocument}`;
+              docLink.href = `${data.supportingDocument || data.supporting_document}`;
             } else {
               docContainer.style.display = 'none';
             }
 
             // Stepper and Feedback section
+            const stepApplied = document.getElementById('step-applied');
             const stepPending = document.getElementById('step-pending');
             const stepFinal = document.getElementById('step-final');
             const line1 = document.getElementById('line-1');
@@ -1294,51 +1295,107 @@
             const finalLabel = document.getElementById('step-final-label');
 
             const remarksBox = document.getElementById('modal-remarks-box');
+            const remarksTitle = document.getElementById('modal-remarks-title');
             const remarksLabel = document.getElementById('modal-remarks-label');
             const remarksValue = document.getElementById('modal-remarks-value');
 
             // Reset stepper styles
-            stepPending.className = 'step';
-            stepFinal.className = 'step';
-            line1.className = 'line';
-            line2.className = 'line';
-            finalNode.className = 'node';
-            finalLabel.textContent = 'Decided';
+            if (stepApplied) stepApplied.className = 'step done';
+            if (stepPending) stepPending.className = 'step';
+            if (stepFinal) stepFinal.className = 'step';
+            if (line1) line1.className = 'line';
+            if (line2) line2.className = 'line';
+            if (finalNode) {
+              finalNode.className = 'node';
+              finalNode.innerHTML = '<i class="fa-solid fa-clock"></i>';
+            }
+            if (finalLabel) finalLabel.textContent = 'Decision';
 
-            if (data.status === 'Pending') {
-              stepPending.className = 'step done';
-              line1.className = 'line done';
-              
-              remarksBox.style.backgroundColor = '#ECEFF1';
-              remarksLabel.textContent = 'HOD Processing State';
-              remarksValue.textContent = 'Awaiting department head review.';
-              remarksValue.style.color = '#546E7A';
-            } else {
-              stepPending.className = 'step done';
-              line1.className = 'line done';
-              
-              line2.className = 'line done';
+            const rawStatus = String(data.status || '').toUpperCase().trim();
 
-              if (data.status === 'Approved') {
-                stepFinal.className = 'step done approved';
+            if (rawStatus === 'APPROVED') {
+              // 1. Approved State
+              if (stepPending) stepPending.className = 'step done approved';
+              if (line1) line1.className = 'line done';
+              if (line2) line2.className = 'line done';
+              if (stepFinal) stepFinal.className = 'step done approved';
+              if (finalNode) {
                 finalNode.className = 'node';
                 finalNode.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-                finalLabel.textContent = 'Approved';
-                
-                remarksBox.style.backgroundColor = '#E8F5E9';
-                remarksLabel.textContent = 'HOD Remarks (Approved)';
-                remarksValue.textContent = data.hodRemarks || 'Approved without additional remarks.';
+              }
+              if (finalLabel) finalLabel.textContent = 'Approved';
+
+              if (remarksTitle) remarksTitle.textContent = 'Approval Details';
+              if (remarksBox) remarksBox.style.backgroundColor = '#E8F5E9';
+              if (remarksLabel) remarksLabel.textContent = 'HOD Remarks (Approved)';
+              if (remarksValue) {
+                remarksValue.textContent = data.hodRemarks || 'Approved by Department HOD.';
                 remarksValue.style.color = '#1B5E20';
-              } else {
-                stepFinal.className = 'step done rejected';
+              }
+            } else if (rawStatus === 'REJECTED_BY_CLASS_INCHARGE') {
+              // 2. Rejected by Class Incharge
+              if (line1) line1.className = 'line done';
+              if (stepPending) stepPending.className = 'step done rejected';
+              if (stepFinal) stepFinal.className = 'step';
+              if (finalLabel) finalLabel.textContent = 'Not Forwarded';
+
+              if (remarksTitle) remarksTitle.textContent = 'Rejection Feedback';
+              if (remarksBox) remarksBox.style.backgroundColor = '#FFEBEE';
+              if (remarksLabel) remarksLabel.textContent = 'Rejection Reason (Class Incharge)';
+              if (remarksValue) {
+                remarksValue.textContent = data.rejectionReason || 'Rejected by Class Incharge.';
+                remarksValue.style.color = '#C62828';
+              }
+            } else if (rawStatus === 'REJECTED_BY_HOD' || rawStatus === 'REJECTED') {
+              // 3. Rejected by HOD
+              if (stepPending) stepPending.className = 'step done approved';
+              if (line1) line1.className = 'line done';
+              if (line2) line2.className = 'line done';
+              if (stepFinal) stepFinal.className = 'step done rejected';
+              if (finalNode) {
                 finalNode.className = 'node';
                 finalNode.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-                finalLabel.textContent = 'Rejected';
+              }
+              if (finalLabel) finalLabel.textContent = 'Rejected';
 
-                remarksBox.style.backgroundColor = '#FFEBEE';
-                remarksLabel.textContent = 'Rejection Reason (Rejected)';
-                remarksValue.textContent = data.rejectionReason || 'No specific reason provided.';
+              if (remarksTitle) remarksTitle.textContent = 'Rejection Feedback';
+              if (remarksBox) remarksBox.style.backgroundColor = '#FFEBEE';
+              if (remarksLabel) remarksLabel.textContent = 'Rejection Reason (HOD)';
+              if (remarksValue) {
+                remarksValue.textContent = data.rejectionReason || 'Rejected by Department HOD.';
                 remarksValue.style.color = '#C62828';
+              }
+            } else if (rawStatus === 'PENDING_HOD') {
+              // 4. Pending HOD Approval
+              if (stepPending) stepPending.className = 'step done approved';
+              if (line1) line1.className = 'line done';
+              if (line2) line2.className = 'line';
+              if (stepFinal) stepFinal.className = 'step';
+              if (finalNode) {
+                finalNode.className = 'node';
+                finalNode.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+              }
+              if (finalLabel) finalLabel.textContent = 'HOD Review';
+
+              if (remarksTitle) remarksTitle.textContent = 'Processing Progress';
+              if (remarksBox) remarksBox.style.backgroundColor = '#FFF7ED';
+              if (remarksLabel) remarksLabel.textContent = 'Current Progress';
+              if (remarksValue) {
+                remarksValue.textContent = 'Class Incharge verified. Awaiting final HOD approval.';
+                remarksValue.style.color = '#C2410C';
+              }
+            } else {
+              // 5. Default / PENDING_CLASS_INCHARGE / Pending
+              if (line1) line1.className = 'line';
+              if (stepPending) stepPending.className = 'step';
+              if (finalLabel) finalLabel.textContent = 'Decision';
+
+              if (remarksTitle) remarksTitle.textContent = 'Processing Progress';
+              if (remarksBox) remarksBox.style.backgroundColor = '#F0F9FF';
+              if (remarksLabel) remarksLabel.textContent = 'Current Progress';
+              if (remarksValue) {
+                remarksValue.textContent = 'Application submitted. Awaiting Class Incharge review.';
+                remarksValue.style.color = '#0284C7';
               }
             }
 

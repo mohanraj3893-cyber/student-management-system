@@ -1635,10 +1635,35 @@ async function handleApiRequest(request, env) {
         numberOfDays: days,
         number_of_days: days,
         days: days,
+      const isApproved = String(leave.status || '').toUpperCase() === 'APPROVED';
+      const isRejected = String(leave.status || '').toUpperCase().startsWith('REJECT');
+
+      const formattedLeave = {
+        id: leave.id,
+        studentId: leave.student_id,
+        studentName: leave.student_name,
+        name: leave.student_name,
+        registerNumber: leave.register_number,
+        department: leave.department,
+        year: leave.year,
+        semester: leave.semester,
+        section: leave.section,
+        leaveType: leave.leave_type || leave.type || 'Medical Leave',
+        leave_type: leave.leave_type || leave.type || 'Medical Leave',
+        reason: leave.reason || '',
+        fromDate: fromD,
+        from_date: fromD,
+        toDate: toD,
+        to_date: toD,
+        startDate: fromD,
+        endDate: toD,
+        numberOfDays: days,
+        number_of_days: days,
+        days: days,
         status: leave.status,
         supportingDocument: leave.supporting_document || null,
-        hodRemarks: leave.hod_remarks || '',
-        rejectionReason: leave.rejection_reason || '',
+        hodRemarks: isApproved ? (leave.hod_remarks || 'Approved by Department HOD.') : (isRejected ? null : (leave.hod_remarks || '')),
+        rejectionReason: isApproved ? null : (leave.rejection_reason || null),
         submittedAt: leave.created_at,
         createdAt: leave.created_at,
         updatedAt: leave.updated_at,
@@ -1690,10 +1715,11 @@ async function handleApiRequest(request, env) {
 
       const body = await request.json().catch(() => ({}));
       const leaveId = leaveApproveMatch[1];
-      const nextStatus = (authUser.role === 'admin' || authUser.role === 'hod') ? 'APPROVED' : 'PENDING_HOD';
+      const isHod = authUser.role === 'admin' || authUser.role === 'hod';
+      const nextStatus = isHod ? 'APPROVED' : 'PENDING_HOD';
 
-      await db.prepare('UPDATE leave_requests SET status = ?, hod_remarks = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-        .bind(nextStatus, body.hodRemarks || body.remarks || '', authUser.id, leaveId).run().catch(async () => {
+      await db.prepare('UPDATE leave_requests SET status = ?, hod_remarks = ?, rejection_reason = NULL, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(nextStatus, body.hodRemarks || body.remarks || (isHod ? 'Approved by Department HOD.' : 'Recommended by Class Incharge.'), authUser.id, leaveId).run().catch(async () => {
           await db.prepare('UPDATE leave_requests SET status = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
             .bind(nextStatus, authUser.id, leaveId).run();
         });
@@ -1750,16 +1776,21 @@ async function handleApiRequest(request, env) {
 
       const body = await request.json().catch(() => ({}));
       const leaveId = leaveRejectMatch[1];
+      const isHod = authUser.role === 'admin' || authUser.role === 'hod';
+      const rejectStatus = isHod ? 'REJECTED_BY_HOD' : 'REJECTED_BY_CLASS_INCHARGE';
 
-      await db.prepare('UPDATE leave_requests SET status = ?, rejection_reason = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-        .bind('REJECTED', body.reason || 'Not approved', authUser.id, leaveId).run();
+      await db.prepare('UPDATE leave_requests SET status = ?, rejection_reason = ?, hod_remarks = NULL, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(rejectStatus, body.reason || body.rejectionReason || 'Application rejected.', authUser.id, leaveId).run().catch(async () => {
+          await db.prepare('UPDATE leave_requests SET status = ?, rejection_reason = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+            .bind(rejectStatus, body.reason || body.rejectionReason || 'Application rejected.', authUser.id, leaveId).run();
+        });
 
       const leaveRecord = await db.prepare(`
         SELECT l.*, s.user_id as student_user_id FROM leave_requests l JOIN students s ON l.student_id = s.id WHERE l.id = ?
       `).bind(leaveId).first();
 
       if (leaveRecord?.student_user_id) {
-        const msg = `Your leave application was rejected: ${body.reason || 'No remarks provided'}.`;
+        const msg = `Your leave application was rejected: ${body.reason || body.rejectionReason || 'No remarks provided'}.`;
         await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
           .bind(leaveRecord.student_user_id, msg, 'LEAVE_REJECTED', leaveId).run();
 
