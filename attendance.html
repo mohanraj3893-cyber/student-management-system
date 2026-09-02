@@ -783,7 +783,12 @@
 
               tbody.innerHTML = '';
               defaultClasses.forEach(c => {
-                const current = assignments.find(a => (a.year === c.year || a.year === c.year.split(' ')[0]) && a.section === c.section);
+                const normYear = (y) => String(y || '').toLowerCase().replace(/[^0-9a-z]/g, '');
+                const current = assignments.find(a => 
+                  (normYear(a.year) === normYear(c.year) || normYear(a.year) === normYear(c.year.split(' ')[0])) &&
+                  normYear(a.semester) === normYear(c.semester) &&
+                  String(a.section || 'A').toUpperCase() === String(c.section || 'A').toUpperCase()
+                );
                 const currentFacId = current ? (current.facultyId || current.faculty_id) : '';
                 const isAssigned = !!current;
 
@@ -814,12 +819,19 @@
                 `;
 
                 // Assign / Reassign Handler
-                tr.querySelector('.btn-save-incharge').addEventListener('click', async () => {
-                  const facId = tr.querySelector('.incharge-fac-select').value;
+                const saveBtn = tr.querySelector('.btn-save-incharge');
+                const removeBtn = tr.querySelector('.btn-remove-incharge');
+                const facSelect = tr.querySelector('.incharge-fac-select');
+
+                saveBtn.addEventListener('click', async () => {
+                  const facId = facSelect.value;
                   if (!facId) {
-                    alert('Please select a faculty member to assign.');
+                    showToast('Please select a faculty member to assign.', false);
                     return;
                   }
+
+                  saveBtn.disabled = true;
+                  saveBtn.innerHTML = '<span>⏳</span> Assigning...';
 
                   try {
                     const assignRes = await fetch('/api/admin/class-incharges/assign', {
@@ -835,21 +847,28 @@
                         facultyId: parseInt(facId)
                       })
                     });
-                    const assignData = await assignRes.json();
+                    const assignData = await assignRes.json().catch(() => ({}));
                     if (!assignRes.ok) throw new Error(assignData.message || 'Failed to assign class incharge.');
 
-                    showToast(assignData.message, true);
+                    showToast(assignData.message || 'Class Incharge assigned successfully!', true);
                     await loadClassInchargeAssignments();
                   } catch (err) {
-                    alert(err.message);
+                    console.error('[SMS Class Incharge Assign Error]', err);
+                    showToast(err.message || 'Failed to assign class incharge.', false);
+                  } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = isAssigned ? 'Reassign / Save' : 'Assign';
                   }
                 });
 
                 // Remove Incharge Handler
-                tr.querySelector('.btn-remove-incharge').addEventListener('click', async () => {
-                  if (!confirm(`Are you sure you want to remove the Class Incharge for ${c.year} (Sem ${c.semester} - Sec ${c.section})? Attendance entry will be disabled for this class.`)) {
+                removeBtn.addEventListener('click', async () => {
+                  if (!confirm(`Are you sure you want to remove the Class Incharge for ${c.year} (Sem ${c.semester} - Sec ${c.section})?`)) {
                     return;
                   }
+
+                  removeBtn.disabled = true;
+                  removeBtn.innerHTML = '<span>⏳</span> Removing...';
 
                   try {
                     const removeRes = await fetch('/api/admin/class-incharges/remove', {
@@ -864,13 +883,17 @@
                         section: c.section
                       })
                     });
-                    const removeData = await removeRes.json();
+                    const removeData = await removeRes.json().catch(() => ({}));
                     if (!removeRes.ok) throw new Error(removeData.message || 'Failed to remove class incharge.');
 
-                    showToast(removeData.message, true);
+                    showToast(removeData.message || 'Class Incharge removed successfully.', true);
                     await loadClassInchargeAssignments();
                   } catch (err) {
-                    alert(err.message);
+                    console.error('[SMS Class Incharge Remove Error]', err);
+                    showToast(err.message || 'Failed to remove class incharge.', false);
+                  } finally {
+                    removeBtn.disabled = false;
+                    removeBtn.innerHTML = '🗑 Remove';
                   }
                 });
 
