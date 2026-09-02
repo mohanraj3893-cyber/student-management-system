@@ -963,17 +963,38 @@
             const res = await fetch(`/api/admin/leaves${query}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to load leave applications.');
-            const { stats, requests } = await res.json();
+            const data = await res.json().catch(() => ({}));
+            const requests = Array.isArray(data)
+              ? data
+              : Array.isArray(data.requests)
+                ? data.requests
+                : Array.isArray(data.leaves)
+                  ? data.leaves
+                  : [];
+
+            const stats = data.stats || {
+              total: requests.length,
+              pending: requests.filter(r => String(r.status || '').toUpperCase().includes('PENDING')).length,
+              approved: requests.filter(r => r.status === 'APPROVED').length,
+              rejected: requests.filter(r => r.status === 'REJECTED').length
+            };
 
             // Populate Stats Cards
-            document.getElementById('stats-total').textContent = stats.total;
-            document.getElementById('stats-pending').textContent = stats.pending;
-            document.getElementById('stats-approved').textContent = stats.approved;
-            document.getElementById('stats-rejected').textContent = stats.rejected;
+            const stTotal = document.getElementById('stats-total');
+            if (stTotal) stTotal.textContent = stats.total || 0;
+
+            const stPending = document.getElementById('stats-pending');
+            if (stPending) stPending.textContent = stats.pending || 0;
+
+            const stApproved = document.getElementById('stats-approved');
+            if (stApproved) stApproved.textContent = stats.approved || 0;
+
+            const stRejected = document.getElementById('stats-rejected');
+            if (stRejected) stRejected.textContent = stats.rejected || 0;
 
             // Populate Table
             const tbody = document.getElementById('leaves-requests-tbody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (requests.length === 0) {

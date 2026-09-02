@@ -356,21 +356,38 @@
               throw new Error('Failed to fetch faculty from DB.');
             }
 
-            facultyList = await res.json();
+            const result = await res.json().catch(() => ({}));
+            const rawList = Array.isArray(result)
+              ? result
+              : Array.isArray(result?.faculty)
+                ? result.faculty
+                : Array.isArray(result?.data)
+                  ? result.data
+                  : [];
+
+            facultyList = rawList.map(f => ({
+              ...f,
+              employeeId: f.employeeId || f.employee_id || f.username,
+              photoPath: f.photoPath || f.photo_path
+            }));
+
             applySearch();
 
           } catch (error) {
             console.error('Error fetching faculty:', error);
-            showToast(error.message, false);
+            showToast(error.message || 'Failed to load faculty records.', false);
           }
         }
 
         // Render table rows
         function renderFacultyTable(list) {
           const tbody = document.getElementById('faculty-table-body');
+          if (!tbody) return;
           tbody.innerHTML = '';
 
-          if (list.length === 0) {
+          const safeList = Array.isArray(list) ? list : [];
+
+          if (safeList.length === 0) {
             tbody.innerHTML = `
               <tr>
                 <td colspan="7" style="text-align: center; padding: 32px; color: #64748b;">
@@ -381,7 +398,7 @@
             return;
           }
 
-          list.forEach(fac => {
+          safeList.forEach(fac => {
             const tr = document.createElement('tr');
             tr.className = 'clickable-row';
             tr.style.cursor = 'pointer';
@@ -565,13 +582,14 @@
         function applySearch() {
           const searchInput = document.getElementById('faculty-search-input');
           const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+          const safeFacultyList = Array.isArray(facultyList) ? facultyList : [];
 
           if (!query) {
-            renderFacultyTable(facultyList);
+            renderFacultyTable(safeFacultyList);
             return;
           }
 
-          const filtered = facultyList.filter(fac => 
+          const filtered = safeFacultyList.filter(fac => 
             (fac.name || '').toLowerCase().includes(query) ||
             (fac.employeeId || '').toLowerCase().includes(query) ||
             (fac.email || '').toLowerCase().includes(query) ||
@@ -617,7 +635,5 @@
         <span class="nav-label">Reports</span>
       </a>
     </nav>
-
-    <script type="module" src="/src/dashboard_global.js"></script>
   </body>
 </html>

@@ -445,13 +445,21 @@
               throw new Error('Failed to fetch students from DB.');
             }
 
-            studentsList = await res.json();
+            const result = await res.json().catch(() => ({}));
+            const rawList = Array.isArray(result)
+              ? result
+              : Array.isArray(result?.students)
+                ? result.students
+                : Array.isArray(result?.data)
+                  ? result.data
+                  : [];
+            studentsList = rawList;
             applyFilters();
             updatePendingBadge();
 
           } catch (error) {
             console.error('Error fetching students:', error);
-            showToast(error.message, false);
+            showToast(error.message || 'Failed to fetch students.', false);
           }
         }
 
@@ -490,12 +498,16 @@
         function renderStudentsTable(list, activeYearFilter) {
           const tbody = document.getElementById('student-table-body');
           const pagInfo = document.getElementById('student-pagination-info');
+          if (!tbody) return;
           tbody.innerHTML = '';
 
+          const safeList = Array.isArray(list) ? list : [];
           const filterLabel = activeYearFilter && activeYearFilter !== 'all' ? ` (${activeYearFilter})` : '';
-          pagInfo.textContent = `Showing ${list.length > 0 ? 1 : 0} to ${list.length} of ${list.length} Students${filterLabel}`;
+          if (pagInfo) {
+            pagInfo.textContent = `Showing ${safeList.length > 0 ? 1 : 0} to ${safeList.length} of ${safeList.length} Students${filterLabel}`;
+          }
 
-          if (list.length === 0) {
+          if (safeList.length === 0) {
             const yearMsg = activeYearFilter && activeYearFilter !== 'all' ? ` for ${activeYearFilter}` : '';
             tbody.innerHTML = `
               <tr>
@@ -509,7 +521,7 @@
             return;
           }
 
-          list.forEach(student => {
+          safeList.forEach(student => {
             const tr = document.createElement('tr');
             tr.className = 'clickable-row';
             tr.style.cursor = 'pointer';

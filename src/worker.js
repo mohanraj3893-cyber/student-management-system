@@ -774,13 +774,28 @@ async function handleApiRequest(request, env) {
     // 6. FACULTY MODULE
     // =============================================================
     if (path === '/api/faculty' && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
       const department = url.searchParams.get('department');
       let query = 'SELECT f.*, u.email FROM faculty f JOIN users u ON f.user_id = u.id WHERE u.is_approved = 1';
       const params = [];
-      if (department) { query += ' AND f.department = ?'; params.push(department); }
+      if (department) {
+        query += ' AND f.department = ?';
+        params.push(department);
+      } else if (authUser && authUser.role === 'admin') {
+        const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        if (hodFac?.department) {
+          query += ' AND f.department = ?';
+          params.push(hodFac.department);
+        }
+      }
       query += ' ORDER BY f.name ASC';
       const results = await db.prepare(query).bind(...params).all();
-      return jsonResponse({ success: true, faculty: results.results });
+      const mapped = (results.results || []).map(f => ({
+        ...f,
+        employeeId: f.employee_id || f.employeeId,
+        photoPath: f.photo_path || f.photoPath
+      }));
+      return jsonResponse({ success: true, faculty: mapped, count: mapped.length });
     }
 
     if (path === '/api/faculty/my-students' && method === 'GET') {
@@ -808,20 +823,43 @@ async function handleApiRequest(request, env) {
     if (facultyIdMatch && method === 'GET') {
       const fac = await db.prepare('SELECT f.*, u.email FROM faculty f JOIN users u ON f.user_id = u.id WHERE f.id = ?').bind(facultyIdMatch[1]).first();
       if (!fac) return jsonResponse({ message: 'Faculty not found' }, 404);
-      return jsonResponse({ success: true, faculty: fac });
+      return jsonResponse({
+        success: true,
+        faculty: {
+          ...fac,
+          employeeId: fac.employee_id || fac.employeeId,
+          photoPath: fac.photo_path || fac.photoPath
+        }
+      });
     }
 
     // =============================================================
     // 7. CLASS INCHARGE MODULE
     // =============================================================
-    if (path === '/api/class-incharge' && method === 'GET') {
-      const results = await db.prepare(`
+    if ((path === '/api/class-incharge' || path === '/api/admin/class-incharges') && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      let query = `
         SELECT ci.*, f.name as faculty_name, f.employee_id
         FROM class_incharges ci
         JOIN faculty f ON ci.faculty_id = f.id
-        ORDER BY ci.year, ci.semester, ci.section
-      `).all();
-      return jsonResponse({ success: true, classIncharges: results.results });
+        WHERE 1=1
+      `;
+      const params = [];
+      if (authUser && authUser.role === 'admin') {
+        const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        if (hodFac?.department) {
+          query += ' AND ci.department = ?';
+          params.push(hodFac.department);
+        }
+      }
+      query += ' ORDER BY ci.year, ci.semester, ci.section';
+      const results = await db.prepare(query).bind(...params).all();
+      const mapped = (results.results || []).map(ci => ({
+        ...ci,
+        facultyId: ci.faculty_id || ci.facultyId,
+        facultyName: ci.faculty_name || ci.facultyName
+      }));
+      return jsonResponse({ success: true, classIncharges: mapped, assignments: mapped });
     }
 
     if (path === '/api/class-incharge/assign' && method === 'POST') {
@@ -1142,7 +1180,7 @@ async function handleApiRequest(request, env) {
     // =============================================================
     // 11. LEAVE MANAGEMENT MODULE
     // =============================================================
-    if ((path === '/api/leaves/requests' || path === '/api/leaves') && method === 'GET') {
+    if ((path === '/api/leaves/requests' || path === '/api/leaves' || path === '/api/admin/leaves') && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
@@ -1200,13 +1238,21 @@ async function handleApiRequest(request, env) {
 
       const pending = allRows.filter(r => String(r.status || '').toUpperCase().includes('PENDING'));
       const history = allRows.filter(r => !String(r.status || '').toUpperCase().includes('PENDING'));
+      const approvedCount = allRows.filter(r => r.status === 'APPROVED').length;
+      const rejectedCount = allRows.filter(r => r.status === 'REJECTED').length;
 
       return jsonResponse({
         success: true,
         requests: allRows,
         pending,
         history,
-        leaves: allRows
+        leaves: allRows,
+        stats: {
+          total: allRows.length,
+          pending: pending.length,
+          approved: approvedCount,
+          rejected: rejectedCount
+        }
       });
     }
 

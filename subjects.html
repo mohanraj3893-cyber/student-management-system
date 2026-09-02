@@ -432,12 +432,20 @@
               throw new Error('Failed to fetch subjects from DB.');
             }
 
-            subjectsList = await res.json();
+            const result = await res.json().catch(() => ({}));
+            const rawList = Array.isArray(result)
+              ? result
+              : Array.isArray(result?.subjects)
+                ? result.subjects
+                : Array.isArray(result?.data)
+                  ? result.data
+                  : [];
+            subjectsList = rawList;
             applyFilters();
 
           } catch (error) {
             console.error('Error fetching subjects:', error);
-            showToast(error.message, false);
+            showToast(error.message || 'Failed to fetch subjects.', false);
           }
         }
 
@@ -464,7 +472,15 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
-              facultyList = await res.json();
+              const result = await res.json().catch(() => ({}));
+              const rawList = Array.isArray(result)
+                ? result
+                : Array.isArray(result?.faculty)
+                  ? result.faculty
+                  : Array.isArray(result?.data)
+                    ? result.data
+                    : [];
+              facultyList = rawList;
               populateFacultyDropdown(facultyList);
             }
           } catch (e) {
@@ -476,10 +492,11 @@
           const dropdown = document.getElementById('modal-faculty-id');
           if (!dropdown) return;
           dropdown.innerHTML = '<option value="">-- Unassigned --</option>';
-          list.forEach(fac => {
+          const safeList = Array.isArray(list) ? list : [];
+          safeList.forEach(fac => {
             const opt = document.createElement('option');
             opt.value = fac.id;
-            opt.textContent = `${fac.name} (${fac.designation})`;
+            opt.textContent = `${fac.name} (${fac.designation || 'Faculty'})`;
             dropdown.appendChild(opt);
           });
         }
@@ -490,7 +507,9 @@
           if (!tbody) return;
           tbody.innerHTML = '';
 
-          if (list.length === 0) {
+          const safeList = Array.isArray(list) ? list : [];
+
+          if (safeList.length === 0) {
             const semMsg = activeSemesterFilter && activeSemesterFilter !== 'all' ? ` for ${activeSemesterFilter}` : '';
             tbody.innerHTML = `
               <tr>
@@ -504,7 +523,7 @@
             return;
           }
 
-          list.forEach(sub => {
+          safeList.forEach(sub => {
             const tr = document.createElement('tr');
 
             let facultyColumnMarkup = '<span class="badge-pill bg-red-light">Unassigned</span>';

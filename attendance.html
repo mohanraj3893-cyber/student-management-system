@@ -721,14 +721,24 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (facRes.ok) {
-              facultyList = await facRes.json();
+              const result = await facRes.json();
+              const rawList = Array.isArray(result)
+                ? result
+                : Array.isArray(result.faculty)
+                  ? result.faculty
+                  : Array.isArray(result.data)
+                    ? result.data
+                    : [];
+              facultyList = rawList;
               const facSelect = document.getElementById('hod-filter-faculty');
-              facultyList.forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f.id;
-                opt.textContent = f.name;
-                facSelect.appendChild(opt);
-              });
+              if (facSelect) {
+                facultyList.forEach(f => {
+                  const opt = document.createElement('option');
+                  opt.value = f.id;
+                  opt.textContent = f.name;
+                  facSelect.appendChild(opt);
+                });
+              }
             }
 
             // Load Class Incharge Assignments Table
@@ -738,7 +748,10 @@
             console.error('Error seeding HOD filters:', err);
           }
 
-          document.getElementById('btn-hod-filter').addEventListener('click', loadHODAttendance);
+          const hodFilterBtn = document.getElementById('btn-hod-filter');
+          if (hodFilterBtn) {
+            hodFilterBtn.addEventListener('click', loadHODAttendance);
+          }
           
           // Initial load
           loadHODAttendance();
@@ -752,8 +765,14 @@
             const res = await fetch('/api/admin/class-incharges', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to load class incharges.');
-            const assignments = await res.json();
+            const result = await res.json().catch(() => ({}));
+            const assignments = Array.isArray(result)
+              ? result
+              : Array.isArray(result.classIncharges)
+                ? result.classIncharges
+                : Array.isArray(result.assignments)
+                  ? result.assignments
+                  : [];
 
             const defaultClasses = [
               { year: '1st Year', semester: 'I', section: 'A' },
@@ -764,15 +783,16 @@
 
               tbody.innerHTML = '';
               defaultClasses.forEach(c => {
-                const current = assignments.find(a => a.year === c.year && a.section === c.section);
-                const currentFacId = current ? current.facultyId : '';
+                const current = assignments.find(a => (a.year === c.year || a.year === c.year.split(' ')[0]) && a.section === c.section);
+                const currentFacId = current ? (current.facultyId || current.faculty_id) : '';
                 const isAssigned = !!current;
 
                 const tr = document.createElement('tr');
                 let optionsHtml = '<option value="">-- No Class Incharge Assigned --</option>';
-                facultyList.forEach(f => {
+                const safeFacList = Array.isArray(facultyList) ? facultyList : [];
+                safeFacList.forEach(f => {
                   const isSelected = String(f.id) === String(currentFacId) || String(f.facultyId) === String(currentFacId);
-                  optionsHtml += `<option value="${f.id}" ${isSelected ? 'selected' : ''}>${f.name} (${f.employeeId || 'FAC'})</option>`;
+                  optionsHtml += `<option value="${f.id}" ${isSelected ? 'selected' : ''}>${f.name} (${f.employeeId || f.employee_id || 'FAC'})</option>`;
                 });
 
                 tr.innerHTML = `
