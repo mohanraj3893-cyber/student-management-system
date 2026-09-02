@@ -1190,7 +1190,54 @@ async function handleApiRequest(request, env) {
       return jsonResponse({ success: true, message: 'Subject created successfully.' });
     }
 
-    const subjectIdMatch = path.match(/^\/api\/subjects\/(\d+)$/);
+    const subjectIdMatch = path.match(/^\/api\/(?:admin\/)?subjects\/(\d+)$/);
+    if (subjectIdMatch && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const subjectId = subjectIdMatch[1];
+      const s = await db.prepare(`
+        SELECT s.*,
+               f.name as faculty_name,
+               f.name as full_name,
+               f.employee_id,
+               f.photo_path as faculty_photo_path
+        FROM subjects s
+        LEFT JOIN faculty f ON s.faculty_id = f.id
+        WHERE s.id = ?
+      `).bind(subjectId).first();
+
+      if (!s) return jsonResponse({ message: 'Subject not found.' }, 404);
+
+      const facName = s.faculty_name || s.full_name || null;
+      const formattedSubject = {
+        id: s.id,
+        code: s.code,
+        subject_code: s.code,
+        subjectCode: s.code,
+        name: s.name,
+        subject_name: s.name,
+        subjectName: s.name,
+        credits: s.credits || 3,
+        semester: s.semester,
+        year: s.year || 'III-Year',
+        section: s.section || 'A',
+        department: s.department,
+        faculty_id: s.faculty_id || null,
+        facultyId: s.faculty_id || null,
+        faculty_name: facName || 'Unassigned',
+        facultyName: facName || 'Unassigned',
+        assigned_faculty_name: facName || 'Unassigned',
+        assignedFaculty: facName || 'Unassigned',
+        assigned_faculty: facName || 'Unassigned',
+        employee_id: s.employee_id || null,
+        photo_path: s.faculty_photo_path || null,
+        photoPath: s.faculty_photo_path || null
+      };
+
+      return jsonResponse({ success: true, subject: formattedSubject, data: formattedSubject, ...formattedSubject });
+    }
+
     if (subjectIdMatch && (method === 'PUT' || method === 'POST')) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'hod')) {
@@ -1202,11 +1249,13 @@ async function handleApiRequest(request, env) {
       if (!existing) return jsonResponse({ message: 'Subject not found.' }, 404);
 
       const adminUser = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (adminUser?.department && existing.department !== adminUser.department) {
+      const userDept = adminUser?.department || authUser.department;
+      if (userDept && existing.department !== userDept) {
         return jsonResponse({ message: 'Forbidden: Cannot edit subjects outside your department.' }, 403);
       }
 
       const body = await request.json().catch(() => ({}));
+      const code = (body.code || body.subject_code || body.subjectCode || existing.code);
       const name = (body.name || body.subject_name || body.subjectName || existing.name);
       const credits = body.credits !== undefined ? parseInt(body.credits, 10) : existing.credits;
       const semester = (body.semester || existing.semester);
@@ -1227,16 +1276,18 @@ async function handleApiRequest(request, env) {
 
       await db.prepare(`
         UPDATE subjects
-        SET name = ?, credits = ?, semester = ?, year = ?, section = ?, faculty_id = ?, updated_at = CURRENT_TIMESTAMP
+        SET code = ?, name = ?, credits = ?, semester = ?, year = ?, section = ?, faculty_id = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-      `).bind(name, credits, semester, year, section, facultyId, subjectId).run();
+      `).bind(code, name, credits, semester, year, section, facultyId, subjectId).run();
 
       const updated = await db.prepare(`
-        SELECT s.*, f.name as faculty_name
+        SELECT s.*, f.name as faculty_name, f.photo_path as faculty_photo_path, f.employee_id
         FROM subjects s
         LEFT JOIN faculty f ON s.faculty_id = f.id
         WHERE s.id = ?
       `).bind(subjectId).first();
+
+      const facName = updated.faculty_name || 'Unassigned';
 
       return jsonResponse({
         success: true,
@@ -1244,7 +1295,11 @@ async function handleApiRequest(request, env) {
         subject: {
           id: updated.id,
           code: updated.code,
+          subject_code: updated.code,
+          subjectCode: updated.code,
           name: updated.name,
+          subject_name: updated.name,
+          subjectName: updated.name,
           credits: updated.credits,
           semester: updated.semester,
           year: updated.year,
@@ -1252,9 +1307,13 @@ async function handleApiRequest(request, env) {
           department: updated.department,
           faculty_id: updated.faculty_id,
           facultyId: updated.faculty_id,
-          faculty_name: updated.faculty_name || 'Unassigned',
-          facultyName: updated.faculty_name || 'Unassigned',
-          assigned_faculty_name: updated.faculty_name || 'Unassigned'
+          faculty_name: facName,
+          facultyName: facName,
+          assigned_faculty_name: facName,
+          assignedFaculty: facName,
+          assigned_faculty: facName,
+          employee_id: updated.employee_id || null,
+          photoPath: updated.faculty_photo_path || null
         }
       });
     }
@@ -1270,7 +1329,8 @@ async function handleApiRequest(request, env) {
       if (!existing) return jsonResponse({ message: 'Subject not found.' }, 404);
 
       const adminUser = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (adminUser?.department && existing.department !== adminUser.department) {
+      const userDept = adminUser?.department || authUser.department;
+      if (userDept && existing.department !== userDept) {
         return jsonResponse({ message: 'Forbidden: Cannot delete subjects outside your department.' }, 403);
       }
 
