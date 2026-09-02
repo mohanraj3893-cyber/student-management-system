@@ -1020,11 +1020,11 @@
             const res = await fetch('/api/leaves/my', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to load leave history.');
-            const list = await res.json();
+            const raw = await res.json();
+            const list = Array.isArray(raw) ? raw : (raw.leaves || []);
 
             tbody.innerHTML = '';
-            if (list.length === 0) {
+            if (!list || list.length === 0) {
               tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #78909C; padding: 2rem;">No leave requests submitted yet.</td></tr>`;
               return;
             }

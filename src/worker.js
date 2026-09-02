@@ -28,6 +28,84 @@ async function verifyPassword(password, storedHash) {
   return computed === storedHash;
 }
 
+// =============================================================
+// ACADEMIC DATA NORMALIZATION HELPERS
+// =============================================================
+const DEPT_MAP = {
+  'cse': 'computer science and engineering',
+  'it': 'information technology',
+  'ece': 'electronics and communication engineering',
+  'eee': 'electrical and electronics engineering',
+  'mech': 'mechanical engineering',
+  'civil': 'civil engineering',
+  'aids': 'artificial intelligence and data science',
+  'aiml': 'artificial intelligence and machine learning'
+};
+
+function normalizeDept(dept) {
+  if (!dept) return '';
+  let clean = String(dept).trim().toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]/g, '');
+  if (DEPT_MAP[clean]) clean = DEPT_MAP[clean].replace(/[^a-z0-9]/g, '');
+  return clean;
+}
+
+function isDepartmentMatch(deptA, deptB) {
+  if (!deptA || !deptB) return false;
+  const normA = normalizeDept(deptA);
+  const normB = normalizeDept(deptB);
+  if (normA === normB) return true;
+  return normA.includes(normB) || normB.includes(normA);
+}
+
+function getSemNum(sem) {
+  if (sem === null || sem === undefined) return 0;
+  const str = String(sem).trim().toUpperCase();
+  if (str.includes('VIII') || str === '8' || str.includes('SEM 8')) return 8;
+  if (str.includes('VII') || str === '7' || str.includes('SEM 7')) return 7;
+  if (str.includes('VI') || str === '6' || str.includes('SEM 6')) return 6;
+  if (str.includes('IV') || str === '4' || str.includes('SEM 4')) return 4;
+  if (str.includes('V') || str === '5' || str.includes('SEM 5')) return 5;
+  if (str.includes('III') || str === '3' || str.includes('SEM 3')) return 3;
+  if (str.includes('II') || str === '2' || str.includes('SEM 2')) return 2;
+  if (str.includes('I') || str === '1' || str.includes('SEM 1')) return 1;
+  const match = str.match(/\d+/);
+  return match ? parseInt(match[0], 10) : 0;
+}
+
+function getYearNum(yr) {
+  if (yr === null || yr === undefined) return 0;
+  const str = String(yr).trim().toUpperCase();
+  if (str.includes('4TH') || str.includes('IV') || str === '4') return 4;
+  if (str.includes('3RD') || str.includes('III') || str === '3') return 3;
+  if (str.includes('2ND') || str.includes('II') || str === '2') return 2;
+  if (str.includes('1ST') || str.includes('I') || str === '1') return 1;
+  const match = str.match(/\d+/);
+  return match ? parseInt(match[0], 10) : 0;
+}
+
+function isSemesterMatch(semA, semB) {
+  if (!semA || !semB) return false;
+  const numA = getSemNum(semA);
+  const numB = getSemNum(semB);
+  if (numA > 0 && numB > 0) return numA === numB;
+  return String(semA).trim().toLowerCase() === String(semB).trim().toLowerCase();
+}
+
+function isYearMatch(yrA, yrB) {
+  if (!yrA || !yrB) return false;
+  const numA = getYearNum(yrA);
+  const numB = getYearNum(yrB);
+  if (numA > 0 && numB > 0) return numA === numB;
+  return String(yrA).trim().toLowerCase() === String(yrB).trim().toLowerCase();
+}
+
+function isSectionMatch(secA, secB) {
+  if (!secA || !secB) return false;
+  return String(secA).trim().toUpperCase() === String(secB).trim().toUpperCase();
+}
+
 // Lightweight JWT implementation using WebCrypto HMAC-SHA256
 async function signJwt(payload, secret = 'sms_super_secret_jwt_key_2026') {
   const header = { alg: 'HS256', typ: 'JWT' };
@@ -1068,34 +1146,47 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      let query = `
+      let allLeaves = await db.prepare(`
         SELECT l.*, s.name as student_name, s.register_number, s.department, s.year, s.semester, s.section, s.phone, s.photo_path
         FROM leave_requests l
         JOIN students s ON l.student_id = s.id
-        WHERE 1=1
-      `;
-      const params = [];
+        ORDER BY l.created_at DESC
+      `).all();
+
+      let filteredLeaves = allLeaves.results || [];
 
       if (authUser.role === 'student') {
         const student = await db.prepare('SELECT id FROM students WHERE user_id = ?').bind(authUser.id).first();
         if (student) {
-          query += ' AND l.student_id = ?';
-          params.push(student.id);
+          filteredLeaves = filteredLeaves.filter(l => l.student_id === student.id);
+        } else {
+          filteredLeaves = [];
         }
       } else if (authUser.role === 'faculty') {
         const fac = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
         if (fac) {
-          query += ` AND EXISTS (
-            SELECT 1 FROM class_incharges ci 
-            WHERE ci.faculty_id = ? AND ci.department = s.department AND ci.year = s.year AND ci.semester = s.semester AND ci.section = s.section
-          )`;
-          params.push(fac.id);
+          const myAssignments = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ?').bind(fac.id).all();
+          const assignments = myAssignments.results || [];
+
+          filteredLeaves = filteredLeaves.filter(l => {
+            return assignments.some(ci => {
+              return isDepartmentMatch(ci.department, l.department) &&
+                     isYearMatch(ci.year, l.year) &&
+                     isSemesterMatch(ci.semester, l.semester) &&
+                     isSectionMatch(ci.section, l.section);
+            });
+          });
+        } else {
+          filteredLeaves = [];
+        }
+      } else if (authUser.role === 'admin') {
+        const hodFac = await db.prepare('SELECT department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        if (hodFac?.department) {
+          filteredLeaves = filteredLeaves.filter(l => isDepartmentMatch(l.department, hodFac.department));
         }
       }
 
-      query += ' ORDER BY l.created_at DESC';
-      const results = await db.prepare(query).bind(...params).all();
-      const allRows = results.results.map(r => ({
+      const allRows = filteredLeaves.map(r => ({
         ...r,
         studentName: r.student_name,
         registerNumber: r.register_number,
@@ -1123,8 +1214,20 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const body = await request.json();
-      const student = await db.prepare('SELECT id FROM students WHERE user_id = ?').bind(authUser.id).first();
+      let body = {};
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        body = await request.json().catch(() => ({}));
+      } else if (contentType.includes('multipart/form-data') || contentType.includes('application/x-www-form-urlencoded')) {
+        const formData = await request.formData().catch(() => new FormData());
+        for (const [key, value] of formData.entries()) {
+          body[key] = value;
+        }
+      } else {
+        body = await request.json().catch(() => ({}));
+      }
+
+      const student = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(authUser.id).first();
       if (!student) return jsonResponse({ message: 'Student record not found.' }, 400);
 
       const leaveType = body.leaveType || body.type || 'Casual Leave';
@@ -1134,32 +1237,48 @@ async function handleApiRequest(request, env) {
       const reason = body.reason || 'Personal Leave';
       const supportingDoc = body.supportingDocument || body.supportingDoc || '';
 
+      if (!fromDate || !toDate) {
+        return jsonResponse({ message: 'From Date and To Date are required.' }, 400);
+      }
+
+      // Query all class incharges with faculty records
+      const allIncharges = await db.prepare(`
+        SELECT ci.*, f.user_id as faculty_user_id, f.name as faculty_name
+        FROM class_incharges ci
+        JOIN faculty f ON ci.faculty_id = f.id
+        JOIN users u ON f.user_id = u.id
+        WHERE u.is_approved = 1
+      `).all();
+
+      const matchingIncharges = (allIncharges.results || []).filter(c => {
+        const dMatch = isDepartmentMatch(c.department, student.department);
+        const yMatch = isYearMatch(c.year, student.year);
+        const sMatch = isSemesterMatch(c.semester, student.semester);
+        const secMatch = isSectionMatch(c.section, student.section);
+        return dMatch && yMatch && sMatch && secMatch;
+      });
+
+      if (matchingIncharges.length === 0) {
+        return jsonResponse({ message: 'No Class Incharge has been assigned for this class.' }, 400);
+      }
+
+      const assignedIncharge = matchingIncharges[0];
+
       await db.prepare(`
         INSERT INTO leave_requests (student_id, leave_type, from_date, to_date, number_of_days, reason, supporting_document, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING_CLASS_INCHARGE')
-      `).bind(student.id, leaveType, fromDate, toDate, numberOfDays, reason, supportingDoc).run();
+      `).bind(student.id, leaveType, fromDate, toDate, numberOfDays, reason, typeof supportingDoc === 'string' ? supportingDoc : '').run();
 
-      // Push notify assigned Class Incharge
-      const classIncharge = await db.prepare(`
-        SELECT f.user_id 
-        FROM class_incharges ci
-        JOIN faculty f ON ci.faculty_id = f.id
-        WHERE ci.department = ? AND ci.year = ? AND ci.semester = ? AND ci.section = ?
-        LIMIT 1
-      `).bind(student.department, student.year, student.semester, student.section).first();
+      const notifMsg = `📝 New Leave Request: ${student.name || 'Student'} (${student.register_number || ''}) applied for ${leaveType} (${fromDate} to ${toDate}).`;
+      await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
+        .bind(assignedIncharge.faculty_user_id, notifMsg, 'leave_request', student.id).run();
 
-      if (classIncharge?.user_id) {
-        const notifMsg = `${student.name || 'Student'} applied for ${leaveType} (${fromDate} to ${toDate}).`;
-        await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
-          .bind(classIncharge.user_id, notifMsg, 'LEAVE_APPLICATION', student.id).run();
-
-        await sendPushNotificationToUser(db, env, classIncharge.user_id, {
-          title: '📝 New Leave Application',
-          body: notifMsg,
-          url: '/faculty_requests.html',
-          type: 'LEAVE_APPLICATION'
-        });
-      }
+      await sendPushNotificationToUser(db, env, assignedIncharge.faculty_user_id, {
+        title: '📝 New Leave Application',
+        body: notifMsg,
+        url: '/faculty_requests.html',
+        type: 'leave_request'
+      });
 
       return jsonResponse({ success: true, message: 'Leave application submitted to Class Incharge.' });
     }
