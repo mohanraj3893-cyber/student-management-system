@@ -1131,17 +1131,31 @@
                 displayStatus = 'Rejected by HOD';
               }
 
-              const submitDate = new Date(item.submittedAt || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-              const fromD = new Date(item.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-              const toD = new Date(item.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+              const submitDate = new Date(item.submittedAt || item.createdAt || item.created_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+              const fDateStr = item.fromDate || item.from_date || item.startDate;
+              const tDateStr = item.toDate || item.to_date || item.endDate;
+              const fromD = new Date(fDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              const toD = new Date(tDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+              let numDays = item.numberOfDays || item.number_of_days || item.days;
+              if (!numDays && fDateStr && tDateStr) {
+                const s = new Date(fDateStr);
+                const e = new Date(tDateStr);
+                s.setHours(0, 0, 0, 0);
+                e.setHours(0, 0, 0, 0);
+                numDays = Math.floor((e - s) / 86400000) + 1;
+              }
+              numDays = numDays > 0 ? numDays : 1;
+
+              const lType = item.leaveType || item.leave_type || item.type || 'General Leave';
 
               const tr = document.createElement('tr');
               tr.innerHTML = `
                 <td><strong>LREQ-${item.id}</strong></td>
-                <td>${item.leaveType}</td>
+                <td>${lType}</td>
                 <td>${fromD}</td>
                 <td>${toD}</td>
-                <td><strong>${item.numberOfDays || 1} ${(item.numberOfDays || 1) === 1 ? 'Day' : 'Days'}</strong></td>
+                <td><strong>${numDays} ${numDays === 1 ? 'Day' : 'Days'}</strong></td>
                 <td>${submitDate}</td>
                 <td><span class="badge-pill ${badgeClass}">${displayStatus}</span></td>
                 <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -1214,24 +1228,52 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to load leave details.');
-            const data = await res.json();
+            const resData = await res.json();
+            const data = resData.leave || resData.data || resData;
 
             // Populate Modal details
-            const _slName = data.student ? data.student.name : 'Student';
-            const _slAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_slName, data.student ? data.student.photoPath : null) : (data.student && data.student.photoPath ? data.student.photoPath : ''));
+            const studentObj = data.student || {};
+            const _slName = studentObj.name || data.studentName || data.name || 'Student';
+            const _slPhoto = studentObj.photoPath || studentObj.photo_path || data.photoPath || null;
+            const _slAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_slName, _slPhoto) : (_slPhoto ? _slPhoto : ''));
             const modalImg = document.getElementById('modal-student-img');
             modalImg.src = _slAvatar;
             modalImg.alt = _slName;
             modalImg.onerror = function() { this.onerror = null; this.src = (window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : ''); };
-            document.getElementById('modal-student-name').textContent = data.student ? data.student.name : 'Unknown';
-            document.getElementById('modal-student-reg').textContent = data.student ? data.student.registerNumber : 'N/A';
-            document.getElementById('modal-student-year-sem').textContent = data.student ? `${data.student.year} Year / Sem ${data.student.semester}` : '-';
+            document.getElementById('modal-student-name').textContent = _slName;
+            document.getElementById('modal-student-reg').textContent = studentObj.registerNumber || studentObj.register_number || data.registerNumber || 'N/A';
+            
+            const yVal = studentObj.year || data.year || '';
+            const sVal = studentObj.semester || data.semester || '';
+            let formattedYearSem = '-';
+            if (yVal && sVal) {
+              const normY = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
+              const normS = String(sVal).toLowerCase().includes('sem') ? sVal : `Sem ${sVal}`;
+              formattedYearSem = `${normY} / ${normS}`;
+            } else if (yVal) {
+              formattedYearSem = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
+            }
+            document.getElementById('modal-student-year-sem').textContent = formattedYearSem;
 
-            document.getElementById('modal-leave-type').textContent = data.leaveType;
-            document.getElementById('modal-leave-days').textContent = `${data.numberOfDays} ${data.numberOfDays === 1 ? 'Day' : 'Days'}`;
-            document.getElementById('modal-leave-reason').textContent = data.reason;
-            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('modal-leave-duration').textContent = `${new Date(data.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(data.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+            const modalLeaveType = data.leaveType || data.leave_type || data.type || 'General Leave';
+            document.getElementById('modal-leave-type').textContent = modalLeaveType;
+
+            const fD = data.fromDate || data.from_date || data.startDate;
+            const tD = data.toDate || data.to_date || data.endDate;
+            let numDaysVal = data.numberOfDays || data.number_of_days || data.days;
+            if (!numDaysVal && fD && tD) {
+              const s = new Date(fD);
+              const e = new Date(tD);
+              s.setHours(0, 0, 0, 0);
+              e.setHours(0, 0, 0, 0);
+              numDaysVal = Math.floor((e - s) / 86400000) + 1;
+            }
+            numDaysVal = numDaysVal > 0 ? numDaysVal : 1;
+
+            document.getElementById('modal-leave-days').textContent = `${numDaysVal} ${numDaysVal === 1 ? 'Day' : 'Days'}`;
+            document.getElementById('modal-leave-reason').textContent = data.reason || 'No specific reason provided.';
+            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt || data.created_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('modal-leave-duration').textContent = `${new Date(fD).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(tD).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
 
             // Document link
             const docContainer = document.getElementById('modal-doc-container');

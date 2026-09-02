@@ -106,6 +106,22 @@ function isSectionMatch(secA, secB) {
   return String(secA).trim().toUpperCase() === String(secB).trim().toUpperCase();
 }
 
+function calculateLeaveDays(fromDateStr, toDateStr, fallbackDays = 1) {
+  if (!fromDateStr || !toDateStr) return parseInt(fallbackDays || 1, 10) || 1;
+  try {
+    const start = new Date(fromDateStr);
+    const end = new Date(toDateStr);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return parseInt(fallbackDays || 1, 10) || 1;
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays > 0 ? diffDays : 1;
+  } catch (e) {
+    return parseInt(fallbackDays || 1, 10) || 1;
+  }
+}
+
 // Lightweight JWT implementation using WebCrypto HMAC-SHA256
 async function signJwt(payload, secret = 'sms_super_secret_jwt_key_2026') {
   const header = { alg: 'HS256', typ: 'JWT' };
@@ -324,6 +340,13 @@ async function handleApiRequest(request, env) {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(department, year, semester, section)
       )
+    `).run().catch(() => {});
+
+    // Repair existing leave request days calculation in D1 database
+    await db.prepare(`
+      UPDATE leave_requests
+      SET number_of_days = CAST(julianday(to_date) - julianday(from_date) + 1 AS INTEGER)
+      WHERE to_date IS NOT NULL AND from_date IS NOT NULL AND julianday(to_date) >= julianday(from_date)
     `).run().catch(() => {});
 
     // =============================================================
@@ -1385,37 +1408,42 @@ async function handleApiRequest(request, env) {
         }
       }
 
-      const allRows = filteredLeaves.map(r => ({
-        ...r,
-        studentName: r.student_name,
-        name: r.student_name,
-        registerNumber: r.register_number,
-        leaveType: r.leave_type || r.leaveType || r.type || 'Medical Leave',
-        leave_type: r.leave_type || r.leaveType || r.type || 'Medical Leave',
-        fromDate: r.from_date || r.fromDate,
-        from_date: r.from_date || r.fromDate,
-        toDate: r.to_date || r.toDate,
-        to_date: r.to_date || r.toDate,
-        startDate: r.from_date || r.startDate,
-        endDate: r.to_date || r.endDate,
-        numberOfDays: r.number_of_days || r.numberOfDays || r.days || 1,
-        number_of_days: r.number_of_days || r.numberOfDays || r.days || 1,
-        days: r.number_of_days || r.numberOfDays || r.days || 1,
-        photoPath: r.photo_path || r.photoPath,
-        rejectionReason: r.rejection_reason || r.rejectionReason,
-        hodRemarks: r.hod_remarks || r.hodRemarks || '',
-        student: {
-          id: r.student_id,
+      const allRows = filteredLeaves.map(r => {
+        const fromD = r.from_date || r.fromDate || r.startDate;
+        const toD = r.to_date || r.toDate || r.endDate;
+        const days = calculateLeaveDays(fromD, toD, r.number_of_days || r.numberOfDays);
+        return {
+          ...r,
+          studentName: r.student_name,
           name: r.student_name,
           registerNumber: r.register_number,
-          department: r.department,
-          year: r.year,
-          semester: r.semester,
-          section: r.section,
-          phone: r.phone,
-          photoPath: r.photo_path || ''
-        }
-      }));
+          leaveType: r.leave_type || r.leaveType || r.type || 'Medical Leave',
+          leave_type: r.leave_type || r.leaveType || r.type || 'Medical Leave',
+          fromDate: fromD,
+          from_date: fromD,
+          toDate: toD,
+          to_date: toD,
+          startDate: fromD,
+          endDate: toD,
+          numberOfDays: days,
+          number_of_days: days,
+          days: days,
+          photoPath: r.photo_path || r.photoPath,
+          rejectionReason: r.rejection_reason || r.rejectionReason,
+          hodRemarks: r.hod_remarks || r.hodRemarks || '',
+          student: {
+            id: r.student_id,
+            name: r.student_name,
+            registerNumber: r.register_number,
+            department: r.department,
+            year: r.year,
+            semester: r.semester,
+            section: r.section,
+            phone: r.phone,
+            photoPath: r.photo_path || ''
+          }
+        };
+      });
 
       const pending = allRows.filter(r => String(r.status || '').toUpperCase().includes('PENDING'));
       const history = allRows.filter(r => !String(r.status || '').toUpperCase().includes('PENDING'));
@@ -1459,13 +1487,24 @@ async function handleApiRequest(request, env) {
       const leaveType = body.leaveType || body.leave_type || 'General Leave';
       const fromDate = body.fromDate || body.from_date || body.startDate;
       const toDate = body.toDate || body.to_date || body.endDate;
-      const numberOfDays = parseInt(body.numberOfDays || body.days || body.daysCount || 1, 10);
       const reason = body.reason || '';
       const supportingDoc = body.supportingDocument || body.document || '';
 
       if (!fromDate || !toDate) {
         return jsonResponse({ message: 'From Date and To Date are required.' }, 400);
       }
+
+      const start = new Date(fromDate);
+      const end = new Date(toDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+
+      if (end.getTime() < start.getTime()) {
+        return jsonResponse({ message: 'To Date cannot be earlier than From Date.' }, 400);
+      }
+
+      const calculatedDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const numberOfDays = calculatedDays > 0 ? calculatedDays : 1;
 
       const student = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(authUser.id).first();
       if (!student) {
@@ -1499,7 +1538,7 @@ async function handleApiRequest(request, env) {
         VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING_CLASS_INCHARGE')
       `).bind(student.id, leaveType, fromDate, toDate, numberOfDays, reason, typeof supportingDoc === 'string' ? supportingDoc : '').run();
 
-      const notifMsg = `📝 New Leave Request: ${student.name || 'Student'} (${student.register_number || ''}) applied for ${leaveType} (${fromDate} to ${toDate}).`;
+      const notifMsg = `📝 New Leave Request: ${student.name || 'Student'} (${student.register_number || ''}) applied for ${leaveType} (${fromDate} to ${toDate} - ${numberOfDays} ${numberOfDays === 1 ? 'Day' : 'Days'}).`;
       await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
         .bind(assignedIncharge.faculty_user_id, notifMsg, 'leave_request', student.id).run();
 
@@ -1521,7 +1560,23 @@ async function handleApiRequest(request, env) {
       if (!student) return jsonResponse({ success: true, leaves: [] });
 
       const leaves = await db.prepare('SELECT * FROM leave_requests WHERE student_id = ? ORDER BY created_at DESC').bind(student.id).all();
-      return jsonResponse({ success: true, leaves: leaves.results });
+      const mapped = (leaves.results || []).map(l => {
+        const fromD = l.from_date || l.fromDate;
+        const toD = l.to_date || l.toDate;
+        const days = calculateLeaveDays(fromD, toD, l.number_of_days);
+        return {
+          ...l,
+          leaveType: l.leave_type || l.type || 'General Leave',
+          fromDate: fromD,
+          from_date: fromD,
+          toDate: toD,
+          to_date: toD,
+          numberOfDays: days,
+          number_of_days: days,
+          days: days
+        };
+      });
+      return jsonResponse({ success: true, leaves: mapped });
     }
 
     const singleLeaveMatch = path.match(/^\/api\/(?:admin\/)?leaves?\/(\d+)$/);
@@ -1554,6 +1609,10 @@ async function handleApiRequest(request, env) {
         }
       }
 
+      const fromD = leave.from_date || leave.fromDate || leave.startDate;
+      const toD = leave.to_date || leave.toDate || leave.endDate;
+      const days = calculateLeaveDays(fromD, toD, leave.number_of_days);
+
       const formattedLeave = {
         id: leave.id,
         studentId: leave.student_id,
@@ -1567,15 +1626,15 @@ async function handleApiRequest(request, env) {
         leaveType: leave.leave_type || leave.type || 'Medical Leave',
         leave_type: leave.leave_type || leave.type || 'Medical Leave',
         reason: leave.reason || '',
-        fromDate: leave.from_date,
-        from_date: leave.from_date,
-        toDate: leave.to_date,
-        to_date: leave.to_date,
-        startDate: leave.from_date,
-        endDate: leave.to_date,
-        numberOfDays: leave.number_of_days || 1,
-        number_of_days: leave.number_of_days || 1,
-        days: leave.number_of_days || 1,
+        fromDate: fromD,
+        from_date: fromD,
+        toDate: toD,
+        to_date: toD,
+        startDate: fromD,
+        endDate: toD,
+        numberOfDays: days,
+        number_of_days: days,
+        days: days,
         status: leave.status,
         supportingDocument: leave.supporting_document || null,
         hodRemarks: leave.hod_remarks || '',

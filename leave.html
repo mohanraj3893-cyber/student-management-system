@@ -1143,9 +1143,17 @@
             if (stRegEl) stRegEl.textContent = studentObj.registerNumber || studentObj.register_number || data.registerNumber || 'N/A';
             const stYearEl = document.getElementById('modal-student-year-sem');
             if (stYearEl) {
-              const yVal = studentObj.year || data.year;
-              const sVal = studentObj.semester || data.semester;
-              stYearEl.textContent = (yVal && sVal) ? `${yVal} Year / Sem ${sVal}` : (yVal || '-');
+              const yVal = studentObj.year || data.year || '';
+              const sVal = studentObj.semester || data.semester || '';
+              let formattedYearSem = '-';
+              if (yVal && sVal) {
+                const normY = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
+                const normS = String(sVal).toLowerCase().includes('sem') ? sVal : `Sem ${sVal}`;
+                formattedYearSem = `${normY} / ${normS}`;
+              } else if (yVal) {
+                formattedYearSem = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
+              }
+              stYearEl.textContent = formattedYearSem;
             }
 
             // Leave information
@@ -1156,7 +1164,15 @@
             const fDate = data.fromDate || data.from_date || data.startDate;
             const tDate = data.toDate || data.to_date || data.endDate;
             document.getElementById('modal-leave-duration').textContent = `${new Date(fDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(tDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-            const numDaysVal = data.numberOfDays || data.number_of_days || data.days || 1;
+            let numDaysVal = data.numberOfDays || data.number_of_days || data.days;
+            if (!numDaysVal && fDate && tDate) {
+              const s = new Date(fDate);
+              const e = new Date(tDate);
+              s.setHours(0, 0, 0, 0);
+              e.setHours(0, 0, 0, 0);
+              numDaysVal = Math.floor((e - s) / 86400000) + 1;
+            }
+            numDaysVal = numDaysVal > 0 ? numDaysVal : 1;
             document.getElementById('modal-leave-days').textContent = `${numDaysVal} ${numDaysVal === 1 ? 'Day' : 'Days'}`;
             document.getElementById('modal-leave-reason').textContent = data.reason || 'No specific reason provided.';
 
