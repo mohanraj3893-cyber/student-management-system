@@ -1716,13 +1716,30 @@ async function handleApiRequest(request, env) {
       const body = await request.json().catch(() => ({}));
       const leaveId = leaveApproveMatch[1];
       const isHod = authUser.role === 'admin' || authUser.role === 'hod';
-      const nextStatus = isHod ? 'APPROVED' : 'PENDING_HOD';
 
-      await db.prepare('UPDATE leave_requests SET status = ?, hod_remarks = ?, rejection_reason = NULL, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-        .bind(nextStatus, body.hodRemarks || body.remarks || (isHod ? 'Approved by Department HOD.' : 'Recommended by Class Incharge.'), authUser.id, leaveId).run().catch(async () => {
-          await db.prepare('UPDATE leave_requests SET status = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-            .bind(nextStatus, authUser.id, leaveId).run();
-        });
+      const existingLeave = await db.prepare('SELECT * FROM leave_requests WHERE id = ?').bind(leaveId).first();
+      if (!existingLeave) return jsonResponse({ message: 'Leave request not found.' }, 404);
+
+      const curStatus = String(existingLeave.status || '').toUpperCase().trim();
+      if (curStatus === 'APPROVED') {
+        return jsonResponse({ message: 'Leave request is already approved.' }, 400);
+      }
+      if (curStatus.startsWith('REJECT')) {
+        return jsonResponse({ message: 'Cannot approve a rejected leave request.' }, 400);
+      }
+
+      const nextStatus = isHod ? 'APPROVED' : 'PENDING_HOD';
+      const remarks = body.hodRemarks || body.remarks || (isHod ? 'Approved by Department HOD.' : 'Recommended by Class Incharge.');
+
+      await db.prepare(`
+        UPDATE leave_requests
+        SET status = ?,
+            hod_remarks = ?,
+            rejection_reason = NULL,
+            processed_by = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).bind(nextStatus, remarks, authUser.id, leaveId).run();
 
       const leaveRecord = await db.prepare(`
         SELECT l.*, s.name as student_name, s.department, s.user_id as student_user_id
@@ -1777,20 +1794,37 @@ async function handleApiRequest(request, env) {
       const body = await request.json().catch(() => ({}));
       const leaveId = leaveRejectMatch[1];
       const isHod = authUser.role === 'admin' || authUser.role === 'hod';
-      const rejectStatus = isHod ? 'REJECTED_BY_HOD' : 'REJECTED_BY_CLASS_INCHARGE';
 
-      await db.prepare('UPDATE leave_requests SET status = ?, rejection_reason = ?, hod_remarks = NULL, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-        .bind(rejectStatus, body.reason || body.rejectionReason || 'Application rejected.', authUser.id, leaveId).run().catch(async () => {
-          await db.prepare('UPDATE leave_requests SET status = ?, rejection_reason = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-            .bind(rejectStatus, body.reason || body.rejectionReason || 'Application rejected.', authUser.id, leaveId).run();
-        });
+      const existingLeave = await db.prepare('SELECT * FROM leave_requests WHERE id = ?').bind(leaveId).first();
+      if (!existingLeave) return jsonResponse({ message: 'Leave request not found.' }, 404);
+
+      const curStatus = String(existingLeave.status || '').toUpperCase().trim();
+      if (curStatus === 'APPROVED') {
+        return jsonResponse({ message: 'Cannot reject an already approved leave request.' }, 400);
+      }
+      if (curStatus.startsWith('REJECT')) {
+        return jsonResponse({ message: 'Leave request is already rejected.' }, 400);
+      }
+
+      const rejectStatus = isHod ? 'REJECTED_BY_HOD' : 'REJECTED_BY_CLASS_INCHARGE';
+      const rejectReason = body.reason || body.rejectionReason || 'Application rejected.';
+
+      await db.prepare(`
+        UPDATE leave_requests
+        SET status = ?,
+            rejection_reason = ?,
+            hod_remarks = NULL,
+            processed_by = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).bind(rejectStatus, rejectReason, authUser.id, leaveId).run();
 
       const leaveRecord = await db.prepare(`
         SELECT l.*, s.user_id as student_user_id FROM leave_requests l JOIN students s ON l.student_id = s.id WHERE l.id = ?
       `).bind(leaveId).first();
 
       if (leaveRecord?.student_user_id) {
-        const msg = `Your leave application was rejected: ${body.reason || body.rejectionReason || 'No remarks provided'}.`;
+        const msg = `Your leave application was rejected: ${rejectReason}.`;
         await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
           .bind(leaveRecord.student_user_id, msg, 'LEAVE_REJECTED', leaveId).run();
 
