@@ -365,10 +365,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const reason = document.getElementById('leave-reason').value;
-      const startDate = document.getElementById('leave-start').value;
-      const endDate = document.getElementById('leave-end').value;
-      const days = document.getElementById('leave-days').value;
+      console.log('[SMS Leave SPA Debug] Leave submit started');
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>⏳</span> Submitting...';
+      }
+
+      const reason = document.getElementById('leave-reason')?.value || '';
+      const startDate = document.getElementById('leave-start')?.value || '';
+      const endDate = document.getElementById('leave-end')?.value || startDate;
+      const days = document.getElementById('leave-days')?.value || '1';
+
+      const payload = {
+        reason: reason.trim(),
+        startDate,
+        endDate,
+        fromDate: startDate,
+        toDate: endDate,
+        days: Number(days),
+        numberOfDays: Number(days)
+      };
+
+      console.log('[SMS Leave SPA Debug] Sending payload:', payload);
 
       try {
         const res = await fetch('/api/leaves/apply', {
@@ -377,17 +397,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ reason, startDate, endDate, days })
+          body: JSON.stringify(payload)
         });
 
-        const body = await res.json();
+        console.log('[SMS Leave SPA Debug] Response Status:', res.status);
+        const body = await res.json().catch(() => ({}));
+        console.log('[SMS Leave SPA Debug] Response Body:', body);
+
         if (!res.ok) throw new Error(body.message || 'Submission failed.');
 
-        showToast('Leave request submitted successfully!', true);
+        showToast(body.message || 'Leave request submitted successfully!', true);
         form.reset();
-        loadStudentLeaves();
+        await loadStudentLeaves();
       } catch (err) {
+        console.error('[SMS Leave SPA Debug] Error:', err);
         showToast(err.message, false);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>🚀</span> Submit Request';
+        }
       }
     });
 

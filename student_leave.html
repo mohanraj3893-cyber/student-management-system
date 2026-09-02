@@ -679,7 +679,7 @@
               <!-- Form Buttons -->
               <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; justify-content: flex-end;">
                 <button type="reset" class="btn btn-secondary" id="reset-form-btn" style="background: #F1F5F9; color: #475569; border: none; font-weight: 600; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">Reset</button>
-                <button type="submit" class="btn btn-primary" style="background: #1D4ED8; color: white; border: none; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                <button type="submit" class="btn btn-primary" id="submit-leave-btn" style="background: #1D4ED8; color: white; border: none; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
                   <span>🚀</span> Submit Leave Request
                 </button>
               </div>
@@ -881,16 +881,30 @@
             studentProfile = data;
 
             // Form static displays
-            document.getElementById('student-name').textContent = data.name || 'N/A';
-            document.getElementById('student-reg').textContent = data.registerNumber || 'N/A';
-            document.getElementById('student-dept').textContent = data.department || 'Computer Science & Engineering';
-            document.getElementById('student-year').textContent = data.year || 'N/A';
-            document.getElementById('student-semester').textContent = data.semester || 'N/A';
+            const stName = document.getElementById('student-name');
+            if (stName) stName.textContent = data.name || 'N/A';
 
-            // Sidebar and Navbar displays
-            document.getElementById('sidebar-profile-student-name').textContent = data.name || 'N/A';
-            document.getElementById('sidebar-profile-student-reg').textContent = data.registerNumber || 'N/A';
-            document.getElementById('nav-profile-student-name').textContent = data.name || 'N/A';
+            const stReg = document.getElementById('student-reg');
+            if (stReg) stReg.textContent = data.registerNumber || 'N/A';
+
+            const stDept = document.getElementById('student-dept');
+            if (stDept) stDept.textContent = data.department || 'Computer Science & Engineering';
+
+            const stYear = document.getElementById('student-year');
+            if (stYear) stYear.textContent = data.year || 'N/A';
+
+            const stSem = document.getElementById('student-semester');
+            if (stSem) stSem.textContent = data.semester || 'N/A';
+
+            // Sidebar and Navbar displays (Safely handle any ID variation)
+            const sbName = document.getElementById('sidebar-profile-name') || document.getElementById('sidebar-profile-student-name');
+            if (sbName) sbName.textContent = data.name || 'N/A';
+
+            const sbRole = document.getElementById('sidebar-profile-role') || document.getElementById('sidebar-profile-student-reg');
+            if (sbRole) sbRole.textContent = data.registerNumber || 'Student';
+
+            const navName = document.getElementById('nav-profile-student-name') || document.getElementById('nav-profile-name');
+            if (navName) navName.textContent = data.name || 'N/A';
 
             let avatarSrc;
             if (data.photoPath) {
@@ -901,11 +915,14 @@
               const color = colors[initials.charCodeAt(0) % colors.length];
               avatarSrc = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
             }
-            document.getElementById('sidebar-profile-img').src = avatarSrc;
-            document.getElementById('nav-profile-img').src = avatarSrc;
+            const sbImg = document.getElementById('sidebar-profile-img');
+            if (sbImg) sbImg.src = avatarSrc;
+
+            const navImg = document.getElementById('nav-profile-img');
+            if (navImg) navImg.src = avatarSrc;
 
           } catch (err) {
-            console.error('Profile fetch error:', err);
+            console.error('[SMS Leave] Profile fetch error:', err);
             showToast('Failed to load profile details.', false);
           }
         }
@@ -916,16 +933,20 @@
         const fileInput = document.getElementById('supporting-document-file');
         const dropzoneText = document.getElementById('dropzone-text');
 
-        dropzone.addEventListener('click', () => fileInput.click());
-        
-        fileInput.addEventListener('change', (e) => {
-          if (e.target.files.length > 0) {
-            const file = e.target.files[0];
-            dropzoneText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color: #2E7D32;"></i> <strong>Attached:</strong> ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-            dropzone.style.borderColor = '#2E7D32';
-            dropzone.style.backgroundColor = 'rgba(46, 125, 50, 0.05)';
-          }
-        });
+        if (dropzone && fileInput) {
+          dropzone.addEventListener('click', () => fileInput.click());
+          
+          fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+              const file = e.target.files[0];
+              if (dropzoneText) {
+                dropzoneText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color: #2E7D32;"></i> <strong>Attached:</strong> ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+              }
+              dropzone.style.borderColor = '#2E7D32';
+              dropzone.style.backgroundColor = 'rgba(46, 125, 50, 0.05)';
+            }
+          });
+        }
 
         // 3. Dynamic leave days calculation
         const fromDateInput = document.getElementById('leave-from-date');
@@ -933,6 +954,7 @@
         const calculatedDaysDiv = document.getElementById('calculated-days');
 
         function updateCalculatedDays() {
+          if (!fromDateInput || !toDateInput || !calculatedDaysDiv) return;
           const fromVal = fromDateInput.value;
           const toVal = toDateInput.value;
           
@@ -955,63 +977,121 @@
           }
         }
 
-        fromDateInput.addEventListener('change', updateCalculatedDays);
-        toDateInput.addEventListener('change', updateCalculatedDays);
+        if (fromDateInput) fromDateInput.addEventListener('change', updateCalculatedDays);
+        if (toDateInput) toDateInput.addEventListener('change', updateCalculatedDays);
 
         // Reset form functionality
-        document.getElementById('reset-form-btn').addEventListener('click', () => {
-          setTimeout(() => {
-            updateCalculatedDays();
-            dropzoneText.textContent = 'Click or drag files here to upload certificate';
-            dropzone.style.borderColor = 'var(--primary-red)';
-            dropzone.style.backgroundColor = 'var(--white)';
-            fileInput.value = '';
-          }, 10);
-        });
+        const resetBtn = document.getElementById('reset-form-btn');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            setTimeout(() => {
+              updateCalculatedDays();
+              if (dropzoneText) dropzoneText.textContent = 'Click or drag files here to upload certificate';
+              if (dropzone) {
+                dropzone.style.borderColor = 'var(--primary-red)';
+                dropzone.style.backgroundColor = 'var(--white)';
+              }
+              if (fileInput) fileInput.value = '';
+            }, 10);
+          });
+        }
 
         // 4. Submit leave application
         const leaveForm = document.getElementById('leave-request-form');
-        leaveForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
+        const submitBtn = document.getElementById('submit-leave-btn') || (leaveForm ? leaveForm.querySelector('button[type="submit"]') : null);
 
-          const fromVal = fromDateInput.value;
-          const toVal = toDateInput.value;
+        if (leaveForm) {
+          leaveForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('[SMS Leave Debug] Leave submit started');
 
-          if (new Date(toVal) < new Date(fromVal)) {
-            showToast('From Date cannot be after To Date.', false);
-            return;
-          }
+            const fromVal = fromDateInput ? fromDateInput.value : '';
+            const toVal = toDateInput ? toDateInput.value : '';
 
-          const formData = new FormData(leaveForm);
-          // Multer checks file size & file extensions on backend
+            if (!fromVal || !toVal) {
+              showToast('Please select both From Date and To Date.', false);
+              return;
+            }
 
-          try {
-            const res = await fetch('/api/leaves', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`
-              },
-              body: formData
-            });
+            if (new Date(toVal) < new Date(fromVal)) {
+              showToast('From Date cannot be after To Date.', false);
+              return;
+            }
 
-            const body = await res.json();
-            if (!res.ok) throw new Error(body.message || 'Submission failed.');
+            const leaveTypeEl = document.getElementById('leave-type');
+            const leaveType = leaveTypeEl ? leaveTypeEl.value : 'Casual Leave';
+            if (!leaveType) {
+              showToast('Please select a leave type.', false);
+              return;
+            }
 
-            showToast('Leave request submitted successfully!', true);
-            leaveForm.reset();
-            // Reset uploader display
-            dropzoneText.textContent = 'Click or drag files here to upload certificate';
-            dropzone.style.borderColor = 'var(--primary-red)';
-            dropzone.style.backgroundColor = 'var(--white)';
-            fileInput.value = '';
-            updateCalculatedDays();
+            const reasonEl = document.getElementById('leave-reason');
+            const reason = reasonEl ? reasonEl.value : '';
+            if (!reason || reason.trim() === '') {
+              showToast('Please provide a reason for the leave.', false);
+              return;
+            }
 
-            // Refresh logs
-            await loadLeaveHistory();
-          } catch (err) {
-            showToast(err.message, false);
-          }
-        });
+            // UI Feedback: Loading state & disable button
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.innerHTML = '<span>⏳</span> Submitting...';
+            }
+
+            const payload = {
+              leaveType,
+              fromDate: fromVal,
+              toDate: toVal,
+              reason: reason.trim(),
+              startDate: fromVal,
+              endDate: toVal
+            };
+
+            console.log('[SMS Leave Debug] Sending Payload:', payload);
+
+            try {
+              const res = await fetch('/api/leaves/apply', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+
+              console.log('[SMS Leave Debug] Response Status:', res.status);
+              const body = await res.json().catch(() => ({}));
+              console.log('[SMS Leave Debug] Response Body:', body);
+
+              if (!res.ok) {
+                throw new Error(body.message || 'Submission failed.');
+              }
+
+              showToast(body.message || 'Leave request submitted successfully!', true);
+              leaveForm.reset();
+
+              // Reset dropzone display
+              if (dropzoneText) dropzoneText.textContent = 'Click or drag files here to upload certificate';
+              if (dropzone) {
+                dropzone.style.borderColor = 'var(--primary-red)';
+                dropzone.style.backgroundColor = 'var(--white)';
+              }
+              if (fileInput) fileInput.value = '';
+              updateCalculatedDays();
+
+              // Refresh leave history
+              await loadLeaveHistory();
+            } catch (err) {
+              console.error('[SMS Leave Debug] Submission Error:', err);
+              showToast(err.message || 'Failed to submit leave request.', false);
+            } finally {
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>🚀</span> Submit Leave Request';
+              }
+            }
+          });
+        }
 
         // 5. Fetch and Render Student's Leave History
         async function loadLeaveHistory() {
