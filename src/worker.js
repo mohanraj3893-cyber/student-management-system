@@ -760,6 +760,178 @@ async function handleApiRequest(request, env) {
       });
     }
 
+    if ((path === '/api/dashboard/faculty' || path === '/api/faculty/dashboard') && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const faculty = await db.prepare('SELECT * FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const facId = faculty?.id || authUser.id;
+      const dept = faculty?.department || authUser.department || 'Computer Science & Engineering';
+
+      // 1. Check Class Incharge assignment from D1
+      const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
+      const isClassIncharge = Boolean(assignment);
+
+      // 2. Count Assigned Students
+      let studentCount = 0;
+      if (assignment) {
+        const sRes = await db.prepare(`
+          SELECT COUNT(*) as count FROM students s
+          JOIN users u ON s.user_id = u.id
+          WHERE s.department = ? AND s.year = ? AND s.semester = ? AND s.section = ? AND u.is_approved = 1
+        `).bind(assignment.department, assignment.year, assignment.semester, assignment.section).first();
+        studentCount = sRes?.count || 0;
+      } else {
+        // Fallback to department or assigned subjects
+        const sRes = await db.prepare(`
+          SELECT COUNT(DISTINCT s.id) as count FROM students s
+          JOIN users u ON s.user_id = u.id
+          JOIN subjects sub ON sub.department = s.department AND sub.year = s.year AND sub.semester = s.semester AND sub.section = s.section
+          WHERE (sub.faculty_id = ? OR sub.faculty_id = ?) AND u.is_approved = 1
+        `).bind(facId, authUser.id).first();
+        studentCount = sRes?.count || 0;
+      }
+
+      // 3. Today's Attendance summary
+      const today = new Date().toISOString().split('T')[0];
+      let todayAttendance = { present: 0, absent: 0, total: 0, isMarked: false, date: today };
+      if (assignment) {
+        const sess = await db.prepare(`
+          SELECT id FROM attendance_sessions
+          WHERE department = ? AND year = ? AND semester = ? AND section = ? AND date = ?
+        `).bind(assignment.department, assignment.year, assignment.semester, assignment.section, today).first();
+
+        if (sess) {
+          const counts = await db.prepare(`
+            SELECT
+              SUM(CASE WHEN status = 'PRESENT' OR status = 'Present' THEN 1 ELSE 0 END) as p,
+              SUM(CASE WHEN status = 'ABSENT' OR status = 'Absent' THEN 1 ELSE 0 END) as a
+            FROM attendance_records WHERE session_id = ?
+          `).bind(sess.id).first();
+          const p = Number(counts?.p || 0);
+          const a = Number(counts?.a || 0);
+          todayAttendance = {
+            present: p,
+            absent: a,
+            total: p + a,
+            isMarked: (p + a) > 0,
+            date: today
+          };
+        }
+      }
+
+      // 4. Pending Internal Marks (subjects assigned to this faculty)
+      const subRes = await db.prepare(`
+        SELECT COUNT(*) as count FROM subjects
+        WHERE (faculty_id = ? OR faculty_id = ?)
+      `).bind(facId, authUser.id).first();
+      const assignedSubjectsCount = subRes?.count || 0;
+
+      // 5. Pending Leave Requests (for Class Incharge)
+      let pendingLeavesCount = 0;
+      let pendingLeaveRequests = [];
+      if (assignment) {
+        const allPending = await db.prepare(`
+          SELECT l.*, s.name as student_name, s.register_number, s.photo_path, s.department as student_dept, s.year as student_year, s.semester as student_sem, s.section as student_sec
+          FROM leave_requests l
+          JOIN students s ON l.student_id = s.id
+          WHERE l.status = 'PENDING_CLASS_INCHARGE'
+          ORDER BY l.created_at DESC
+        `).all();
+
+        const filtered = (allPending.results || []).filter(l =>
+          isDepartmentMatch(l.student_dept, assignment.department) &&
+          isYearMatch(l.student_year, assignment.year) &&
+          isSemesterMatch(l.student_sem, assignment.semester) &&
+          isSectionMatch(l.student_sec, assignment.section)
+        );
+
+        pendingLeavesCount = filtered.length;
+        pendingLeaveRequests = filtered.slice(0, 4);
+      }
+
+      // 6. Uploaded Resources count
+      const resCount = await db.prepare('SELECT COUNT(*) as count FROM resources WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
+
+      // 7. Latest Announcements
+      const announcements = await db.prepare(`
+        SELECT a.*, u.username as author
+        FROM announcements a
+        JOIN users u ON a.posted_by = u.id
+        ORDER BY a.created_at DESC
+        LIMIT 4
+      `).all();
+
+      return jsonResponse({
+        success: true,
+        user: {
+          id: authUser.id,
+          name: faculty?.name || authUser.name,
+          employeeId: faculty?.employee_id || '',
+          department: dept,
+          designation: faculty?.designation || 'Assistant Professor',
+          role: authUser.role,
+          isClassIncharge: isClassIncharge
+        },
+        assignment: assignment ? {
+          department: assignment.department,
+          year: assignment.year,
+          semester: String(assignment.semester),
+          section: assignment.section || 'A'
+        } : null,
+        stats: {
+          assignedStudents: studentCount,
+          todayAttendance,
+          assignedSubjects: assignedSubjectsCount,
+          pendingLeaves: pendingLeavesCount,
+          uploadedResources: resCount?.count || 0
+        },
+        pendingLeaveRequests,
+        recentAnnouncements: announcements.results || []
+      });
+    }
+
+    if ((path === '/api/faculty/profile' || path === '/api/faculty/my-profile') && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const faculty = await db.prepare('SELECT f.*, u.email, u.username FROM faculty f JOIN users u ON f.user_id = u.id WHERE f.user_id = ?').bind(authUser.id).first();
+      const facId = faculty?.id || authUser.id;
+      const dept = faculty?.department || authUser.department || 'Computer Science & Engineering';
+
+      const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
+
+      const profileObj = {
+        id: faculty?.id || authUser.id,
+        user_id: authUser.id,
+        userId: authUser.id,
+        name: faculty?.name || authUser.name,
+        email: faculty?.email || authUser.email,
+        phone: faculty?.phone || '',
+        department: dept,
+        designation: faculty?.designation || 'Assistant Professor',
+        employeeId: faculty?.employee_id || '',
+        employee_id: faculty?.employee_id || '',
+        photoPath: faculty?.photo_path || '',
+        photo_path: faculty?.photo_path || '',
+        role: authUser.role,
+        isClassIncharge: Boolean(assignment),
+        assignment: assignment ? {
+          department: assignment.department,
+          year: assignment.year,
+          semester: String(assignment.semester),
+          section: assignment.section || 'A'
+        } : null
+      };
+
+      return jsonResponse({
+        success: true,
+        profile: profileObj,
+        faculty: profileObj,
+        ...profileObj
+      });
+    }
+
     // =============================================================
     // 5. STUDENTS MODULE
     // =============================================================
@@ -1064,7 +1236,7 @@ async function handleApiRequest(request, env) {
       }
     }
 
-    if ((path === '/api/class-incharge/my-assignments' || path === '/api/class-incharges/my-assignments' || path === '/api/admin/class-incharges/my-assignments') && method === 'GET') {
+    if ((path === '/api/class-incharge/my-assignment' || path === '/api/class-incharge/my-assignments' || path === '/api/class-incharges/my-assignment' || path === '/api/class-incharges/my-assignments' || path === '/api/admin/class-incharges/my-assignments') && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
@@ -1372,11 +1544,36 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (!faculty) return jsonResponse({ success: true, subjects: [] });
+      const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const facId = faculty?.id || authUser.id;
 
-      const subjects = await db.prepare('SELECT * FROM subjects WHERE faculty_id = ?').bind(faculty.id).all();
-      return jsonResponse({ success: true, subjects: subjects.results });
+      const subjects = await db.prepare(`
+        SELECT * FROM subjects
+        WHERE faculty_id = ? OR faculty_id = ?
+        ORDER BY semester, code
+      `).bind(facId, authUser.id).all();
+
+      const formatted = (subjects.results || []).map(s => ({
+        id: s.id,
+        code: s.code,
+        subject_code: s.code,
+        subjectCode: s.code,
+        name: s.name,
+        subject_name: s.name,
+        subjectName: s.name,
+        credits: s.credits || 3,
+        semester: s.semester,
+        year: s.year || 'III-Year',
+        section: s.section || 'A',
+        department: s.department
+      }));
+
+      return jsonResponse({
+        success: true,
+        subjects: formatted,
+        data: formatted,
+        count: formatted.length
+      });
     }
 
     if (path === '/api/subjects/my-enrolled' && method === 'GET') {
@@ -1724,19 +1921,37 @@ async function handleApiRequest(request, env) {
     // 10. INTERNAL MARKS MODULE
     // =============================================================
     if (path === '/api/marks/roster' && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
       const subjectId = url.searchParams.get('subjectId');
       const examType = url.searchParams.get('examType') || 'CIA-1';
 
+      if (!subjectId) {
+        return jsonResponse({ message: 'Subject ID is required' }, 400);
+      }
+
       const subject = await db.prepare('SELECT * FROM subjects WHERE id = ?').bind(subjectId).first();
       if (!subject) return jsonResponse({ success: true, roster: [] });
+
+      // Faculty authorization check: Must be assigned to this subject by HOD
+      const isHod = authUser.role === 'admin' || authUser.role === 'hod';
+      if (!isHod && authUser.role === 'faculty') {
+        const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        const facId = faculty?.id || authUser.id;
+        if (subject.faculty_id !== facId && subject.faculty_id !== authUser.id) {
+          return jsonResponse({ message: 'Forbidden: You can only view marks for subjects assigned to you by the HOD.' }, 403);
+        }
+      }
 
       const roster = await db.prepare(`
         SELECT s.id as student_id, s.name, s.register_number, s.photo_path,
                COALESCE(m.marks_obtained, '') as marks_obtained,
                COALESCE(m.max_marks, 100) as max_marks
         FROM students s
+        JOIN users u ON s.user_id = u.id
         LEFT JOIN internal_marks m ON m.student_id = s.id AND m.subject_id = ? AND m.exam_type = ?
-        WHERE s.department = ? AND s.year = ? AND s.semester = ? AND (s.section = ? OR ? = 'ALL')
+        WHERE u.is_approved = 1 AND s.department = ? AND s.year = ? AND s.semester = ? AND (s.section = ? OR ? = 'ALL')
         ORDER BY s.register_number ASC
       `).bind(subjectId, examType, subject.department, subject.year, subject.semester, subject.section, subject.section).all();
 
@@ -1744,11 +1959,26 @@ async function handleApiRequest(request, env) {
     }
 
     if ((path === '/api/marks/save' || path === '/api/marks/add') && method === 'POST') {
-      const body = await request.json();
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const body = await request.json().catch(() => ({}));
       const { subjectId, examType, maxMarks, marks } = body;
 
-      const subRow = await db.prepare('SELECT name, code FROM subjects WHERE id = ?').bind(subjectId).first();
-      const subLabel = subRow ? `${subRow.code}` : 'Subject';
+      const subject = await db.prepare('SELECT * FROM subjects WHERE id = ?').bind(subjectId).first();
+      if (!subject) return jsonResponse({ message: 'Subject not found.' }, 404);
+
+      // Server-side Authorization: Faculty can enter marks ONLY for HOD-assigned subjects
+      const isHod = authUser.role === 'admin' || authUser.role === 'hod';
+      if (!isHod && authUser.role === 'faculty') {
+        const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+        const facId = faculty?.id || authUser.id;
+        if (subject.faculty_id !== facId && subject.faculty_id !== authUser.id) {
+          return jsonResponse({ message: 'Forbidden: You can only enter marks for subjects assigned to you by the HOD.' }, 403);
+        }
+      }
+
+      const subLabel = `${subject.code} - ${subject.name}`;
 
       if (Array.isArray(marks)) {
         for (const item of marks) {
@@ -1808,7 +2038,7 @@ async function handleApiRequest(request, env) {
     // =============================================================
     // 11. LEAVE MANAGEMENT MODULE
     // =============================================================
-    if ((path === '/api/leaves/requests' || path === '/api/leaves' || path === '/api/admin/leaves') && method === 'GET') {
+    if ((path === '/api/leaves/class-incharge' || path === '/api/leaves/requests' || path === '/api/leaves' || path === '/api/admin/leaves') && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
@@ -2057,28 +2287,6 @@ async function handleApiRequest(request, env) {
       const toD = leave.to_date || leave.toDate || leave.endDate;
       const days = calculateLeaveDays(fromD, toD, leave.number_of_days);
 
-      const formattedLeave = {
-        id: leave.id,
-        studentId: leave.student_id,
-        studentName: leave.student_name,
-        name: leave.student_name,
-        registerNumber: leave.register_number,
-        department: leave.department,
-        year: leave.year,
-        semester: leave.semester,
-        section: leave.section,
-        leaveType: leave.leave_type || leave.type || 'Medical Leave',
-        leave_type: leave.leave_type || leave.type || 'Medical Leave',
-        reason: leave.reason || '',
-        fromDate: fromD,
-        from_date: fromD,
-        toDate: toD,
-        to_date: toD,
-        startDate: fromD,
-        endDate: toD,
-        numberOfDays: days,
-        number_of_days: days,
-        days: days,
       const isApproved = String(leave.status || '').toUpperCase() === 'APPROVED';
       const isRejected = String(leave.status || '').toUpperCase().startsWith('REJECT');
 
@@ -2152,7 +2360,7 @@ async function handleApiRequest(request, env) {
       return jsonResponse({ success: true, message: 'Leave request cancelled successfully.' });
     }
 
-    const leaveApproveMatch = path.match(/^\/api\/(?:admin\/)?leaves?(?:\/requests)?\/(\d+)\/approve$/);
+    const leaveApproveMatch = path.match(/^\/api\/(?:admin\/)?leaves?(?:\/requests)?\/(\d+)\/(?:approve|forward)$/);
     if (leaveApproveMatch && (method === 'POST' || method === 'PUT')) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
@@ -2160,6 +2368,7 @@ async function handleApiRequest(request, env) {
       const body = await request.json().catch(() => ({}));
       const leaveId = leaveApproveMatch[1];
       const isHod = authUser.role === 'admin' || authUser.role === 'hod';
+      const isForward = path.endsWith('/forward');
 
       const existingLeave = await db.prepare('SELECT * FROM leave_requests WHERE id = ?').bind(leaveId).first();
       if (!existingLeave) return jsonResponse({ message: 'Leave request not found.' }, 404);
@@ -2172,8 +2381,8 @@ async function handleApiRequest(request, env) {
         return jsonResponse({ message: 'Cannot approve a rejected leave request.' }, 400);
       }
 
-      const nextStatus = isHod ? 'APPROVED' : 'PENDING_HOD';
-      const remarks = body.hodRemarks || body.remarks || (isHod ? 'Approved by Department HOD.' : 'Recommended by Class Incharge.');
+      const nextStatus = (isHod && !isForward) ? 'APPROVED' : 'PENDING_HOD';
+      const remarks = body.hodRemarks || body.remarks || (nextStatus === 'APPROVED' ? 'Approved by Department HOD.' : 'Recommended by Class Incharge.');
 
       await db.prepare(`
         UPDATE leave_requests
@@ -2285,7 +2494,7 @@ async function handleApiRequest(request, env) {
 
     // =============================================================
     // 12. ANNOUNCEMENTS MODULE
-    if (path === '/api/announcements' && method === 'GET') {
+    if ((path === '/api/announcements/faculty' || path === '/api/announcements') && method === 'GET') {
       const results = await db.prepare(`
         SELECT a.*, u.username as author
         FROM announcements a

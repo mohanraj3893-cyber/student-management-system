@@ -219,7 +219,7 @@
                     <th>Register Number</th>
                     <th>Name</th>
                     <th>Year / Sem</th>
-                    <th>Email</th>
+                    <th>Section</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -317,7 +317,7 @@
               <td><strong>${s.registerNumber || s.username}</strong></td>
               <td>${s.name || '--'}</td>
               <td>${yearDisplay}${semDisplay}</td>
-              <td>${s.email || '--'}</td>
+              <td><span class="badge-pill" style="font-weight: 700; background: #F1F5F9; color: #334155; padding: 4px 8px; border-radius: 6px;">Sec ${s.section || 'A'}</span></td>
               <td><span class="badge-pill bg-green-light">Active</span></td>
             `;
             tbody.appendChild(tr);

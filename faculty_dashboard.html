@@ -284,13 +284,49 @@
 
           </div>
 
+          <!-- ASSIGNED CLASS CARD (CLASS INCHARGE) -->
+          <div id="dashboard-assigned-class-card" style="background: white; border-radius: 16px; padding: 1.15rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.45rem;">
+                <span style="font-size: 1.1rem;">🎓</span>
+                <h3 style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0;">Class Incharge Assignment</h3>
+              </div>
+              <span id="incharge-status-badge" style="font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0;">Active Incharge</span>
+            </div>
+
+            <!-- Incharge assigned state -->
+            <div id="incharge-assigned-state" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem;">
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.6rem;">
+                <span style="display: block; font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Department</span>
+                <span id="dash-assigned-dept" style="font-size: 0.82rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.6rem;">
+                <span style="display: block; font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Year</span>
+                <span id="dash-assigned-year" style="font-size: 0.82rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.6rem;">
+                <span style="display: block; font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Semester</span>
+                <span id="dash-assigned-sem" style="font-size: 0.82rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.6rem;">
+                <span style="display: block; font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Section</span>
+                <span id="dash-assigned-sec" style="font-size: 0.82rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Incharge unassigned state -->
+            <div id="incharge-unassigned-state" style="display: none; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 0.85rem; color: #92400E; font-size: 0.82rem; font-weight: 600; text-align: center;">
+              ℹ️ No Class Incharge Assignment. You are operating in Faculty mode.
+            </div>
+          </div>
+
           <!-- 5. Quick Academic Actions Card -->
           <div style="background: white; border-radius: 20px; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
             <h3 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin: 0 0 1rem 0;">Quick Academic Actions</h3>
 
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
               <!-- Action 1: Mark Attendance -->
-              <div onclick="location.href='faculty_attendance.html'" style="background: #FAFAFD; border: 1px solid #F1F5F9; border-radius: 14px; padding: 1rem 0.5rem; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; transition: transform 0.2s ease;">
+              <div id="action-mark-attendance" onclick="location.href='faculty_attendance.html'" style="background: #FAFAFD; border: 1px solid #F1F5F9; border-radius: 14px; padding: 1rem 0.5rem; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; transition: transform 0.2s ease;">
                 <div style="width: 36px; height: 36px; border-radius: 10px; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
                   ☑️
                 </div>
@@ -360,7 +396,7 @@
             </div>
 
             <!-- Right Card: Pending Leave Applications -->
-            <div style="background: white; border-radius: 20px; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; display: flex; flex-direction: column; justify-content: space-between;">
+            <div id="dashboard-leave-card" style="background: white; border-radius: 20px; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; display: flex; flex-direction: column; justify-content: space-between;">
               <div>
                 <h3 style="font-size: 0.95rem; font-weight: 800; color: #16A34A; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.4rem;">
                   <span>📄</span> Pending Leave Applications
@@ -394,58 +430,6 @@
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
         if (!token) return;
 
-        // Fetch announcements
-        try {
-          const res = await fetch('/api/announcements', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const list = await res.json();
-            const container = document.getElementById('faculty-recent-activities');
-            if (container) {
-              if (list.length === 0) {
-                container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:#9CA3AF;">No announcements posted yet.</div>`;
-              } else {
-                container.innerHTML = list.slice(0, 4).map(item => `
-                  <div class="exp-timeline-item" style="margin-bottom: 1rem; position: relative; padding-left: 1.25rem;">
-                    <span class="exp-bullet success-bg" style="position: absolute; left: 0; top: 5px; width: 8px; height: 8px; border-radius: 50%;"></span>
-                    <h4 style="font-size: 0.8rem; font-weight: 700; margin: 0 0 0.15rem;">${item.title}</h4>
-                    <span style="font-size: 0.68rem; color: #9CA3AF; font-weight: 600;">${new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} • ${item.category || 'Notice'}</span>
-                  </div>
-                `).join('');
-              }
-            }
-          }
-        } catch (e) {
-          console.error('Error fetching announcements:', e);
-        }
-
-        // Fetch pending leave applications
-        try {
-          const res = await fetch('/api/leaves/requests', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            const container = document.getElementById('faculty-pending-tasks');
-            if (container) {
-              const pending = (data.requests || []).filter(item => item.status === 'Pending');
-              if (pending.length === 0) {
-                container.innerHTML = `<div style="text-align:center;padding:1rem;color:#64748B;font-size:0.8rem;">No pending applications</div>`;
-              } else {
-                container.innerHTML = pending.slice(0, 4).map(item => `
-                  <div onclick="location.href='faculty_requests.html'" style="margin: 0 0 0.65rem 0; cursor: pointer; padding: 0.75rem; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0; text-align: left;">
-                    <h4 style="font-size: 0.8rem; font-weight: 700; margin: 0 0 0.2rem 0; color: #0F172A;">${item.student ? item.student.name : 'Student'} (${item.leaveType || 'Leave'})</h4>
-                    <span style="font-size: 0.68rem; color: #2563EB; font-weight: 600;">${item.numberOfDays || 1} Days • Reg: ${item.student ? item.student.registerNumber : 'N/A'}</span>
-                  </div>
-                `).join('');
-              }
-            }
-          }
-        } catch (e) {
-          console.error('Error fetching pending leave requests:', e);
-        }
-        
         // Set date string dynamically
         const dateDisplay = document.getElementById('nav-date-display');
         if (dateDisplay) {
@@ -453,67 +437,148 @@
           dateDisplay.textContent = new Date().toLocaleDateString('en-GB', opt);
         }
 
-        // Fetch faculty dashboard stats (student count, today's attendance)
         try {
-          const statsRes = await fetch('/api/dashboard/stats', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (statsRes.ok) {
-            const statsData = await statsRes.json();
-            // Student count for assigned class
-            const studentsEl = document.getElementById('stats-total-students');
-            const attendanceEl = document.getElementById('stats-attendance-rate');
+          // Auto-load all 3 required endpoints concurrently
+          const [dashRes, assignRes, subRes] = await Promise.all([
+            fetch('/api/dashboard/faculty', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => null),
+            fetch('/api/class-incharge/my-assignment', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => null),
+            fetch('/api/subjects/my-subjects', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => null)
+          ]);
 
-            // If faculty is Class Incharge, get their assigned class student count
-            if (studentsEl && statsData.user?.isClassIncharge) {
-              try {
-                const classRes = await fetch('/api/attendance/my-classes', {
-                  headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (classRes.ok) {
-                  const classData = await classRes.json();
-                  const classes = Array.isArray(classData) ? classData : (classData.classes || []);
-                  if (classes.length > 0) {
-                    const c = classes[0];
-                    const stuRes = await fetch(`/api/students?year=${encodeURIComponent(c.year)}&semester=${encodeURIComponent(c.semester)}&section=${encodeURIComponent(c.section)}`, {
-                      headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (stuRes.ok) {
-                      const stuData = await stuRes.json();
-                      const count = stuData.count || (stuData.students || []).length || 0;
-                      if (studentsEl) studentsEl.textContent = count;
-                    }
-                  }
-                }
-              } catch (e) { /* silently ignore */ }
-            } else if (studentsEl) {
-              studentsEl.textContent = statsData.stats?.totalStudents ?? statsData.totalStudents ?? '--';
+          let dashData = null;
+          if (dashRes && dashRes.ok) {
+            dashData = await dashRes.json();
+          }
+
+          let assignData = null;
+          if (assignRes && assignRes.ok) {
+            assignData = await assignRes.json();
+          }
+
+          let subData = null;
+          if (subRes && subRes.ok) {
+            subData = await subRes.json();
+          }
+
+          const isClassIncharge = Boolean(
+            (dashData?.user?.isClassIncharge) ||
+            (assignData?.success && assignData?.assignment) ||
+            (assignData?.year)
+          );
+
+          const assignment = assignData?.assignment || (assignData?.year && assignData) || dashData?.assignment;
+
+          // Update Greeting & Subtitle
+          const greetingName = document.getElementById('faculty-greeting-name');
+          if (greetingName && dashData?.user?.name) {
+            greetingName.textContent = `Welcome, ${dashData.user.name} 👋`;
+          }
+          const greetingDept = document.getElementById('faculty-greeting-dept');
+          if (greetingDept && dashData?.user?.department) {
+            greetingDept.textContent = `${dashData.user.designation || 'Faculty Member'} | ${dashData.user.department}`;
+          }
+
+          // Update Assigned Class Card & Conditional UI
+          const inchargeAssignedState = document.getElementById('incharge-assigned-state');
+          const inchargeUnassignedState = document.getElementById('incharge-unassigned-state');
+          const inchargeBadge = document.getElementById('incharge-status-badge');
+          const attAction = document.getElementById('action-mark-attendance');
+          const leaveCard = document.getElementById('dashboard-leave-card');
+
+          if (isClassIncharge && assignment && assignment.year) {
+            if (inchargeAssignedState) inchargeAssignedState.style.display = 'grid';
+            if (inchargeUnassignedState) inchargeUnassignedState.style.display = 'none';
+            if (inchargeBadge) {
+              inchargeBadge.textContent = 'Active Incharge';
+              inchargeBadge.style.background = '#ECFDF5';
+              inchargeBadge.style.color = '#059669';
+              inchargeBadge.style.border = '1px solid #A7F3D0';
             }
+            const dEl = document.getElementById('dash-assigned-dept');
+            const yEl = document.getElementById('dash-assigned-year');
+            const sEl = document.getElementById('dash-assigned-sem');
+            const secEl = document.getElementById('dash-assigned-sec');
+            if (dEl) dEl.textContent = assignment.department || 'Computer Science & Engineering';
+            if (yEl) yEl.textContent = `${assignment.year} Year`;
+            if (sEl) sEl.textContent = `Sem ${assignment.semester}`;
+            if (secEl) secEl.textContent = `Sec ${assignment.section || 'A'}`;
 
-            // Fetch today's attendance summary
-            if (attendanceEl) {
-              try {
-                const todayRes = await fetch('/api/attendance/today-summary', {
-                  headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (todayRes.ok) {
-                  const todayData = await todayRes.json();
-                  if (todayData.hasData) {
-                    attendanceEl.textContent = `${todayData.present}P / ${todayData.absent}A`;
-                  } else {
-                    attendanceEl.textContent = 'Not Marked';
-                    attendanceEl.style.fontSize = '0.95rem';
-                  }
-                } else {
-                  attendanceEl.textContent = 'N/A';
-                }
-              } catch (e) {
-                attendanceEl.textContent = 'N/A';
-              }
+            if (attAction) attAction.style.display = 'flex';
+            if (leaveCard) leaveCard.style.display = 'flex';
+          } else {
+            if (inchargeAssignedState) inchargeAssignedState.style.display = 'none';
+            if (inchargeUnassignedState) inchargeUnassignedState.style.display = 'block';
+            if (inchargeBadge) {
+              inchargeBadge.textContent = 'No Assignment';
+              inchargeBadge.style.background = '#F3F4F6';
+              inchargeBadge.style.color = '#6B7280';
+              inchargeBadge.style.border = '1px solid #E5E7EB';
+            }
+            if (attAction) attAction.style.display = 'none';
+            if (leaveCard) leaveCard.style.display = 'none';
+          }
+
+          // Update metrics
+          const stuEl = document.getElementById('stats-total-students');
+          if (stuEl) stuEl.textContent = dashData?.stats?.assignedStudents ?? '--';
+
+          const attEl = document.getElementById('stats-attendance-rate');
+          if (attEl) {
+            if (!isClassIncharge) {
+              attEl.textContent = 'N/A';
+              attEl.style.fontSize = '1.2rem';
+            } else if (dashData?.stats?.todayAttendance?.isMarked) {
+              attEl.textContent = `${dashData.stats.todayAttendance.present}P / ${dashData.stats.todayAttendance.absent}A`;
+            } else {
+              attEl.textContent = 'Not Marked';
+              attEl.style.fontSize = '0.95rem';
             }
           }
+
+          const marksEl = document.getElementById('stats-pending-leaves');
+          if (marksEl) {
+            const subjectsCount = Array.isArray(subData?.subjects) ? subData.subjects.length : (dashData?.stats?.assignedSubjects ?? 0);
+            marksEl.textContent = subjectsCount;
+          }
+
+          // Render Announcements
+          const announcementsList = dashData?.recentAnnouncements || [];
+          const actContainer = document.getElementById('faculty-recent-activities');
+          if (actContainer) {
+            if (announcementsList.length === 0) {
+              actContainer.innerHTML = `<div style="text-align:center;padding:1.5rem;color:#9CA3AF;">No announcements posted yet.</div>`;
+            } else {
+              actContainer.innerHTML = announcementsList.map(item => `
+                <div class="exp-timeline-item" style="margin-bottom: 0.85rem; position: relative; padding-left: 1.15rem;">
+                  <span class="exp-bullet success-bg" style="position: absolute; left: 0; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: #2563EB;"></span>
+                  <h4 style="font-size: 0.8rem; font-weight: 700; margin: 0 0 0.15rem; color: #0F172A;">${item.title}</h4>
+                  <span style="font-size: 0.68rem; color: #64748B; font-weight: 600;">${new Date(item.created_at || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} • ${item.category || 'Notice'}</span>
+                </div>
+              `).join('');
+            }
+          }
+
+          // Render Pending Leaves (Class Incharge only)
+          const leavesList = dashData?.pendingLeaveRequests || [];
+          const leaveContainer = document.getElementById('faculty-pending-tasks');
+          if (leaveContainer) {
+            if (leavesList.length === 0) {
+              leaveContainer.innerHTML = `
+                <span style="font-size: 2.2rem; opacity: 0.8;">📑</span>
+                <span style="font-size: 0.78rem; font-weight: 600; color: #64748B;">No pending applications</span>
+              `;
+            } else {
+              leaveContainer.innerHTML = leavesList.map(item => `
+                <div onclick="location.href='faculty_requests.html'" style="margin: 0 0 0.65rem 0; cursor: pointer; padding: 0.75rem; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0; text-align: left; width: 100%; box-sizing: border-box;">
+                  <h4 style="font-size: 0.8rem; font-weight: 700; margin: 0 0 0.2rem 0; color: #0F172A;">${item.student_name || 'Student'} (${item.leave_type || 'Leave'})</h4>
+                  <span style="font-size: 0.68rem; color: #2563EB; font-weight: 600;">${item.number_of_days || 1} Days • Reg: ${item.register_number || 'N/A'}</span>
+                </div>
+              `).join('');
+            }
+          }
+
         } catch (e) {
-          console.error('Error fetching dashboard stats:', e);
+          console.error('Error loading faculty dashboard:', e);
         }
       });
     </script>
