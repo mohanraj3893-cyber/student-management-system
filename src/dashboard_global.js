@@ -656,10 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // DO NOT redirect if on attendance page
-      if (currentPath.includes('faculty_attendance')) {
-        // Attendance page handles its own authentication & empty state
-      } else if (
+      // If on any attendance page, completely bypass all redirects – attendance pages manage their own state
+      if (currentPath.includes('attendance')) {
+        console.log('[DashboardGlobal] On attendance page – all global redirects bypassed.');
+        return;
+      }
+
+      if (
         !currentPath.includes('faculty_') && 
         !currentPath.includes('student_profile.html') &&
         !currentPath.endsWith('announcements.html') && 
@@ -669,15 +672,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPath !== '/' &&
         currentPath !== '/index.html'
       ) {
+        console.warn('[DashboardGlobal] Redirecting faculty to faculty_dashboard.html from', currentPath);
         window.location.href = '/faculty_dashboard.html';
         return;
       }
     } else if (userRole === 'admin') {
+      if (currentPath.includes('attendance')) {
+        return;
+      }
       if (
         (currentPath.includes('student_') || currentPath.includes('faculty_')) &&
         !currentPath.includes('student_profile.html') &&
-        !currentPath.includes('faculty_profile.html') &&
-        !currentPath.includes('faculty_attendance')
+        !currentPath.includes('faculty_profile.html')
       ) {
         window.location.href = '/dashboard.html';
         return;

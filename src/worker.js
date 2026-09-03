@@ -2431,7 +2431,30 @@ export default {
 
     // Serve static assets from ./dist
     if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
+      // Map clean URLs like /faculty_attendance to /faculty_attendance.html
+      let assetRequest = request;
+      if (!url.pathname.includes('.') && url.pathname !== '/') {
+        const rewrittenUrl = new URL(request.url);
+        rewrittenUrl.pathname = `${url.pathname}.html`;
+        assetRequest = new Request(rewrittenUrl.toString(), request);
+      }
+
+      const response = await env.ASSETS.fetch(assetRequest);
+
+      // Ensure HTML pages are never cached stale by browser or CDN
+      if (url.pathname.endsWith('.html') || !url.pathname.includes('.')) {
+        const headers = new Headers(response.headers);
+        headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        headers.set('Pragma', 'no-cache');
+        headers.set('Expires', '0');
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers
+        });
+      }
+
+      return response;
     }
 
     return new Response('Not Found', { status: 404 });

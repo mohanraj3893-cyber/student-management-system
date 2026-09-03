@@ -344,9 +344,12 @@
     <script type="module" src="/src/dashboard_global.js"></script>
     <script type="module">
       document.addEventListener('DOMContentLoaded', async () => {
+        console.log("Attendance page started");
+        console.log("Current page:", location.pathname);
+
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
         if (!token) {
-          console.warn('Redirect triggered: No accessToken found');
+          console.warn("Redirect reason: No accessToken found in storage");
           window.location.href = '/login.html?role=faculty';
           return;
         }
@@ -358,13 +361,11 @@
           userRole = payload.role || payload.role_name || 'faculty';
         } catch (e) {}
 
-        console.log("Attendance page loaded");
         console.log("Role:", userRole);
 
-        if (userRole !== 'faculty' && userRole !== 'admin' && userRole !== 'hod') {
-          console.warn('Redirect triggered: User role is not faculty or admin/hod:', userRole);
-          window.location.href = '/login.html';
-          return;
+        const normalizedRole = String(userRole).toLowerCase();
+        if (normalizedRole !== 'faculty' && normalizedRole !== 'admin' && normalizedRole !== 'hod') {
+          console.warn("Notice: Role is", userRole, "- displaying on-page restricted notice without redirect");
         }
 
         const dateInput = document.getElementById('att-date');
