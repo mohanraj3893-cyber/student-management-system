@@ -414,8 +414,13 @@
             const res = await fetch('/api/attendance/my-classes', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
+            if (res.status === 401) {
+              window.location.href = '/login.html?role=faculty';
+              return;
+            }
             if (res.status === 403) {
-              window.location.href = '/faculty_dashboard.html';
+              classSelect.innerHTML = '<option value="">Access Denied</option>';
+              tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #ef4444; padding: 2rem;">⛔ Access denied. You are not authorized to mark attendance.</td></tr>';
               return;
             }
             if (!res.ok) throw new Error('Failed to load assigned classes.');
