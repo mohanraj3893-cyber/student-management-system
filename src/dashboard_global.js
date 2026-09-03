@@ -637,10 +637,10 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.setItem('sms_is_class_incharge', isClassIncharge ? 'true' : 'false');
 
       // If not a class incharge, hide the Attendance nav link and dashboard tile.
-      // DO NOT redirect away from faculty_attendance.html – the page itself shows
+      // DO NOT redirect away from faculty_attendance – the page itself shows
       // a friendly "No class assigned" message for non-class-incharge faculty.
       if (!isClassIncharge) {
-        const isOnAttendancePage = currentPath.includes('faculty_attendance.html');
+        const isOnAttendancePage = currentPath.includes('faculty_attendance');
         if (!isOnAttendancePage) {
           document.querySelectorAll('a[href*="faculty_attendance.html"]').forEach(link => {
             const item = link.closest('li, .mobile-nav-item, .bottom-nav-item');
@@ -656,7 +656,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      if (
+      // DO NOT redirect if on attendance page
+      if (currentPath.includes('faculty_attendance')) {
+        // Attendance page handles its own authentication & empty state
+      } else if (
         !currentPath.includes('faculty_') && 
         !currentPath.includes('student_profile.html') &&
         !currentPath.endsWith('announcements.html') && 
@@ -673,7 +676,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (
         (currentPath.includes('student_') || currentPath.includes('faculty_')) &&
         !currentPath.includes('student_profile.html') &&
-        !currentPath.includes('faculty_profile.html')
+        !currentPath.includes('faculty_profile.html') &&
+        !currentPath.includes('faculty_attendance')
       ) {
         window.location.href = '/dashboard.html';
         return;

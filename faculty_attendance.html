@@ -346,7 +346,24 @@
       document.addEventListener('DOMContentLoaded', async () => {
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
         if (!token) {
+          console.warn('Redirect triggered: No accessToken found');
           window.location.href = '/login.html?role=faculty';
+          return;
+        }
+
+        // Decode token payload to inspect user role
+        let userRole = 'faculty';
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userRole = payload.role || payload.role_name || 'faculty';
+        } catch (e) {}
+
+        console.log("Attendance page loaded");
+        console.log("Role:", userRole);
+
+        if (userRole !== 'faculty' && userRole !== 'admin' && userRole !== 'hod') {
+          console.warn('Redirect triggered: User role is not faculty or admin/hod:', userRole);
+          window.location.href = '/login.html';
           return;
         }
 
@@ -381,6 +398,24 @@
           }, 4000);
         }
 
+        function showNoAssignmentMessage(msg) {
+          if (classSelect) {
+            classSelect.innerHTML = '<option value="">No Class Incharge Assignment</option>';
+            classSelect.disabled = true;
+          }
+          if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #b45309; padding: 2.5rem; background: #fffbeb; font-weight: 600; border-radius: 12px;">⚠️ ${msg || 'No Class Incharge Assignment. Please contact your HOD to assign you a class.'}</td></tr>`;
+          }
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.5';
+            saveBtn.style.cursor = 'not-allowed';
+          }
+          if (rosterTag) {
+            rosterTag.textContent = 'No Assignment';
+          }
+        }
+
         // Fetch Faculty Profile to update header name
         try {
           const profRes = await fetch('/api/auth/profile', {
@@ -411,42 +446,86 @@
         // Load assigned classes
         async function loadAssignedClasses() {
           try {
-            const res = await fetch('/api/attendance/my-classes', {
+            // First check /api/class-incharge/my-assignments, then fallback to /api/attendance/my-classes
+            let res = await fetch('/api/class-incharge/my-assignments', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
+
             if (res.status === 401) {
+              console.warn('Redirect triggered: 401 Unauthorized from assignments API');
               window.location.href = '/login.html?role=faculty';
               return;
             }
+
+            if (!res.ok) {
+              res = await fetch('/api/attendance/my-classes', {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+            }
+
+            if (res.status === 401) {
+              console.warn('Redirect triggered: 401 Unauthorized from my-classes API');
+              window.location.href = '/login.html?role=faculty';
+              return;
+            }
+
             if (res.status === 403) {
-              classSelect.innerHTML = '<option value="">Access Denied</option>';
-              tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #ef4444; padding: 2rem;">⛔ Access denied. You are not authorized to mark attendance.</td></tr>';
+              showNoAssignmentMessage("Access Denied: You are not authorized to access this department's attendance.");
               return;
             }
-            if (!res.ok) throw new Error('Failed to load assigned classes.');
+
+            if (!res.ok) {
+              throw new Error(`Server returned HTTP ${res.status}`);
+            }
+
             const data = await res.json();
+            console.log("Assignment response:", data);
 
-            // Extract classes array from response – server returns { success, classes: [...] }
-            const classes = Array.isArray(data) ? data : (data.classes || data.data || []);
+            // Extract classes array from various possible response formats
+            let classes = [];
+            if (Array.isArray(data)) {
+              classes = data;
+            } else if (Array.isArray(data.classes) && data.classes.length > 0) {
+              classes = data.classes;
+            } else if (Array.isArray(data.assignments) && data.assignments.length > 0) {
+              classes = data.assignments;
+            } else if (data.assignment && data.assignment.year) {
+              classes = [data.assignment];
+            } else if (data.year && data.semester) {
+              classes = [{
+                department: data.department,
+                year: data.year,
+                semester: data.semester,
+                section: data.section || 'A'
+              }];
+            }
 
-            classSelect.innerHTML = '';
+            console.log("Assignment:", classes[0] || null);
+
             if (!classes || classes.length === 0) {
-              classSelect.innerHTML = '<option value="">No class assigned. Please contact HOD.</option>';
-              tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">You have no assigned class. Please contact your HOD to assign you as Class Incharge.</td></tr>';
+              showNoAssignmentMessage("No Class Incharge Assignment: You are not currently assigned to any class. Please contact your HOD.");
               return;
             }
 
+            classSelect.disabled = false;
+            classSelect.innerHTML = '';
             classes.forEach(c => {
               const opt = document.createElement('option');
               opt.value = JSON.stringify({
                 department: c.department,
                 year: c.year,
                 semester: String(c.semester),
-                section: c.section
+                section: c.section || 'A'
               });
-              opt.textContent = `${c.year} (Sem ${c.semester} – Sec ${c.section})`;
+              opt.textContent = `${c.year} (Sem ${c.semester} – Sec ${c.section || 'A'})`;
               classSelect.appendChild(opt);
             });
+
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.style.opacity = '1';
+              saveBtn.style.cursor = 'pointer';
+            }
 
             // Auto-load roster for the first class
             await loadClassRoster();
@@ -455,8 +534,8 @@
             dateInput.addEventListener('change', loadClassRoster);
 
           } catch (err) {
-            console.error(err);
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ef4444; padding: 2rem;">Error loading class assignments: ${err.message}</td></tr>`;
+            console.error('[Attendance] Error loading class assignments:', err);
+            showNoAssignmentMessage(`Could not load class assignments: ${err.message}. Please check connection or contact HOD.`);
           }
         }
 

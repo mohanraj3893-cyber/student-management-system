@@ -718,10 +718,9 @@ async function handleApiRequest(request, env) {
         profileData = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(authUser.id).first() || {};
       } else {
         profileData = await db.prepare('SELECT * FROM faculty WHERE user_id = ?').bind(authUser.id).first() || {};
-        if (profileData.id) {
-          const inchargeCheck = await db.prepare('SELECT id FROM class_incharges WHERE faculty_id = ?').bind(profileData.id).first();
-          isClassIncharge = Boolean(inchargeCheck);
-        }
+        const fId = profileData.id || authUser.id;
+        const inchargeCheck = await db.prepare('SELECT id FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(fId, authUser.id).first();
+        isClassIncharge = Boolean(inchargeCheck);
       }
 
       const dept = profileData.department || authUser.department || 'Computer Science & Engineering';
@@ -1069,15 +1068,33 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (!faculty) return jsonResponse({ success: true, count: 0, assignments: [], classes: [] });
+      const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const facId = faculty?.id || authUser.id;
+      const dept = faculty?.department || authUser.department || 'Computer Science & Engineering';
 
-      const assignments = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ?').bind(faculty.id).all();
+      const assignments = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).all();
+      const rawList = assignments.results || [];
+      const normalized = rawList.map(c => ({
+        id: c.id,
+        department: c.department || dept,
+        year: c.year,
+        semester: String(c.semester),
+        section: c.section || 'A',
+        faculty_id: c.faculty_id
+      }));
+
+      const single = normalized[0] || null;
+
       return jsonResponse({
         success: true,
-        count: (assignments.results || []).length,
-        assignments: assignments.results || [],
-        classes: assignments.results || []
+        count: normalized.length,
+        assignment: single,
+        assignments: normalized,
+        classes: normalized,
+        department: single?.department || dept,
+        year: single?.year || '',
+        semester: single?.semester || '',
+        section: single?.section || 'A'
       });
     }
 
@@ -1396,18 +1413,24 @@ async function handleApiRequest(request, env) {
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
       const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (!faculty) return jsonResponse({ success: true, classes: [] });
+      const facId = faculty?.id || authUser.id;
+      const dept = faculty?.department || authUser.department || 'Computer Science & Engineering';
 
-      const rawClasses = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ?').bind(faculty.id).all();
+      const rawClasses = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).all();
       const normalizedClasses = (rawClasses.results || []).map(c => ({
         id: c.id,
-        department: c.department || faculty.department,
+        department: c.department || dept,
         year: c.year,
         semester: String(c.semester),
-        section: c.section,
+        section: c.section || 'A',
         faculty_id: c.faculty_id
       }));
-      return jsonResponse({ success: true, classes: normalizedClasses });
+      return jsonResponse({
+        success: true,
+        classes: normalizedClasses,
+        assignment: normalizedClasses[0] || null,
+        assignments: normalizedClasses
+      });
     }
 
     if (path === '/api/attendance/today-summary' && method === 'GET') {
