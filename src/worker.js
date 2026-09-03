@@ -1072,29 +1072,42 @@ async function handleApiRequest(request, env) {
       const facId = faculty?.id || authUser.id;
       const dept = faculty?.department || authUser.department || 'Computer Science & Engineering';
 
-      const assignments = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).all();
-      const rawList = assignments.results || [];
-      const normalized = rawList.map(c => ({
-        id: c.id,
-        department: c.department || dept,
-        year: c.year,
-        semester: String(c.semester),
-        section: c.section || 'A',
-        faculty_id: c.faculty_id
-      }));
+      // Load ONLY this logged-in faculty's assignment from D1
+      const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
 
-      const single = normalized[0] || null;
+      if (!assignment) {
+        return jsonResponse({
+          success: false,
+          message: 'No Class Incharge assignment found for this faculty member.',
+          department: dept,
+          year: '',
+          semester: '',
+          section: '',
+          assignment: null,
+          assignments: [],
+          classes: []
+        }, 200);
+      }
+
+      const single = {
+        id: assignment.id,
+        department: assignment.department || dept,
+        year: assignment.year,
+        semester: String(assignment.semester),
+        section: assignment.section || 'A',
+        faculty_id: assignment.faculty_id
+      };
 
       return jsonResponse({
         success: true,
-        count: normalized.length,
+        count: 1,
+        department: single.department,
+        year: single.year,
+        semester: single.semester,
+        section: single.section,
         assignment: single,
-        assignments: normalized,
-        classes: normalized,
-        department: single?.department || dept,
-        year: single?.year || '',
-        semester: single?.semester || '',
-        section: single?.section || 'A'
+        assignments: [single],
+        classes: [single]
       });
     }
 
@@ -1472,16 +1485,36 @@ async function handleApiRequest(request, env) {
       });
     }
 
-    if (path === '/api/attendance/daily-checklist' && method === 'GET') {
+    if ((path === '/api/attendance/daily-checklist' || path === '/api/attendance/students') && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
       const facultyRow = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      // Use faculty's verified department from DB, not from query params
-      const department = (facultyRow?.department) || url.searchParams.get('department') || 'Computer Science & Engineering';
-      const year = url.searchParams.get('year');
-      const semester = url.searchParams.get('semester');
-      const section = url.searchParams.get('section') || 'A';
+      const facId = facultyRow?.id || authUser.id;
+
+      const isHodOrAdmin = authUser.role === 'admin' || authUser.role === 'hod';
+      let department, year, semester, section;
+
+      if (!isHodOrAdmin) {
+        // Step 2: Strictly lock to HOD assignment from D1 - ignore frontend filters
+        const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
+        if (!assignment) {
+          return jsonResponse({
+            message: 'Forbidden: You are not assigned as Class Incharge for any class. Contact your HOD.'
+          }, 403);
+        }
+        department = assignment.department;
+        year = assignment.year;
+        semester = assignment.semester;
+        section = assignment.section;
+      } else {
+        // HOD / Admin viewing
+        department = (facultyRow?.department) || url.searchParams.get('department') || 'Computer Science & Engineering';
+        year = url.searchParams.get('year');
+        semester = url.searchParams.get('semester');
+        section = url.searchParams.get('section') || 'A';
+      }
+
       const date = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
 
       const students = await db.prepare(`
@@ -1492,7 +1525,7 @@ async function handleApiRequest(request, env) {
         LEFT JOIN attendance_sessions sess ON sess.department = s.department AND sess.year = s.year AND sess.semester = s.semester AND sess.section = s.section AND sess.date = ?
         LEFT JOIN attendance_records ar ON ar.session_id = sess.id AND ar.student_id = s.id
         WHERE u.is_approved = 1 AND s.department = ? AND s.year = ? AND s.semester = ? AND s.section = ?
-        ORDER BY s.register_number ASC
+        ORDER BY s.name ASC, s.register_number ASC
       `).bind(date, department, year, semester, section).all();
 
       const mapped = (students.results || []).map(s => ({
@@ -1505,20 +1538,72 @@ async function handleApiRequest(request, env) {
         status: s.status || 'Present'
       }));
 
-      return jsonResponse({ success: true, students: mapped, date });
+      return jsonResponse({
+        success: true,
+        students: mapped,
+        date,
+        assignment: { department, year, semester, section }
+      });
     }
 
-    if ((path === '/api/attendance/daily' || path === '/api/attendance/mark') && method === 'POST') {
+    if ((path === '/api/attendance/daily' || path === '/api/attendance/mark' || path === '/api/attendance/save') && method === 'POST') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const body = await request.json();
-      const { department, year, semester, section, date, records } = body;
+      // Security rule: HOD cannot mark attendance. Only assigned Class Incharge can mark.
+      const isHodOrAdmin = authUser.role === 'admin' || authUser.role === 'hod';
+      if (isHodOrAdmin) {
+        return jsonResponse({ message: 'Forbidden: HOD cannot mark attendance. Only assigned Class Incharge can mark attendance.' }, 403);
+      }
 
-      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      const facultyId = faculty ? faculty.id : 1;
+      const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const facId = faculty?.id || authUser.id;
 
-      // Check existing session or create new
+      // Step 3.1: Read faculty assignment from D1
+      const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
+      if (!assignment) {
+        return jsonResponse({ message: 'Forbidden: You are not assigned as Class Incharge for any class.' }, 403);
+      }
+
+      const body = await request.json().catch(() => ({}));
+      const { date, records } = body;
+
+      if (!date || !Array.isArray(records) || records.length === 0) {
+        return jsonResponse({ message: 'Date and student records are required.' }, 400);
+      }
+
+      // Reject attempts to submit for another class
+      if (
+        (body.year && body.year !== assignment.year) ||
+        (body.semester && String(body.semester) !== String(assignment.semester)) ||
+        (body.section && body.section !== assignment.section) ||
+        (body.department && body.department !== assignment.department)
+      ) {
+        return jsonResponse({ message: 'Forbidden: You can only mark attendance for your assigned class.' }, 403);
+      }
+
+      const department = assignment.department;
+      const year = assignment.year;
+      const semester = assignment.semester;
+      const section = assignment.section;
+
+      // Step 3.2: Verify every student belongs to that assignment in D1
+      for (const rec of records) {
+        const sId = rec.studentId || rec.id;
+        const studentCheck = await db.prepare(`
+          SELECT s.id FROM students s
+          JOIN users u ON s.user_id = u.id
+          WHERE s.id = ? AND s.department = ? AND s.year = ? AND s.semester = ? AND s.section = ? AND u.is_approved = 1
+        `).bind(sId, department, year, semester, section).first();
+
+        if (!studentCheck) {
+          return jsonResponse({
+            message: `Forbidden: Student ID ${sId} does not belong to your assigned class (${department} • ${year} Sem ${semester} Sec ${section}).`
+          }, 403);
+        }
+      }
+
+      // Step 3.3: Save session & records
       let session = await db.prepare(`
         SELECT id FROM attendance_sessions
         WHERE department = ? AND year = ? AND semester = ? AND section = ? AND date = ?
@@ -1526,63 +1611,84 @@ async function handleApiRequest(request, env) {
 
       let sessionId = session ? session.id : null;
       if (!sessionId) {
-        const ins = await db.prepare(`
+        await db.prepare(`
           INSERT INTO attendance_sessions (faculty_id, department, year, semester, section, date)
           VALUES (?, ?, ?, ?, ?, ?)
-        `).bind(facultyId, department, year, semester, section, date).run();
+        `).bind(facId, department, year, semester, section, date).run();
         const sRow = await db.prepare('SELECT id FROM attendance_sessions WHERE department = ? AND year = ? AND semester = ? AND section = ? AND date = ?')
           .bind(department, year, semester, section, date).first();
         sessionId = sRow.id;
       }
 
-      if (Array.isArray(records)) {
-        for (const rec of records) {
-          const sId = rec.studentId || rec.id;
-          await db.prepare(`
-            INSERT OR REPLACE INTO attendance_records (session_id, student_id, date, status, marked_at)
-            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-          `).bind(sessionId, sId, date, rec.status).run();
+      for (const rec of records) {
+        const sId = rec.studentId || rec.id;
+        await db.prepare(`
+          INSERT OR REPLACE INTO attendance_records (session_id, student_id, date, status, marked_at)
+          VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `).bind(sessionId, sId, date, rec.status).run();
 
-          const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(sId).first();
-          if (sUser?.user_id) {
-            await sendPushNotificationToUser(db, env, sUser.user_id, {
-              title: '📅 Attendance Update',
-              body: `Your attendance for ${date} has been recorded as ${rec.status}.`,
-              url: '/student_attendance.html',
-              type: 'ATTENDANCE_UPDATE'
-            });
-          }
+        const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(sId).first();
+        if (sUser?.user_id) {
+          await sendPushNotificationToUser(db, env, sUser.user_id, {
+            title: '📅 Attendance Update',
+            body: `Your attendance for ${date} has been recorded as ${rec.status}.`,
+            url: '/student_attendance.html',
+            type: 'ATTENDANCE_UPDATE'
+          });
         }
       }
 
-      return jsonResponse({ success: true, message: 'Attendance recorded successfully!' });
+      return jsonResponse({ success: true, message: 'Daily attendance saved successfully!' });
     }
 
     if (path === '/api/attendance/history' && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (!faculty) return jsonResponse([]);
+      const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const facId = faculty?.id || authUser.id;
 
-      // Return session-level summaries for this faculty's marked sessions
-      const sessions = await db.prepare(`
-        SELECT
-          sess.id,
-          sess.date,
-          sess.year,
-          sess.semester,
-          sess.section,
-          sess.department,
-          SUM(CASE WHEN ar.status = 'PRESENT' OR ar.status = 'Present' THEN 1 ELSE 0 END) as presentCount,
-          SUM(CASE WHEN ar.status = 'ABSENT'  OR ar.status = 'Absent'  THEN 1 ELSE 0 END) as absentCount,
-          COUNT(ar.id) as totalCount
-        FROM attendance_sessions sess
-        LEFT JOIN attendance_records ar ON ar.session_id = sess.id
-        WHERE sess.faculty_id = ?
-        GROUP BY sess.id
-        ORDER BY sess.date DESC, sess.year ASC
-      `).bind(faculty.id).all();
+      // Scope history strictly to this faculty's assigned class
+      const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
+
+      let sessions;
+      if (assignment) {
+        sessions = await db.prepare(`
+          SELECT
+            sess.id,
+            sess.date,
+            sess.year,
+            sess.semester,
+            sess.section,
+            sess.department,
+            SUM(CASE WHEN ar.status = 'PRESENT' OR ar.status = 'Present' THEN 1 ELSE 0 END) as presentCount,
+            SUM(CASE WHEN ar.status = 'ABSENT'  OR ar.status = 'Absent'  THEN 1 ELSE 0 END) as absentCount,
+            COUNT(ar.id) as totalCount
+          FROM attendance_sessions sess
+          LEFT JOIN attendance_records ar ON ar.session_id = sess.id
+          WHERE sess.faculty_id = ? OR sess.faculty_id = ? OR (sess.department = ? AND sess.year = ? AND sess.semester = ? AND sess.section = ?)
+          GROUP BY sess.id
+          ORDER BY sess.date DESC, sess.year ASC
+        `).bind(facId, authUser.id, assignment.department, assignment.year, assignment.semester, assignment.section).all();
+      } else {
+        sessions = await db.prepare(`
+          SELECT
+            sess.id,
+            sess.date,
+            sess.year,
+            sess.semester,
+            sess.section,
+            sess.department,
+            SUM(CASE WHEN ar.status = 'PRESENT' OR ar.status = 'Present' THEN 1 ELSE 0 END) as presentCount,
+            SUM(CASE WHEN ar.status = 'ABSENT'  OR ar.status = 'Absent'  THEN 1 ELSE 0 END) as absentCount,
+            COUNT(ar.id) as totalCount
+          FROM attendance_sessions sess
+          LEFT JOIN attendance_records ar ON ar.session_id = sess.id
+          WHERE sess.faculty_id = ? OR sess.faculty_id = ?
+          GROUP BY sess.id
+          ORDER BY sess.date DESC, sess.year ASC
+        `).bind(facId, authUser.id).all();
+      }
 
       const sessionRows = (sessions.results || []).map(s => ({
         ...s,

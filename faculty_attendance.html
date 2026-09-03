@@ -250,20 +250,40 @@
           <!-- Alert Banner -->
           <div id="att-alert-banner" style="display: none; padding: 12px 16px; border-radius: 10px; margin-bottom: 1.25rem; font-size: 14px; font-weight: 600;"></div>
 
-          <!-- ATTENDANCE SELECTION CARD -->
+          <!-- ASSIGNED CLASS CARD (READ-ONLY FOR CLASS INCHARGE) -->
           <div style="background: white; border-radius: 20px; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; margin-bottom: 1.25rem;">
-            <div style="border-bottom: 1px solid #F1F5F9; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-              <h3 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin: 0;">Select Assigned Class &amp; Attendance Date</h3>
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-              <div>
-                <label for="att-class-select" style="font-weight: 700; margin-bottom: 0.35rem; display: block; font-size: 0.78rem; color: #334155;">Assigned Class (Class Incharge)</label>
-                <select id="att-class-select" class="toolbar-select" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; border: 1px solid #CBD5E1; font-weight: 600; font-size: 0.85rem; color: #0F172A; background: white; outline: none; box-sizing: border-box;">
-                  <option value="">Loading assigned classes...</option>
-                </select>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F1F5F9; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.15rem;">🔒</span>
+                <div>
+                  <h3 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin: 0;">Assigned Class</h3>
+                  <span style="font-size: 0.72rem; color: #059669; font-weight: 700; background: #ECFDF5; padding: 2px 8px; border-radius: 12px; border: 1px solid #A7F3D0; display: inline-block; margin-top: 2px;">HOD Assigned • Read Only</span>
+                </div>
               </div>
+            </div>
 
+            <!-- Read-Only Grid Displaying Department, Year, Semester, Section -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.75rem;">
+                <span style="display: block; font-size: 0.68rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Department</span>
+                <span id="assigned-dept" style="font-size: 0.88rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.75rem;">
+                <span style="display: block; font-size: 0.68rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Year</span>
+                <span id="assigned-year" style="font-size: 0.88rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.75rem;">
+                <span style="display: block; font-size: 0.68rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Semester</span>
+                <span id="assigned-semester" style="font-size: 0.88rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.75rem;">
+                <span style="display: block; font-size: 0.68rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Section</span>
+                <span id="assigned-section" style="font-size: 0.88rem; font-weight: 800; color: #0F172A;">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Attendance Date & Quick Mark Controls -->
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
               <div>
                 <label for="att-date" style="font-weight: 700; margin-bottom: 0.35rem; display: block; font-size: 0.78rem; color: #334155;">Attendance Date</label>
                 <input type="date" id="att-date" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; border: 1px solid #CBD5E1; font-weight: 600; font-size: 0.85rem; color: #0F172A; background: white; outline: none; box-sizing: border-box;">
@@ -369,7 +389,6 @@
         }
 
         const dateInput = document.getElementById('att-date');
-        const classSelect = document.getElementById('att-class-select');
         const tbody = document.getElementById('attendance-students-tbody');
         const historyTbody = document.getElementById('attendance-history-tbody');
         const saveBtn = document.getElementById('save-daily-att-btn');
@@ -379,6 +398,8 @@
         const btnAllPresent = document.getElementById('btn-mark-all-present');
         const btnAllAbsent = document.getElementById('btn-mark-all-absent');
         const rosterTag = document.getElementById('roster-class-tag');
+
+        let currentAssignment = null;
 
         function showAlert(msg, type = 'success') {
           if (!alertBanner) return;
@@ -400,12 +421,18 @@
         }
 
         function showNoAssignmentMessage(msg) {
-          if (classSelect) {
-            classSelect.innerHTML = '<option value="">No Class Incharge Assignment</option>';
-            classSelect.disabled = true;
-          }
+          const deptEl = document.getElementById('assigned-dept');
+          const yearEl = document.getElementById('assigned-year');
+          const semEl = document.getElementById('assigned-semester');
+          const secEl = document.getElementById('assigned-section');
+
+          if (deptEl) deptEl.textContent = 'None';
+          if (yearEl) yearEl.textContent = 'None';
+          if (semEl) semEl.textContent = 'None';
+          if (secEl) secEl.textContent = 'None';
+
           if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #b45309; padding: 2.5rem; background: #fffbeb; font-weight: 600; border-radius: 12px;">⚠️ ${msg || 'No Class Incharge Assignment. Please contact your HOD to assign you a class.'}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #b45309; padding: 2.5rem; background: #fffbeb; font-weight: 600; border-radius: 12px;">⚠️ ${msg || 'No Class Incharge Assignment. You can only mark attendance for a class assigned to you by the HOD.'}</td></tr>`;
           }
           if (saveBtn) {
             saveBtn.disabled = true;
@@ -414,6 +441,9 @@
           }
           if (rosterTag) {
             rosterTag.textContent = 'No Assignment';
+          }
+          if (warningBanner) {
+            warningBanner.style.display = 'block';
           }
         }
 
@@ -444,34 +474,21 @@
           dateInput.value = new Date().toISOString().split('T')[0];
         }
 
-        // Load assigned classes
-        async function loadAssignedClasses() {
+        // Step 1: Load HOD Assignment
+        async function loadAssignmentAndRoster() {
           try {
-            // First check /api/class-incharge/my-assignments, then fallback to /api/attendance/my-classes
-            let res = await fetch('/api/class-incharge/my-assignments', {
+            const res = await fetch('/api/class-incharge/my-assignments', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (res.status === 401) {
-              console.warn('Redirect triggered: 401 Unauthorized from assignments API');
-              window.location.href = '/login.html?role=faculty';
-              return;
-            }
-
-            if (!res.ok) {
-              res = await fetch('/api/attendance/my-classes', {
-                headers: { 'Authorization': `Bearer ${token}` }
-              });
-            }
-
-            if (res.status === 401) {
-              console.warn('Redirect triggered: 401 Unauthorized from my-classes API');
+              console.warn('Redirect reason: 401 Unauthorized from assignments API');
               window.location.href = '/login.html?role=faculty';
               return;
             }
 
             if (res.status === 403) {
-              showNoAssignmentMessage("Access Denied: You are not authorized to access this department's attendance.");
+              showNoAssignmentMessage("Access Denied: You are not authorized to mark attendance.");
               return;
             }
 
@@ -482,45 +499,31 @@
             const data = await res.json();
             console.log("Assignment response:", data);
 
-            // Extract classes array from various possible response formats
-            let classes = [];
-            if (Array.isArray(data)) {
-              classes = data;
-            } else if (Array.isArray(data.classes) && data.classes.length > 0) {
-              classes = data.classes;
-            } else if (Array.isArray(data.assignments) && data.assignments.length > 0) {
-              classes = data.assignments;
-            } else if (data.assignment && data.assignment.year) {
-              classes = [data.assignment];
-            } else if (data.year && data.semester) {
-              classes = [{
-                department: data.department,
-                year: data.year,
-                semester: data.semester,
-                section: data.section || 'A'
-              }];
-            }
+            const assignment = data.assignment || (Array.isArray(data.assignments) && data.assignments[0]) || (Array.isArray(data.classes) && data.classes[0]) || (data.year && data) || null;
 
-            console.log("Assignment:", classes[0] || null);
+            console.log("Assignment:", assignment);
 
-            if (!classes || classes.length === 0) {
-              showNoAssignmentMessage("No Class Incharge Assignment: You are not currently assigned to any class. Please contact your HOD.");
+            if (!assignment || !assignment.year) {
+              showNoAssignmentMessage("No Class Incharge Assignment: You have not been assigned as Class Incharge for any class by the HOD.");
               return;
             }
 
-            classSelect.disabled = false;
-            classSelect.innerHTML = '';
-            classes.forEach(c => {
-              const opt = document.createElement('option');
-              opt.value = JSON.stringify({
-                department: c.department,
-                year: c.year,
-                semester: String(c.semester),
-                section: c.section || 'A'
-              });
-              opt.textContent = `${c.year} (Sem ${c.semester} – Sec ${c.section || 'A'})`;
-              classSelect.appendChild(opt);
-            });
+            currentAssignment = assignment;
+
+            // Display read-only assigned class info
+            const deptEl = document.getElementById('assigned-dept');
+            const yearEl = document.getElementById('assigned-year');
+            const semEl = document.getElementById('assigned-semester');
+            const secEl = document.getElementById('assigned-section');
+
+            if (deptEl) deptEl.textContent = assignment.department || 'Computer Science & Engineering';
+            if (yearEl) yearEl.textContent = `${assignment.year} Year`;
+            if (semEl) semEl.textContent = `Sem ${assignment.semester}`;
+            if (secEl) secEl.textContent = `Sec ${assignment.section || 'A'}`;
+
+            if (rosterTag) {
+              rosterTag.textContent = `${assignment.year} – Sem ${assignment.semester} (${assignment.section || 'A'})`;
+            }
 
             if (saveBtn) {
               saveBtn.disabled = false;
@@ -528,47 +531,42 @@
               saveBtn.style.cursor = 'pointer';
             }
 
-            // Auto-load roster for the first class
+            // Step 2: Automatically load student roster for this locked assignment
             await loadClassRoster();
+            await loadAttendanceHistory();
 
-            classSelect.addEventListener('change', loadClassRoster);
             dateInput.addEventListener('change', loadClassRoster);
 
           } catch (err) {
-            console.error('[Attendance] Error loading class assignments:', err);
-            showNoAssignmentMessage(`Could not load class assignments: ${err.message}. Please check connection or contact HOD.`);
+            console.error('[Attendance] Error loading class assignment:', err);
+            showNoAssignmentMessage(`Could not load class assignment: ${err.message}. Please check connection or contact HOD.`);
           }
         }
 
-        await loadAssignedClasses();
-        await loadAttendanceHistory();
+        await loadAssignmentAndRoster();
 
         async function loadClassRoster() {
-          if (!classSelect.value) return;
-          const classData = JSON.parse(classSelect.value);
-          const date = dateInput.value;
+          if (!currentAssignment) return;
 
-          if (rosterTag) {
-            rosterTag.textContent = `${classData.year} – Sem ${classData.semester} (${classData.section})`;
-          }
-
+          const date = dateInput.value || new Date().toISOString().split('T')[0];
           tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">Loading student roster...</td></tr>';
 
           try {
+            // Frontend requests /api/attendance/students; backend ignores any tampered filters and uses D1 assignment
             const params = new URLSearchParams({
-              year: classData.year,
-              semester: classData.semester,
-              section: classData.section,
+              department: currentAssignment.department,
+              year: currentAssignment.year,
+              semester: currentAssignment.semester,
+              section: currentAssignment.section || 'A',
               date: date
             });
-            if (classData.department) params.set('department', classData.department);
 
-            const res = await fetch(`/api/attendance/daily-checklist?${params.toString()}`, {
+            const res = await fetch(`/api/attendance/students?${params.toString()}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) {
-              const errJson = await res.json();
-              throw new Error(errJson.message || 'Failed to load roster.');
+              const errJson = await res.json().catch(() => ({}));
+              throw new Error(errJson.message || `Failed to load roster (${res.status})`);
             }
             const data = await res.json();
 
@@ -576,7 +574,7 @@
 
             tbody.innerHTML = '';
             if (students.length === 0) {
-              tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">No active approved students found for this class.</td></tr>';
+              tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">No approved active students found for ${currentAssignment.year} Sem ${currentAssignment.semester} Sec ${currentAssignment.section || 'A'}.</td></tr>`;
               return;
             }
 
@@ -627,14 +625,13 @@
           tbody.querySelectorAll('input[value="Absent"]').forEach(r => r.checked = true);
         });
 
-        // Save Daily Attendance
+        // Step 3: Save Daily Attendance - strictly locked to HOD assignment
         saveBtn.addEventListener('click', async () => {
-          if (!classSelect.value || !dateInput.value) {
-            showAlert('Please select an assigned class and date.', 'error');
+          if (!currentAssignment || !dateInput.value) {
+            showAlert('No assigned class loaded or date not selected.', 'error');
             return;
           }
 
-          const classData = JSON.parse(classSelect.value);
           const records = [];
           const rows = tbody.querySelectorAll('tr[data-student-id]');
 
@@ -655,16 +652,17 @@
           saveBtn.textContent = 'Saving Attendance...';
 
           try {
-            const res = await fetch('/api/attendance/daily', {
+            const res = await fetch('/api/attendance/save', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
               },
               body: JSON.stringify({
-                year: classData.year,
-                semester: classData.semester,
-                section: classData.section,
+                department: currentAssignment.department,
+                year: currentAssignment.year,
+                semester: currentAssignment.semester,
+                section: currentAssignment.section || 'A',
                 date: dateInput.value,
                 records
               })
@@ -723,21 +721,7 @@
               btn.addEventListener('click', async (e) => {
                 const tgt = e.currentTarget;
                 const date = tgt.getAttribute('data-date');
-                const year = tgt.getAttribute('data-year');
-                const sem = tgt.getAttribute('data-sem');
-                const sec = tgt.getAttribute('data-sec');
-                const dept = tgt.getAttribute('data-dept');
-
                 if (dateInput) dateInput.value = date;
-
-                // Select matching class in dropdown
-                for (let i = 0; i < classSelect.options.length; i++) {
-                  const val = JSON.parse(classSelect.options[i].value || '{}');
-                  if (val.year === year && String(val.semester) === String(sem) && val.section === sec) {
-                    classSelect.selectedIndex = i;
-                    break;
-                  }
-                }
                 await loadClassRoster();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               });
