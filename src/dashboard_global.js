@@ -520,6 +520,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cachedStr) {
       try {
         const cachedData = JSON.parse(cachedStr);
+        // Mark as from-cache so route guards do NOT redirect based on potentially stale data
+        cachedData._fromCache = true;
         populateDashboardUI(cachedData);
       } catch (e) {}
     }
@@ -610,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function populateDashboardUI(data) {
+  async function populateDashboardUI(data) {
     const currentPath = window.location.pathname.toLowerCase();
     const userRole = data.user.role; // 'admin', 'faculty', 'student'
 
@@ -635,26 +637,56 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.setItem('sms_is_class_incharge', isClassIncharge ? 'true' : 'false');
 
       if (!isClassIncharge) {
-        // Direct URL Protection for faculty_attendance.html
-        if (currentPath.includes('faculty_attendance.html')) {
+        // Only block attendance if we have a LIVE (non-cache) API response confirming no assignment.
+        // Never redirect based solely on cached data – the cache may be stale.
+        const isFromCache = data._fromCache === true;
+        const isOnAttendancePage = currentPath.includes('faculty_attendance.html');
+
+        if (isOnAttendancePage && !isFromCache) {
+          // Double-check using the assignments API before redirecting,
+          // in case the stats endpoint has stale isClassIncharge data.
+          const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+          if (token) {
+            try {
+              const assignRes = await fetch('/api/attendance/my-classes', {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              if (assignRes.ok) {
+                const assignData = await assignRes.json();
+                const classList = Array.isArray(assignData) ? assignData : (assignData.classes || []);
+                if (classList.length > 0) {
+                  // Faculty IS a class incharge – do not redirect; stay on attendance page
+                  console.log('[DashboardGlobal] Faculty confirmed as class incharge via API – no redirect.');
+                  return;
+                }
+              }
+            } catch (e) {
+              console.warn('[DashboardGlobal] Could not verify class incharge status:', e);
+              // Do not redirect on network error – let the attendance page handle it
+              return;
+            }
+          }
+          // Confirmed unassigned from live API – redirect to dashboard
           window.location.href = '/faculty_dashboard.html';
           return;
         }
 
-        // Hide/Remove Attendance from sidebars across desktop & mobile
-        document.querySelectorAll('a[href*="faculty_attendance.html"]').forEach(link => {
-          const item = link.closest('li, .mobile-nav-item, .bottom-nav-item');
-          if (item) {
-            item.style.display = 'none';
-          } else {
-            link.style.display = 'none';
-          }
-        });
+        // Hide/Remove Attendance from sidebars across desktop & mobile (non-attendance pages only)
+        if (!isOnAttendancePage) {
+          document.querySelectorAll('a[href*="faculty_attendance.html"]').forEach(link => {
+            const item = link.closest('li, .mobile-nav-item, .bottom-nav-item');
+            if (item) {
+              item.style.display = 'none';
+            } else {
+              link.style.display = 'none';
+            }
+          });
 
-        // Hide/Remove Attendance quick action cards on dashboard
-        document.querySelectorAll('[onclick*="faculty_attendance.html"]').forEach(tile => {
-          tile.style.display = 'none';
-        });
+          // Hide/Remove Attendance quick action cards on dashboard
+          document.querySelectorAll('[onclick*="faculty_attendance.html"]').forEach(tile => {
+            tile.style.display = 'none';
+          });
+        }
       }
 
       if (
