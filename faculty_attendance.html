@@ -419,21 +419,31 @@
               return;
             }
             if (!res.ok) throw new Error('Failed to load assigned classes.');
-            const classes = await res.json();
+            const data = await res.json();
+
+            // Extract classes array from response – server returns { success, classes: [...] }
+            const classes = Array.isArray(data) ? data : (data.classes || data.data || []);
 
             classSelect.innerHTML = '';
-            if (!Array.isArray(classes) || classes.length === 0) {
-              window.location.href = '/faculty_dashboard.html';
+            if (!classes || classes.length === 0) {
+              classSelect.innerHTML = '<option value="">No class assigned. Please contact HOD.</option>';
+              tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">You have no assigned class. Please contact your HOD to assign you as Class Incharge.</td></tr>';
               return;
             }
 
             classes.forEach(c => {
               const opt = document.createElement('option');
-              opt.value = JSON.stringify({ year: c.year, semester: c.semester, section: c.section });
-              opt.textContent = `${c.year} (Sem ${c.semester} - Sec ${c.section})`;
+              opt.value = JSON.stringify({
+                department: c.department,
+                year: c.year,
+                semester: String(c.semester),
+                section: c.section
+              });
+              opt.textContent = `${c.year} (Sem ${c.semester} – Sec ${c.section})`;
               classSelect.appendChild(opt);
             });
 
+            // Auto-load roster for the first class
             await loadClassRoster();
 
             classSelect.addEventListener('change', loadClassRoster);
@@ -454,14 +464,21 @@
           const date = dateInput.value;
 
           if (rosterTag) {
-            rosterTag.textContent = `${classData.year} - Sem ${classData.semester} (${classData.section})`;
+            rosterTag.textContent = `${classData.year} – Sem ${classData.semester} (${classData.section})`;
           }
 
           tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">Loading student roster...</td></tr>';
 
           try {
-            const url = `/api/attendance/daily-checklist?year=${encodeURIComponent(classData.year)}&semester=${encodeURIComponent(classData.semester)}&section=${encodeURIComponent(classData.section)}&date=${encodeURIComponent(date)}`;
-            const res = await fetch(url, {
+            const params = new URLSearchParams({
+              year: classData.year,
+              semester: classData.semester,
+              section: classData.section,
+              date: date
+            });
+            if (classData.department) params.set('department', classData.department);
+
+            const res = await fetch(`/api/attendance/daily-checklist?${params.toString()}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) {
@@ -470,23 +487,28 @@
             }
             const data = await res.json();
 
+            const students = Array.isArray(data) ? data : (data.students || []);
+
             tbody.innerHTML = '';
-            if (data.students.length === 0) {
+            if (students.length === 0) {
               tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">No active approved students found for this class.</td></tr>';
               return;
             }
 
-            data.students.forEach(s => {
-              const isPresent = s.status === 'Present';
-              const sAvatar = (window.getAvatarUrl ? window.getAvatarUrl(s.name, s.photoPath) : (s.photoPath || ''));
+            students.forEach(s => {
+              const isPresent = (s.status || 'Present') !== 'Absent' && (s.status || 'Present') !== 'ABSENT';
+              const sName = s.name || 'Student';
+              const regNo = s.registerNumber || s.register_number || '—';
+              const photoPath = s.photoPath || s.photo_path || null;
+              const sAvatar = (window.getAvatarUrl ? window.getAvatarUrl(sName, photoPath) : (photoPath || ''));
               const tr = document.createElement('tr');
               tr.setAttribute('data-student-id', s.id);
               tr.innerHTML = `
-                <td><strong>${s.registerNumber}</strong></td>
+                <td><strong>${regNo}</strong></td>
                 <td>
                   <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <img style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;" src="${sAvatar}" alt="${s.name}" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
-                    <span>${s.name}</span>
+                    <img style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;" src="${sAvatar}" alt="${sName}" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+                    <span>${sName}</span>
                   </div>
                 </td>
                 <td class="text-center">
@@ -585,7 +607,10 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to load history');
-            const sessions = await res.json();
+            const rawData = await res.json();
+
+            // API returns an array of session summaries directly
+            const sessions = Array.isArray(rawData) ? rawData : (rawData.sessions || rawData.records || []);
 
             historyTbody.innerHTML = '';
             if (sessions.length === 0) {
@@ -597,13 +622,13 @@
               const tr = document.createElement('tr');
               tr.innerHTML = `
                 <td><strong>${s.date}</strong></td>
-                <td>${s.year} (Sem ${s.semester} - Sec ${s.section})</td>
-                <td><span style="color: #10B981; font-weight: 700;">${s.presentCount}</span></td>
-                <td><span style="color: #EF4444; font-weight: 700;">${s.absentCount}</span></td>
-                <td>${s.totalCount}</td>
-                <td><strong>${s.percentage}</strong></td>
+                <td>${s.year} (Sem ${s.semester} – Sec ${s.section})</td>
+                <td><span style="color: #10B981; font-weight: 700;">${s.presentCount ?? s.present_days ?? 0}</span></td>
+                <td><span style="color: #EF4444; font-weight: 700;">${s.absentCount ?? s.absent_days ?? 0}</span></td>
+                <td>${s.totalCount ?? s.total_days ?? 0}</td>
+                <td><strong>${s.percentage ?? '—'}</strong></td>
                 <td class="text-center">
-                  <button type="button" class="btn btn-secondary btn-sm btn-load-session" data-date="${s.date}" data-year="${s.year}" data-sem="${s.semester}" data-sec="${s.section}">✏️ View / Edit</button>
+                  <button type="button" class="btn btn-secondary btn-sm btn-load-session" data-date="${s.date}" data-year="${s.year}" data-sem="${s.semester}" data-sec="${s.section}" data-dept="${s.department || ''}">✏️ View / Edit</button>
                 </td>
               `;
               historyTbody.appendChild(tr);
@@ -611,17 +636,19 @@
 
             historyTbody.querySelectorAll('.btn-load-session').forEach(btn => {
               btn.addEventListener('click', async (e) => {
-                const date = e.target.getAttribute('data-date');
-                const year = e.target.getAttribute('data-year');
-                const sem = e.target.getAttribute('data-sem');
-                const sec = e.target.getAttribute('data-sec');
+                const tgt = e.currentTarget;
+                const date = tgt.getAttribute('data-date');
+                const year = tgt.getAttribute('data-year');
+                const sem = tgt.getAttribute('data-sem');
+                const sec = tgt.getAttribute('data-sec');
+                const dept = tgt.getAttribute('data-dept');
 
                 if (dateInput) dateInput.value = date;
-                
+
                 // Select matching class in dropdown
                 for (let i = 0; i < classSelect.options.length; i++) {
                   const val = JSON.parse(classSelect.options[i].value || '{}');
-                  if (val.year === year && val.semester === sem && val.section === sec) {
+                  if (val.year === year && String(val.semester) === String(sem) && val.section === sec) {
                     classSelect.selectedIndex = i;
                     break;
                   }

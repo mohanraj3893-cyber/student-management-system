@@ -1395,15 +1395,67 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
       if (!faculty) return jsonResponse({ success: true, classes: [] });
 
-      const classes = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ?').bind(faculty.id).all();
-      return jsonResponse({ success: true, classes: classes.results });
+      const rawClasses = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ?').bind(faculty.id).all();
+      const normalizedClasses = (rawClasses.results || []).map(c => ({
+        id: c.id,
+        department: c.department || faculty.department,
+        year: c.year,
+        semester: String(c.semester),
+        section: c.section,
+        faculty_id: c.faculty_id
+      }));
+      return jsonResponse({ success: true, classes: normalizedClasses });
+    }
+
+    if (path === '/api/attendance/today-summary' && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      if (!faculty) return jsonResponse({ success: true, present: 0, absent: 0, total: 0, hasData: false });
+
+      const today = new Date().toISOString().split('T')[0];
+      const sessions = await db.prepare(
+        'SELECT id FROM attendance_sessions WHERE faculty_id = ? AND date = ?'
+      ).bind(faculty.id, today).all();
+
+      const sessionIds = (sessions.results || []).map(s => s.id);
+      if (sessionIds.length === 0) {
+        return jsonResponse({ success: true, present: 0, absent: 0, total: 0, hasData: false, date: today });
+      }
+
+      let present = 0, absent = 0;
+      for (const sid of sessionIds) {
+        const counts = await db.prepare(`
+          SELECT
+            SUM(CASE WHEN status = 'PRESENT' OR status = 'Present' THEN 1 ELSE 0 END) as p,
+            SUM(CASE WHEN status = 'ABSENT' OR status = 'Absent' THEN 1 ELSE 0 END) as a
+          FROM attendance_records WHERE session_id = ?
+        `).bind(sid).first();
+        present += Number(counts?.p || 0);
+        absent += Number(counts?.a || 0);
+      }
+
+      return jsonResponse({
+        success: true,
+        present,
+        absent,
+        total: present + absent,
+        hasData: (present + absent) > 0,
+        date: today
+      });
     }
 
     if (path === '/api/attendance/daily-checklist' && method === 'GET') {
-      const department = url.searchParams.get('department') || 'Computer Science & Engineering';
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      const facultyRow = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      // Use faculty's verified department from DB, not from query params
+      const department = (facultyRow?.department) || url.searchParams.get('department') || 'Computer Science & Engineering';
       const year = url.searchParams.get('year');
       const semester = url.searchParams.get('semester');
       const section = url.searchParams.get('section') || 'A';
@@ -1411,15 +1463,26 @@ async function handleApiRequest(request, env) {
 
       const students = await db.prepare(`
         SELECT s.id, s.name, s.register_number, s.photo_path,
-               COALESCE(ar.status, 'PRESENT') as status
+               COALESCE(ar.status, 'Present') as status
         FROM students s
+        JOIN users u ON s.user_id = u.id
         LEFT JOIN attendance_sessions sess ON sess.department = s.department AND sess.year = s.year AND sess.semester = s.semester AND sess.section = s.section AND sess.date = ?
         LEFT JOIN attendance_records ar ON ar.session_id = sess.id AND ar.student_id = s.id
-        WHERE s.department = ? AND s.year = ? AND s.semester = ? AND s.section = ?
+        WHERE u.is_approved = 1 AND s.department = ? AND s.year = ? AND s.semester = ? AND s.section = ?
         ORDER BY s.register_number ASC
       `).bind(date, department, year, semester, section).all();
 
-      return jsonResponse({ success: true, students: students.results, date });
+      const mapped = (students.results || []).map(s => ({
+        id: s.id,
+        name: s.name,
+        registerNumber: s.register_number,
+        register_number: s.register_number,
+        photoPath: s.photo_path,
+        photo_path: s.photo_path,
+        status: s.status || 'Present'
+      }));
+
+      return jsonResponse({ success: true, students: mapped, date });
     }
 
     if ((path === '/api/attendance/daily' || path === '/api/attendance/mark') && method === 'POST') {
@@ -1473,29 +1536,39 @@ async function handleApiRequest(request, env) {
     }
 
     if (path === '/api/attendance/history' && method === 'GET') {
-      const department = url.searchParams.get('department');
-      const year = url.searchParams.get('year');
-      const semester = url.searchParams.get('semester');
-      const section = url.searchParams.get('section');
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      let query = `
-        SELECT s.id, s.name, s.register_number, s.department, s.year, s.semester, s.section,
-               COUNT(ar.id) as total_days,
-               SUM(CASE WHEN ar.status = 'PRESENT' THEN 1 ELSE 0 END) as present_days,
-               ROUND((SUM(CASE WHEN ar.status = 'PRESENT' THEN 1.0 ELSE 0 END) / MAX(COUNT(ar.id), 1)) * 100, 1) as percentage
-        FROM students s
-        LEFT JOIN attendance_records ar ON ar.student_id = s.id
-        WHERE 1=1
-      `;
-      const params = [];
-      if (department) { query += ' AND s.department = ?'; params.push(department); }
-      if (year && year !== 'ALL') { query += ' AND s.year = ?'; params.push(year); }
-      if (semester && semester !== 'ALL') { query += ' AND s.semester = ?'; params.push(semester); }
-      if (section && section !== 'ALL') { query += ' AND s.section = ?'; params.push(section); }
+      const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      if (!faculty) return jsonResponse([]);
 
-      query += ' GROUP BY s.id ORDER BY s.register_number ASC';
-      const results = await db.prepare(query).bind(...params).all();
-      return jsonResponse({ success: true, records: results.results });
+      // Return session-level summaries for this faculty's marked sessions
+      const sessions = await db.prepare(`
+        SELECT
+          sess.id,
+          sess.date,
+          sess.year,
+          sess.semester,
+          sess.section,
+          sess.department,
+          SUM(CASE WHEN ar.status = 'PRESENT' OR ar.status = 'Present' THEN 1 ELSE 0 END) as presentCount,
+          SUM(CASE WHEN ar.status = 'ABSENT'  OR ar.status = 'Absent'  THEN 1 ELSE 0 END) as absentCount,
+          COUNT(ar.id) as totalCount
+        FROM attendance_sessions sess
+        LEFT JOIN attendance_records ar ON ar.session_id = sess.id
+        WHERE sess.faculty_id = ?
+        GROUP BY sess.id
+        ORDER BY sess.date DESC, sess.year ASC
+      `).bind(faculty.id).all();
+
+      const sessionRows = (sessions.results || []).map(s => ({
+        ...s,
+        percentage: s.totalCount > 0
+          ? (((s.presentCount) / s.totalCount) * 100).toFixed(1) + '%'
+          : '0.0%'
+      }));
+
+      return jsonResponse(sessionRows);
     }
 
     if (path === '/api/attendance/student-summary' && method === 'GET') {

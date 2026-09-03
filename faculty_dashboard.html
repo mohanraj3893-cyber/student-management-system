@@ -452,6 +452,69 @@
           const opt = { day: 'numeric', month: 'short', year: 'numeric' };
           dateDisplay.textContent = new Date().toLocaleDateString('en-GB', opt);
         }
+
+        // Fetch faculty dashboard stats (student count, today's attendance)
+        try {
+          const statsRes = await fetch('/api/dashboard/stats', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (statsRes.ok) {
+            const statsData = await statsRes.json();
+            // Student count for assigned class
+            const studentsEl = document.getElementById('stats-total-students');
+            const attendanceEl = document.getElementById('stats-attendance-rate');
+
+            // If faculty is Class Incharge, get their assigned class student count
+            if (studentsEl && statsData.user?.isClassIncharge) {
+              try {
+                const classRes = await fetch('/api/attendance/my-classes', {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (classRes.ok) {
+                  const classData = await classRes.json();
+                  const classes = Array.isArray(classData) ? classData : (classData.classes || []);
+                  if (classes.length > 0) {
+                    const c = classes[0];
+                    const stuRes = await fetch(`/api/students?year=${encodeURIComponent(c.year)}&semester=${encodeURIComponent(c.semester)}&section=${encodeURIComponent(c.section)}`, {
+                      headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (stuRes.ok) {
+                      const stuData = await stuRes.json();
+                      const count = stuData.count || (stuData.students || []).length || 0;
+                      if (studentsEl) studentsEl.textContent = count;
+                    }
+                  }
+                }
+              } catch (e) { /* silently ignore */ }
+            } else if (studentsEl) {
+              studentsEl.textContent = statsData.stats?.totalStudents ?? statsData.totalStudents ?? '--';
+            }
+
+            // Fetch today's attendance summary
+            if (attendanceEl) {
+              try {
+                const todayRes = await fetch('/api/attendance/today-summary', {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (todayRes.ok) {
+                  const todayData = await todayRes.json();
+                  if (todayData.hasData) {
+                    attendanceEl.textContent = `${todayData.present}P / ${todayData.absent}A`;
+                  } else {
+                    attendanceEl.textContent = 'Not Marked';
+                    attendanceEl.style.fontSize = '0.95rem';
+                  }
+                } else {
+                  attendanceEl.textContent = 'N/A';
+                }
+              } catch (e) {
+                attendanceEl.textContent = 'N/A';
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching dashboard stats:', e);
+        }
       });
     </script>
 
