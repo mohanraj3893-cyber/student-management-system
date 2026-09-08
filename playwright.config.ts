@@ -2,6 +2,8 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   timeout: 60000,
+  retries: 1,
+  workers: 1,
   expect: {
     timeout: 10000
   },
