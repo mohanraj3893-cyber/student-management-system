@@ -27,9 +27,27 @@ export default defineConfig({
       }
     },
     {
+      name: 'Laptop',
+      use: {
+        viewport: { width: 1366, height: 768 }
+      }
+    },
+    {
+      name: 'Tablet',
+      use: {
+        viewport: { width: 768, height: 1024 }
+      }
+    },
+    {
       name: 'Mobile',
       use: {
         viewport: { width: 390, height: 844 }
+      }
+    },
+    {
+      name: 'Large Mobile',
+      use: {
+        viewport: { width: 430, height: 932 }
       }
     }
   ]
