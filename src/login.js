@@ -1,7 +1,7 @@
 import './api_config.js';
 import './style.css';
 
-document.addEventListener('DOMContentLoaded', () => {
+function initLogin() {
   /* ==========================================
      ROLE CONFIGURATIONS (MATCHING MOCKUPS)
      ========================================== */
@@ -321,4 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLogin);
+} else {
+  initLogin();
+}
