@@ -325,7 +325,7 @@ async function handleApiRequest(request, env) {
       )
     `).run().catch(() => {});
 
-    // Ensure class_incharges table exists
+    // Ensure class_incharges table exists with strict class unique constraint
     await db.prepare(`
       CREATE TABLE IF NOT EXISTS class_incharges (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -339,6 +339,36 @@ async function handleApiRequest(request, env) {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(department, year, semester, section)
+      )
+    `).run().catch(() => {});
+
+    // Ensure attendance_sessions table exists with strict one session per class per day
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS attendance_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        faculty_id INTEGER NOT NULL,
+        department TEXT NOT NULL,
+        year TEXT NOT NULL,
+        semester TEXT NOT NULL,
+        section TEXT NOT NULL DEFAULT 'A',
+        date TEXT NOT NULL,
+        attendance_date TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(department, year, semester, section, date)
+      )
+    `).run().catch(() => {});
+
+    // Ensure attendance_records table exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS attendance_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id INTEGER NOT NULL,
+        student_id INTEGER NOT NULL,
+        date TEXT,
+        status TEXT NOT NULL DEFAULT 'Present',
+        marked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(session_id, student_id)
       )
     `).run().catch(() => {});
 
@@ -581,6 +611,25 @@ async function handleApiRequest(request, env) {
       let details = {};
       if (user.role_name === 'student') {
         details = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(user.id).first() || {};
+        if (details.id) {
+          const stats = await db.prepare(`
+            SELECT 
+              COUNT(*) as total,
+              SUM(CASE WHEN status = 'PRESENT' OR status = 'Present' THEN 1 ELSE 0 END) as present,
+              SUM(CASE WHEN status = 'ABSENT' OR status = 'Absent' THEN 1 ELSE 0 END) as absent
+            FROM attendance_records WHERE student_id = ?
+          `).bind(details.id).first();
+          const totalDays = Number(stats?.total || 0);
+          const presentDays = Number(stats?.present || 0);
+          const absentDays = Number(stats?.absent || 0);
+          const pct = totalDays > 0 ? Number(((presentDays / totalDays) * 100).toFixed(1)) : null;
+          details.attendanceStats = {
+            totalDays,
+            presentDays,
+            absentDays,
+            percentage: pct
+          };
+        }
       } else {
         details = await db.prepare('SELECT * FROM faculty WHERE user_id = ?').bind(user.id).first() || {};
       }
@@ -1823,6 +1872,14 @@ async function handleApiRequest(request, env) {
         return jsonResponse({ message: 'Date and student records are required.' }, 400);
       }
 
+      // Enforce Same-Day 11:59 PM Lock: Attendance cannot be marked or modified for past dates
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (date < todayStr) {
+        return jsonResponse({
+          message: 'Attendance Session Locked: Attendance records can only be edited until 11:59 PM on the day of the class.'
+        }, 403);
+      }
+
       // Reject attempts to submit for another class
       if (
         (body.year && body.year !== assignment.year) ||
@@ -1854,7 +1911,7 @@ async function handleApiRequest(request, env) {
         }
       }
 
-      // Step 3.3: Save session & records
+      // Step 3.3: Save session & records (One session per class per day)
       let session = await db.prepare(`
         SELECT id FROM attendance_sessions
         WHERE department = ? AND year = ? AND semester = ? AND section = ? AND date = ?
@@ -1863,30 +1920,59 @@ async function handleApiRequest(request, env) {
       let sessionId = session ? session.id : null;
       if (!sessionId) {
         await db.prepare(`
-          INSERT INTO attendance_sessions (faculty_id, department, year, semester, section, date)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `).bind(facId, department, year, semester, section, date).run();
+          INSERT INTO attendance_sessions (faculty_id, department, year, semester, section, date, attendance_date)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).bind(facId, department, year, semester, section, date, date).run();
         const sRow = await db.prepare('SELECT id FROM attendance_sessions WHERE department = ? AND year = ? AND semester = ? AND section = ? AND date = ?')
           .bind(department, year, semester, section, date).first();
         sessionId = sRow.id;
+      } else {
+        await db.prepare(`
+          UPDATE attendance_sessions SET updated_at = CURRENT_TIMESTAMP WHERE id = ?
+        `).bind(sessionId).run();
       }
 
       for (const rec of records) {
         const sId = rec.studentId || rec.id;
+        const status = (rec.status === 'Absent' || rec.status === 'ABSENT') ? 'Absent' : 'Present';
         await db.prepare(`
-          INSERT OR REPLACE INTO attendance_records (session_id, student_id, date, status, marked_at)
+          INSERT INTO attendance_records (session_id, student_id, date, status, marked_at)
           VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-        `).bind(sessionId, sId, date, rec.status).run();
+          ON CONFLICT(session_id, student_id) DO UPDATE SET
+            status = excluded.status,
+            date = excluded.date,
+            marked_at = CURRENT_TIMESTAMP
+        `).bind(sessionId, sId, date, status).run();
 
         const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(sId).first();
         if (sUser?.user_id) {
           await sendPushNotificationToUser(db, env, sUser.user_id, {
             title: '📅 Attendance Update',
-            body: `Your attendance for ${date} has been recorded as ${rec.status}.`,
+            body: `Your attendance for ${date} has been recorded as ${status}.`,
             url: '/student_attendance.html',
             type: 'ATTENDANCE_UPDATE'
           });
         }
+      }
+
+      // Notify HOD of completion for same department only
+      const hod = await db.prepare(`
+        SELECT u.id 
+        FROM users u
+        JOIN roles r ON u.role_id = r.id
+        JOIN faculty f ON f.user_id = u.id
+        WHERE (r.name = 'admin' OR r.name = 'hod') 
+          AND f.department = ? 
+          AND u.is_approved = 1
+        LIMIT 1
+      `).bind(department).first();
+
+      if (hod && hod.id) {
+        const hodMsg = `Attendance completed for ${department} ${year} Sem ${semester} Sec ${section} (${date}).`;
+        await db.prepare(`
+          INSERT INTO notifications (user_id, message, is_read, type)
+          VALUES (?, ?, 0, 'ATTENDANCE_MARKED')
+        `).bind(hod.id, hodMsg).run().catch(() => {});
       }
 
       return jsonResponse({ success: true, message: 'Daily attendance saved successfully!' });
@@ -1896,10 +1982,56 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
+      // Student Role: return their own personal records and attendanceStats
+      if (authUser.role === 'student') {
+        const student = await db.prepare('SELECT * FROM students WHERE user_id = ?').bind(authUser.id).first();
+        if (!student) {
+          return jsonResponse({
+            success: true,
+            records: [],
+            attendanceStats: { totalDays: 0, presentDays: 0, absentDays: 0, percentage: 0 }
+          });
+        }
+
+        const studentRecords = await db.prepare(`
+          SELECT 
+            ar.id,
+            COALESCE(ar.date, sess.date) as date,
+            ar.status,
+            ar.marked_at,
+            sess.department,
+            sess.year,
+            sess.semester,
+            sess.section
+          FROM attendance_records ar
+          JOIN attendance_sessions sess ON ar.session_id = sess.id
+          WHERE ar.student_id = ?
+          ORDER BY COALESCE(ar.date, sess.date) DESC
+        `).bind(student.id).all();
+
+        const recs = studentRecords.results || [];
+        const totalDays = recs.length;
+        const presentDays = recs.filter(r => (r.status || '').toLowerCase() === 'present').length;
+        const absentDays = totalDays - presentDays;
+        const pct = totalDays > 0 ? Number(((presentDays / totalDays) * 100).toFixed(1)) : null;
+
+        return jsonResponse({
+          success: true,
+          records: recs,
+          attendanceStats: {
+            totalDays,
+            presentDays,
+            absentDays,
+            percentage: pct
+          }
+        });
+      }
+
+      // Faculty / HOD Roles:
       const faculty = await db.prepare('SELECT id, department FROM faculty WHERE user_id = ?').bind(authUser.id).first();
       const facId = faculty?.id || authUser.id;
 
-      // Scope history strictly to this faculty's assigned class
+      // Scope history strictly to this faculty's assigned class if faculty
       const assignment = await db.prepare('SELECT * FROM class_incharges WHERE faculty_id = ? OR faculty_id = ?').bind(facId, authUser.id).first();
 
       let sessions;

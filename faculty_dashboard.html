@@ -269,7 +269,7 @@
               </div>
               <span style="font-size: 0.62rem; color: #64748B; font-weight: 700; text-transform: uppercase; margin-top: 0.2rem;">ATTENDANCE</span>
               <h2 id="stats-attendance-rate" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0;">--</h2>
-              <span style="font-size: 0.7rem; color: #16A34A; font-weight: 700;">Today's Attendance</span>
+              <span id="stats-attendance-subtext" style="font-size: 0.7rem; color: #16A34A; font-weight: 700;">Today's Attendance</span>
             </div>
 
             <!-- Card 3: RESULTS -->
@@ -523,15 +523,26 @@
           if (stuEl) stuEl.textContent = dashData?.stats?.assignedStudents ?? '--';
 
           const attEl = document.getElementById('stats-attendance-rate');
+          const attSubEl = document.getElementById('stats-attendance-subtext');
           if (attEl) {
             if (!isClassIncharge) {
               attEl.textContent = 'N/A';
               attEl.style.fontSize = '1.2rem';
+              if (attSubEl) attSubEl.textContent = 'Not Incharge';
             } else if (dashData?.stats?.todayAttendance?.isMarked) {
-              attEl.textContent = `${dashData.stats.todayAttendance.present}P / ${dashData.stats.todayAttendance.absent}A`;
+              const p = dashData.stats.todayAttendance.present ?? 0;
+              const a = dashData.stats.todayAttendance.absent ?? 0;
+              const tot = dashData.stats.todayAttendance.total ?? (p + a);
+              attEl.textContent = `${p} / ${tot}`;
+              attEl.style.fontSize = '1.3rem';
+              if (attSubEl) {
+                attSubEl.innerHTML = `Present: <b>${p}</b>, Absent: <b>${a}</b>, Total: <b>${tot}</b>`;
+                attSubEl.style.color = '#15803D';
+              }
             } else {
               attEl.textContent = 'Not Marked';
               attEl.style.fontSize = '0.95rem';
+              if (attSubEl) attSubEl.textContent = "Today's Attendance";
             }
           }
 

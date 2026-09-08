@@ -289,6 +289,21 @@ async function auditSinglePage(
   };
 
   auditResults.push(telemetry);
+
+  // Write immediately to audit_telemetry.json
+  const telemetryFile = path.join(process.cwd(), 'test-results', 'audit_telemetry.json');
+  try {
+    let existing: PageTelemetry[] = [];
+    if (fs.existsSync(telemetryFile)) {
+      existing = JSON.parse(fs.readFileSync(telemetryFile, 'utf-8'));
+    }
+    const filtered = existing.filter(e => !(e.name === telemetry.name && e.viewport === telemetry.viewport));
+    filtered.push(telemetry);
+    fs.writeFileSync(telemetryFile, JSON.stringify(filtered, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to sync audit telemetry:', err);
+  }
+
   return telemetry;
 }
 

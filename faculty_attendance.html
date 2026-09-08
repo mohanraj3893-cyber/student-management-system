@@ -547,6 +547,29 @@
           if (!currentAssignment) return;
 
           const date = dateInput.value || new Date().toISOString().split('T')[0];
+          const todayStr = new Date().toISOString().split('T')[0];
+          const isLocked = date < todayStr;
+
+          if (isLocked) {
+            if (saveBtn) {
+              saveBtn.disabled = true;
+              saveBtn.textContent = '🔒 Session Locked (Past Date)';
+              saveBtn.style.opacity = '0.6';
+              saveBtn.style.cursor = 'not-allowed';
+            }
+            if (btnAllPresent) btnAllPresent.disabled = true;
+            if (btnAllAbsent) btnAllAbsent.disabled = true;
+          } else {
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.textContent = 'Save Daily Attendance';
+              saveBtn.style.opacity = '1';
+              saveBtn.style.cursor = 'pointer';
+            }
+            if (btnAllPresent) btnAllPresent.disabled = false;
+            if (btnAllAbsent) btnAllAbsent.disabled = false;
+          }
+
           tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">Loading student roster...</td></tr>';
 
           try {
@@ -593,13 +616,13 @@
                   </div>
                 </td>
                 <td class="text-center">
-                  <div style="display: inline-flex; gap: 0.5rem;">
-                    <label style="margin: 0; cursor: pointer;">
-                      <input type="radio" class="att-radio-hidden" name="att-${s.id}" value="Present" ${isPresent ? 'checked' : ''}>
+                  <div style="display: inline-flex; gap: 0.5rem; ${isLocked ? 'opacity: 0.75; pointer-events: none;' : ''}">
+                    <label style="margin: 0; cursor: ${isLocked ? 'not-allowed' : 'pointer'};">
+                      <input type="radio" class="att-radio-hidden" name="att-${s.id}" value="Present" ${isPresent ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
                       <span class="att-status-option present-opt">✅ Present</span>
                     </label>
-                    <label style="margin: 0; cursor: pointer;">
-                      <input type="radio" class="att-radio-hidden" name="att-${s.id}" value="Absent" ${!isPresent ? 'checked' : ''}>
+                    <label style="margin: 0; cursor: ${isLocked ? 'not-allowed' : 'pointer'};">
+                      <input type="radio" class="att-radio-hidden" name="att-${s.id}" value="Absent" ${!isPresent ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
                       <span class="att-status-option absent-opt">❌ Absent</span>
                     </label>
                   </div>
@@ -627,6 +650,12 @@
         saveBtn.addEventListener('click', async () => {
           if (!currentAssignment || !dateInput.value) {
             showAlert('No assigned class loaded or date not selected.', 'error');
+            return;
+          }
+
+          const todayStr = new Date().toISOString().split('T')[0];
+          if (dateInput.value < todayStr) {
+            showAlert('Attendance Session Locked: Attendance records can only be edited until 11:59 PM on the day of the class.', 'error');
             return;
           }
 
