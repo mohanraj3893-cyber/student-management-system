@@ -282,8 +282,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear any previous session or cached state completely
         localStorage.clear();
         sessionStorage.clear();
-        localStorage.setItem('accessToken', data.accessToken);
+        const activeToken = data.accessToken || data.token;
+        localStorage.setItem('accessToken', activeToken);
+        localStorage.setItem('token', activeToken);
         localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('user_role', data.user.role);
+        localStorage.setItem('role', data.user.role);
+        sessionStorage.setItem('accessToken', activeToken);
+        sessionStorage.setItem('token', activeToken);
+        sessionStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('user_role', data.user.role);
+        sessionStorage.setItem('role', data.user.role);
 
         showAlert('Login successful! Redirecting...', 'success');
 
