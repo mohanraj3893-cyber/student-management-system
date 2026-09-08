@@ -457,8 +457,8 @@
             const fName = profData.name || 'Faculty Member';
             const navName = document.getElementById('nav-faculty-name');
             if (navName) navName.textContent = fName;
-            const mobGreet = document.getElementById('mobile-greeting-name');
             const photoUrl = profData?.photoPath || user?.photoPath || '';
+            const navAv = document.getElementById('nav-faculty-avatar');
             if (navAv) navAv.src = photoUrl;
             const sideAv = document.getElementById('sidebar-faculty-avatar');
             if (sideAv) sideAv.src = photoUrl;

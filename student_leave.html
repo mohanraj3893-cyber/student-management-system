@@ -1427,7 +1427,8 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to load notifications.');
-            const list = await res.json();
+            const rawNotifs = await res.json();
+            const list = Array.isArray(rawNotifs) ? rawNotifs : (rawNotifs.notifications || rawNotifs.data || []);
 
             const unreadList = list.filter(n => !n.isRead);
             notifCountBadge.textContent = unreadList.length;
