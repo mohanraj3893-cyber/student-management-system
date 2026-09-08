@@ -372,6 +372,10 @@ async function handleApiRequest(request, env) {
       )
     `).run().catch(() => {});
 
+    await db.prepare(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_att_records_session_student ON attendance_records(session_id, student_id)
+    `).run().catch(() => {});
+
     // Repair existing leave request days calculation in D1 database
     await db.prepare(`
       UPDATE leave_requests
@@ -1935,14 +1939,23 @@ async function handleApiRequest(request, env) {
       for (const rec of records) {
         const sId = rec.studentId || rec.id;
         const status = (rec.status === 'Absent' || rec.status === 'ABSENT') ? 'Absent' : 'Present';
-        await db.prepare(`
-          INSERT INTO attendance_records (session_id, student_id, date, status, marked_at)
-          VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-          ON CONFLICT(session_id, student_id) DO UPDATE SET
-            status = excluded.status,
-            date = excluded.date,
-            marked_at = CURRENT_TIMESTAMP
-        `).bind(sessionId, sId, date, status).run();
+
+        const existingRecord = await db.prepare(`
+          SELECT id FROM attendance_records WHERE session_id = ? AND student_id = ?
+        `).bind(sessionId, sId).first();
+
+        if (existingRecord) {
+          await db.prepare(`
+            UPDATE attendance_records
+            SET status = ?, date = ?, marked_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `).bind(status, date, existingRecord.id).run();
+        } else {
+          await db.prepare(`
+            INSERT INTO attendance_records (session_id, student_id, date, status, marked_at)
+            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+          `).bind(sessionId, sId, date, status).run();
+        }
 
         const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(sId).first();
         if (sUser?.user_id) {
