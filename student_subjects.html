@@ -263,12 +263,13 @@
           });
 
           if (!res.ok) throw new Error('Failed to load course materials from database.');
-          const subjectsWithMaterials = await res.json();
+          const rawData = await res.json();
+          const subjectsWithMaterials = Array.isArray(rawData) ? rawData : (rawData?.resources || []);
 
           listContainer.innerHTML = '';
 
           // Check if any materials exist across all subjects
-          const totalMaterials = subjectsWithMaterials.reduce((acc, sub) => acc + (sub.resources ? sub.resources.length : 0), 0);
+          const totalMaterials = subjectsWithMaterials.reduce((acc, sub) => acc + (sub.resources ? sub.resources.length : 1), 0);
 
           if (subjectsWithMaterials.length === 0 || totalMaterials === 0) {
             listContainer.innerHTML = `

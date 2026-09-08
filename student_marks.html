@@ -305,7 +305,8 @@
             throw new Error('Failed to load internal marks from database.');
           }
 
-          rawGradesList = await res.json();
+          const data = await res.json();
+          rawGradesList = Array.isArray(data) ? data : (data?.grades || []);
           renderTabMarks(activeExamTab);
           populateCalculatorSubjects();
 
