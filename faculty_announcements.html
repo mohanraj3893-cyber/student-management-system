@@ -250,8 +250,8 @@
             const res = await fetch('/api/announcements', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to load announcements feed.');
-            const list = await res.json();
+            const rawData = await res.json();
+            const list = Array.isArray(rawData) ? rawData : (rawData.announcements || rawData.data || []);
 
             noticesContainer.innerHTML = '';
             if (list.length === 0) {

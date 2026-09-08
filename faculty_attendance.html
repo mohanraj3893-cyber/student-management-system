@@ -458,9 +458,7 @@
             const navName = document.getElementById('nav-faculty-name');
             if (navName) navName.textContent = fName;
             const mobGreet = document.getElementById('mobile-greeting-name');
-            if (mobGreet) mobGreet.textContent = fName;
-            const photoUrl = (window.getAvatarUrl ? window.getAvatarUrl(typeof sName !== 'undefined' ? sName : (typeof fName !== 'undefined' ? fName : (p?.name || 'User')), profData?.photoPath || p?.photoPath || user?.photoPath) : (profData?.photoPath || p?.photoPath || user?.photoPath || ''));
-            const navAv = document.getElementById('nav-faculty-avatar');
+            const photoUrl = profData?.photoPath || user?.photoPath || '';
             if (navAv) navAv.src = photoUrl;
             const sideAv = document.getElementById('sidebar-faculty-avatar');
             if (sideAv) sideAv.src = photoUrl;

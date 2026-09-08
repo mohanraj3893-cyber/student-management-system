@@ -300,8 +300,7 @@
             const sideName = document.getElementById('sidebar-faculty-name');
             if (sideName) sideName.textContent = fName;
 
-            const defaultAvatar = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
-            const photoUrl = (window.getAvatarUrl ? window.getAvatarUrl(typeof sName !== 'undefined' ? sName : (typeof fName !== 'undefined' ? fName : (p?.name || 'User')), profData?.photoPath || p?.photoPath || user?.photoPath) : (profData?.photoPath || p?.photoPath || user?.photoPath || ''));
+            const photoUrl = p?.photoPath || user?.photoPath || '';
             const navAv = document.getElementById('nav-faculty-avatar');
             if (navAv) navAv.src = photoUrl;
             const sideAv = document.getElementById('sidebar-faculty-avatar');
