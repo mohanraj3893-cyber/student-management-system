@@ -372,7 +372,7 @@
           const greetingName = document.getElementById('mobile-greeting-name');
           if (greetingName) greetingName.textContent = name;
 
-          const empId = data.employeeId || 'CS003';
+          const empId = data.employee_id || data.employeeId || data.username || 'CS002';
           document.getElementById('my-fac-empid').textContent = `Employee ID: ${empId}`;
 
           const desig = data.designation || 'Assistant Professor';

@@ -29,3 +29,7 @@ scratch/
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright Test Artifacts
+playwright-report/
+test-results/

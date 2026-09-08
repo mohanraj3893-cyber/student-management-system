@@ -1540,7 +1540,7 @@ async function handleApiRequest(request, env) {
       return jsonResponse({ success: true, message: 'Subject deleted successfully.' });
     }
 
-    if (path === '/api/subjects/my-subjects' && method === 'GET') {
+    if ((path === '/api/subjects/my-subjects' || path === '/api/attendance/subjects') && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
@@ -1567,6 +1567,10 @@ async function handleApiRequest(request, env) {
         section: s.section || 'A',
         department: s.department
       }));
+
+      if (path === '/api/attendance/subjects') {
+        return jsonResponse(formatted);
+      }
 
       return jsonResponse({
         success: true,
@@ -1955,7 +1959,22 @@ async function handleApiRequest(request, env) {
         ORDER BY s.register_number ASC
       `).bind(subjectId, examType, subject.department, subject.year, subject.semester, subject.section, subject.section).all();
 
-      return jsonResponse({ success: true, roster: roster.results, subject });
+      const formattedStudents = (roster.results || []).map(r => ({
+        id: r.student_id,
+        studentId: r.student_id,
+        name: r.name,
+        registerNumber: r.register_number,
+        register_number: r.register_number,
+        marksObtained: r.marks_obtained !== '' ? r.marks_obtained : null,
+        maxMarks: r.max_marks || 100
+      }));
+
+      return jsonResponse({
+        success: true,
+        roster: roster.results,
+        students: formattedStudents,
+        subject
+      });
     }
 
     if ((path === '/api/marks/save' || path === '/api/marks/add') && method === 'POST') {
@@ -1963,7 +1982,7 @@ async function handleApiRequest(request, env) {
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
       const body = await request.json().catch(() => ({}));
-      const { subjectId, examType, maxMarks, marks } = body;
+      const { subjectId, examType, maxMarks, marks, records } = body;
 
       const subject = await db.prepare('SELECT * FROM subjects WHERE id = ?').bind(subjectId).first();
       if (!subject) return jsonResponse({ message: 'Subject not found.' }, 404);
@@ -1979,24 +1998,28 @@ async function handleApiRequest(request, env) {
       }
 
       const subLabel = `${subject.code} - ${subject.name}`;
+      const markList = Array.isArray(marks) ? marks : (Array.isArray(records) ? records : []);
 
-      if (Array.isArray(marks)) {
-        for (const item of marks) {
-          if (item.marks !== '' && item.marks !== null && item.marks !== undefined) {
-            await db.prepare(`
-              INSERT OR REPLACE INTO internal_marks (student_id, subject_id, exam_type, marks_obtained, max_marks, updated_at)
-              VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            `).bind(item.studentId, subjectId, examType, Number(item.marks), maxMarks || 100).run();
+      for (const item of markList) {
+        const rawScore = item.marks !== undefined && item.marks !== null && item.marks !== ''
+          ? item.marks
+          : (item.marksObtained !== undefined && item.marksObtained !== null && item.marksObtained !== '' ? item.marksObtained : null);
 
-            const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(item.studentId).first();
-            if (sUser?.user_id) {
-              await sendPushNotificationToUser(db, env, sUser.user_id, {
-                title: '📝 Internal Marks Published',
-                body: `${subLabel} (${examType}) marks published: ${item.marks}/${maxMarks || 100}.`,
-                url: '/student_marks.html',
-                type: 'MARKS_PUBLISHED'
-              });
-            }
+        if (rawScore !== null) {
+          const maxVal = item.maxMarks || maxMarks || 100;
+          await db.prepare(`
+            INSERT OR REPLACE INTO internal_marks (student_id, subject_id, exam_type, marks_obtained, max_marks, updated_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          `).bind(item.studentId, subjectId, examType, Number(rawScore), maxVal).run();
+
+          const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(item.studentId).first();
+          if (sUser?.user_id) {
+            await sendPushNotificationToUser(db, env, sUser.user_id, {
+              title: '📝 Internal Marks Published',
+              body: `${subLabel} (${examType}) marks published: ${rawScore}/${maxVal}.`,
+              url: '/student_marks.html',
+              type: 'MARKS_PUBLISHED'
+            });
           }
         }
       }
@@ -2609,7 +2632,7 @@ async function handleApiRequest(request, env) {
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
       const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
-      if (!faculty) return jsonResponse({ success: true, resources: [] });
+      if (!faculty) return jsonResponse([]);
 
       const resources = await db.prepare(`
         SELECT r.*, sub.name as subject_name, sub.code as subject_code
@@ -2619,7 +2642,28 @@ async function handleApiRequest(request, env) {
         ORDER BY r.created_at DESC
       `).bind(faculty.id).all();
 
-      return jsonResponse({ success: true, resources: resources.results });
+      const formatted = (resources.results || []).map(r => ({
+        id: r.id,
+        title: r.title,
+        category: r.category,
+        subjectId: r.subject_id,
+        subject_id: r.subject_id,
+        subjectCode: r.subject_code,
+        subject_code: r.subject_code,
+        subjectName: r.subject_name,
+        subject_name: r.subject_name,
+        fileName: r.file_name,
+        file_name: r.file_name,
+        filePath: r.file_path,
+        file_path: r.file_path,
+        fileUrl: r.file_path,
+        fileSize: r.file_size,
+        file_size: r.file_size,
+        createdAt: r.created_at,
+        created_at: r.created_at
+      }));
+
+      return jsonResponse(formatted);
     }
 
     if (path === '/api/resources/student' && method === 'GET') {
@@ -2645,13 +2689,35 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      const body = await request.json();
+      let title, category, subjectId, fileName, filePath, fileSize;
+      const contentType = request.headers.get('content-type') || '';
+
+      if (contentType.includes('multipart/form-data')) {
+        const formData = await request.formData();
+        title = formData.get('title') || 'Course Material';
+        category = formData.get('category') || 'Lecture Notes';
+        subjectId = formData.get('subjectId');
+        const file = formData.get('file');
+        fileName = file && typeof file === 'object' && file.name ? file.name : (formData.get('fileName') || 'lecture_notes.pdf');
+        fileSize = file && typeof file === 'object' && file.size ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : '1.5 MB';
+        filePath = `/uploads/${fileName}`;
+      } else {
+        const body = await request.json().catch(() => ({}));
+        title = body.title || 'Course Material';
+        category = body.category || 'Lecture Notes';
+        subjectId = body.subjectId;
+        fileName = body.fileName || 'lecture_notes.pdf';
+        filePath = body.filePath || `/uploads/${fileName}`;
+        fileSize = body.fileSize || '1.5 MB';
+      }
+
       const faculty = await db.prepare('SELECT id FROM faculty WHERE user_id = ?').bind(authUser.id).first();
+      const facId = faculty ? faculty.id : (authUser.id || 1);
 
       await db.prepare(`
         INSERT INTO resources (title, category, subject_id, faculty_id, file_name, file_path, file_size)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).bind(body.title, body.category || 'Lecture Notes', body.subjectId, faculty ? faculty.id : 1, body.fileName || 'file.pdf', body.filePath || '', body.fileSize || 'N/A').run();
+      `).bind(title, category, subjectId, facId, fileName, filePath, fileSize).run();
 
       return jsonResponse({ success: true, message: 'Resource uploaded successfully.' });
     }

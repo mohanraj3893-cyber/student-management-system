@@ -320,8 +320,8 @@
           const subjectsRes = await fetch('/api/attendance/subjects', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          if (!subjectsRes.ok) throw new Error('Failed to load assigned subjects.');
-          const subjects = await subjectsRes.json();
+          const resJson = await subjectsRes.json();
+          const subjects = Array.isArray(resJson) ? resJson : (resJson.subjects || []);
 
           subjectSelect.innerHTML = '';
           if (subjects.length === 0) {
@@ -361,15 +361,21 @@
               throw new Error(errJson.message || 'Failed to load marks roster.');
             }
             const data = await res.json();
+            const studentsList = Array.isArray(data.students) ? data.students : (Array.isArray(data.roster) ? data.roster.map(r => ({
+              id: r.student_id,
+              name: r.name,
+              registerNumber: r.register_number,
+              marksObtained: r.marks_obtained !== '' ? r.marks_obtained : null
+            })) : []);
 
             tbody.innerHTML = '';
-            if (data.students.length === 0) {
+            if (studentsList.length === 0) {
               tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">No students found enrolled in this subject.</td></tr>';
               updateStats();
               return;
             }
 
-            data.students.forEach(s => {
+            studentsList.forEach(s => {
               const tr = document.createElement('tr');
               const currentScore = s.marksObtained !== null ? s.marksObtained : '';
               tr.innerHTML = `

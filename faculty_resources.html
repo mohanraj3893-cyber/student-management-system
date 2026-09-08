@@ -316,8 +316,8 @@
           const subRes = await fetch('/api/attendance/subjects', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          if (!subRes.ok) throw new Error('Failed to load assigned subjects.');
-          const subjects = await subRes.json();
+          const resSubData = await subRes.json();
+          const subjects = Array.isArray(resSubData) ? resSubData : (resSubData.subjects || []);
 
           subjectSelect.innerHTML = '';
           if (subjects.length === 0) {
@@ -343,8 +343,8 @@
             const res = await fetch('/api/resources/faculty', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to load materials.');
-            const list = await res.json();
+            const resJson = await res.json();
+            const list = Array.isArray(resJson) ? resJson : (resJson.resources || []);
 
             if (countBadge) countBadge.textContent = `${list.length} Material${list.length === 1 ? '' : 's'}`;
 
