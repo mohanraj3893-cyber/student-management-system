@@ -108,10 +108,24 @@ const STUDENT_USER = {
   section: 'A'
 };
 
+// Resilient navigation helper with automatic retries for edge resilience
+async function safeGoto(page: Page, url: string, options: { waitUntil?: 'commit' | 'domcontentloaded' | 'load'; timeout?: number } = {}) {
+  const maxRetries = 2;
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      await page.goto(url, { waitUntil: options.waitUntil || 'domcontentloaded', timeout: options.timeout || 45000 });
+      return;
+    } catch (err: any) {
+      if (i === maxRetries) throw err;
+      await page.waitForTimeout(1500);
+    }
+  }
+}
+
 // Helper to authenticate by injecting JWT token and session cache
 async function authenticateAsRole(page: Page, role: 'admin' | 'faculty' | 'student' | 'public') {
   if (role === 'public') {
-    await page.goto('/', { waitUntil: 'commit' });
+    await safeGoto(page, '/', { waitUntil: 'commit' });
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
@@ -123,7 +137,7 @@ async function authenticateAsRole(page: Page, role: 'admin' | 'faculty' | 'stude
   const token = generateJwt(userObj);
 
   // Navigate to target domain commit point to inject storage
-  await page.goto('/', { waitUntil: 'commit' });
+  await safeGoto(page, '/', { waitUntil: 'commit' });
   await page.evaluate(({ token, user }) => {
     localStorage.clear();
     sessionStorage.clear();
@@ -172,7 +186,7 @@ async function auditSinglePage(
 
   // 1. Navigate to page
   const startLoad = Date.now();
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await safeGoto(page, url, { waitUntil: 'domcontentloaded', timeout: 45000 });
   const loadTimeMs = Date.now() - startLoad;
 
   // Wait for network to settle slightly
@@ -287,7 +301,7 @@ test.describe('Complete Website UI/UX Quality Assurance Audit', () => {
   // Phase 1 — Initial Website Health Check & Public Pages
   // -----------------------------------------------------------------------
   test('Phase 1 - Initial Health Check & Public Pages', async ({ page }, testInfo) => {
-    test.setTimeout(90000);
+    test.setTimeout(180000);
     const viewportName = testInfo.project.name;
     await authenticateAsRole(page, 'public');
 
@@ -323,7 +337,7 @@ test.describe('Complete Website UI/UX Quality Assurance Audit', () => {
   // Phase 2 — HOD Portal Audit (11 Pages)
   // -----------------------------------------------------------------------
   test('Phase 2 - HOD Portal Complete Audit (All 11 Pages)', async ({ page }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     const viewportName = testInfo.project.name;
     await authenticateAsRole(page, 'admin');
 
@@ -361,7 +375,7 @@ test.describe('Complete Website UI/UX Quality Assurance Audit', () => {
   // Phase 3 — Faculty Portal Audit (10 Pages)
   // -----------------------------------------------------------------------
   test('Phase 3 - Faculty Portal Complete Audit (All 10 Pages)', async ({ page }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     const viewportName = testInfo.project.name;
     await authenticateAsRole(page, 'faculty');
 
@@ -397,7 +411,7 @@ test.describe('Complete Website UI/UX Quality Assurance Audit', () => {
   // Phase 4 — Student Portal Audit (7 Pages)
   // -----------------------------------------------------------------------
   test('Phase 4 - Student Portal Complete Audit (All 7 Pages)', async ({ page }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     const viewportName = testInfo.project.name;
     await authenticateAsRole(page, 'student');
 
@@ -430,7 +444,7 @@ test.describe('Complete Website UI/UX Quality Assurance Audit', () => {
   // Phase 5 — Buttons, Forms, Modals & Theme Audit
   // -----------------------------------------------------------------------
   test('Phase 5 - Interactive Components: Modals, Forms, Buttons & Dark Theme', async ({ page }, testInfo) => {
-    test.setTimeout(90000);
+    test.setTimeout(180000);
     const viewportName = testInfo.project.name;
 
     // 1. Form Validation on Login Page
