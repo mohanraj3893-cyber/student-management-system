@@ -3,13 +3,31 @@ import './style.css';
 import { initPushNotifications } from './push_notifications.js';
 
 // Provide native fallback for realtime events on Cloudflare Edge
-if (typeof window !== 'undefined' && !window.io) {
-  window.io = function() {
-    return {
-      on: function() {},
-      emit: function() {},
-      disconnect: function() {}
+if (typeof window !== 'undefined') {
+  if (!window.io) {
+    window.io = function() {
+      return {
+        on: function() {},
+        emit: function() {},
+        disconnect: function() {}
+      };
     };
+  }
+
+  // Defensive globals to avoid ReferenceError from legacy snippet copies
+  window.profData = window.profData || {};
+  window.p = window.p || {};
+  window.user = window.user || {};
+
+  window.getAvatarUrl = window.getAvatarUrl || function(name, photoPath) {
+    if (photoPath && typeof photoPath === 'string' && photoPath.trim() !== '' && photoPath !== 'null' && photoPath !== 'undefined') {
+      return photoPath.trim();
+    }
+    const initial = (name && typeof name === 'string' && name.trim() !== '') ? name.trim().charAt(0).toUpperCase() : 'U';
+    const palette = ['#0056D2', '#0F9D58', '#6A1B9A', '#D97706', '#DC2626', '#2563EB', '#7C3AED'];
+    const charCode = initial.charCodeAt(0) || 85;
+    const bg = palette[charCode % palette.length];
+    return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='${encodeURIComponent(bg)}'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3E${initial}%3C/text%3E%3C/svg%3E`;
   };
 }
 
