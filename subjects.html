@@ -255,7 +255,6 @@
                   <tr>
                     <th>Subject Code</th>
                     <th>Subject Name</th>
-                    <th>Credits</th>
                     <th>Department</th>
                     <th>Semester</th>
                     <th>Assigned Faculty</th>
@@ -299,20 +298,9 @@
             <input type="text" id="modal-sub-name" required placeholder="e.g. Database Management Systems" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
           </div>
 
-          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-            <div style="flex: 1;">
-              <label for="modal-credits" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Credits</label>
-              <select id="modal-credits" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
-                <option value="1">1 Credit</option>
-                <option value="2">2 Credits</option>
-                <option value="3" selected>3 Credits</option>
-                <option value="4">4 Credits</option>
-              </select>
-            </div>
-            <div style="flex: 1;">
-              <label for="modal-semester" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Semester</label>
-              <input type="text" id="modal-semester" required placeholder="e.g. V" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
-            </div>
+          <div style="margin-bottom: 16px;">
+            <label for="modal-semester" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Semester</label>
+            <input type="text" id="modal-semester" required placeholder="e.g. V" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
           </div>
 
           <div style="display: flex; gap: 16px; margin-bottom: 16px;">
@@ -513,7 +501,7 @@
             const semMsg = activeSemesterFilter && activeSemesterFilter !== 'all' ? ` for ${activeSemesterFilter}` : '';
             tbody.innerHTML = `
               <tr>
-                <td colspan="7" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 0.92rem;">
+                <td colspan="6" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 0.92rem;">
                   <div style="font-size: 1.6rem; margin-bottom: 0.35rem;">📚</div>
                   <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">No subjects found${semMsg}</div>
                   <div>Select another semester or adjust your search query.</div>
@@ -547,7 +535,6 @@
             tr.innerHTML = `
               <td><strong>${sub.code || sub.subject_code || sub.subjectCode}</strong></td>
               <td>${sub.name || sub.subject_name || sub.subjectName}</td>
-              <td>${sub.credits} Credits</td>
               <td>${sub.department || currentHodDept}</td>
               <td>${normalizeSemester(sub.semester)}</td>
               <td>${facultyColumnMarkup}</td>
@@ -602,7 +589,6 @@
         const pkInput = document.getElementById('subject-pk-id');
         const codeInput = document.getElementById('modal-sub-code');
         const nameInput = document.getElementById('modal-sub-name');
-        const creditsInput = document.getElementById('modal-credits');
         const semInput = document.getElementById('modal-semester');
         const yearSelect = document.getElementById('modal-year');
         const sectionSelect = document.getElementById('modal-section');
@@ -627,7 +613,6 @@
             codeInput.value = sub.code || sub.subject_code || sub.subjectCode || '';
             codeInput.disabled = true;
             nameInput.value = sub.name || sub.subject_name || sub.subjectName || '';
-            creditsInput.value = sub.credits || 3;
             semInput.value = sub.semester || '';
             if (yearSelect) yearSelect.value = sub.year || 'III-Year';
             if (sectionSelect) sectionSelect.value = sub.section || 'A';
@@ -665,7 +650,7 @@
             const id = pkInput.value;
             const code = codeInput ? codeInput.value.trim() : '';
             const name = nameInput ? nameInput.value.trim() : '';
-            const credits = creditsInput ? parseInt(creditsInput.value, 10) : 3;
+            const credits = 3;
             const semester = semInput ? semInput.value.trim() : '';
             const year = yearSelect ? yearSelect.value : 'III-Year';
             const section = sectionSelect ? sectionSelect.value : 'A';
