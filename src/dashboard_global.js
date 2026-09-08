@@ -2,6 +2,17 @@ import './api_config.js';
 import './style.css';
 import { initPushNotifications } from './push_notifications.js';
 
+// Provide native fallback for realtime events on Cloudflare Edge
+if (typeof window !== 'undefined' && !window.io) {
+  window.io = function() {
+    return {
+      on: function() {},
+      emit: function() {},
+      disconnect: function() {}
+    };
+  };
+}
+
 // Ensure PWA Manifest link exists in document head
 if (!document.querySelector('link[rel="manifest"]')) {
   const manifestLink = document.createElement('link');

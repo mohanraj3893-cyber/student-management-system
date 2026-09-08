@@ -2855,6 +2855,16 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Handle /socket.io on Cloudflare Edge without 404
+    if (url.pathname.startsWith('/socket.io')) {
+      return new Response('window.io = function() { return { on: function(){}, emit: function(){}, disconnect: function(){} }; };', {
+        headers: {
+          'Content-Type': 'application/javascript; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    }
+
     // Route /api/* to D1 Serverless Edge Router
     if (url.pathname.startsWith('/api')) {
       return handleApiRequest(request, env);
