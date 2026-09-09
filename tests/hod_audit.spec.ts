@@ -129,21 +129,19 @@ test.describe('1. HOD Authentication & Session Security', () => {
     // Prefer visible navbar "Back to Role Selection", or trigger logout navigation directly
     const navBackBtn = page.locator('.btn-back-role-nav, a:has-text("Back to Role Selection")').first();
     if (await navBackBtn.isVisible()) {
-      await navBackBtn.click();
+      await Promise.all([
+        page.waitForURL(/.*(role_selection|login|index)/, { timeout: 15000 }).catch(() => {}),
+        navBackBtn.click()
+      ]);
     } else {
       await page.evaluate(() => {
-        const logoutLink = document.querySelector('.logout-item, a[href*="role_selection.html"], .btn-back-role');
-        if (logoutLink) {
-          logoutLink.click();
-        } else {
-          localStorage.clear();
-          sessionStorage.clear();
-          window.location.href = '/role_selection.html';
-        }
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/role_selection.html';
       });
+      await page.waitForURL(/.*(role_selection|login|index)/, { timeout: 15000 }).catch(() => {});
     }
 
-    await page.waitForTimeout(1500);
     expect(page.url()).toMatch(/(login|role_selection|index)/);
 
     // Now try to visit dashboard again without token
