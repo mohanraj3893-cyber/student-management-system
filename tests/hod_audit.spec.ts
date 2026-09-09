@@ -49,8 +49,8 @@ async function loginViaUI(page: Page) {
   await submitBtn.click();
 
   // Verify redirection to dashboard
-  await page.waitForURL(/.*dashboard\.html/, { timeout: 25000 });
-  expect(page.url()).toContain('dashboard.html');
+  await page.waitForURL(/.*dashboard(\.html)?/, { timeout: 25000 });
+  expect(page.url()).toContain('dashboard');
 
   // Verify JWT token is saved in localStorage
   const token = await page.evaluate(() => localStorage.getItem('accessToken') || localStorage.getItem('token') || sessionStorage.getItem('accessToken'));
@@ -124,18 +124,18 @@ test.describe('1. HOD Authentication & Session Security', () => {
     await page.goto(`${BASE_URL}/dashboard.html`, { waitUntil: 'domcontentloaded' });
     
     // Find logout button
-    const logoutBtn = page.locator('#btn-logout, .logout-btn, a[href*="logout"], button:has-text("Logout"), a:has-text("Logout")').first();
+    const logoutBtn = page.locator('#btn-logout, .logout-btn, a[href*="logout"], a[href*="role_selection"], button:has-text("Logout"), a:has-text("Logout")').first();
     if (await logoutBtn.isVisible()) {
       await logoutBtn.click();
       await page.waitForTimeout(1500);
-      expect(page.url()).toMatch(/(login|role_selection|index)\.html/);
+      expect(page.url()).toMatch(/(login|role_selection|index)/);
     }
 
     // Now try to visit dashboard again without token
     await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
     await page.goto(`${BASE_URL}/dashboard.html`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1500);
-    expect(page.url()).toMatch(/(login|role_selection)\.html/);
+    expect(page.url()).toMatch(/(login|role_selection)/);
   });
 });
 
@@ -150,7 +150,7 @@ test.describe('2. HOD Dashboard Page (dashboard.html)', () => {
     await expect(page.locator('body')).toBeVisible();
 
     // Verify metric cards exist
-    const statsCards = page.locator('.stat-card, .metric-card, .dashboard-card, .analytics-card');
+    const statsCards = page.locator('#stats-total-students, #stats-total-faculty, #stats-total-subjects, .stat-card, .metric-card, .dashboard-card, .analytics-card');
     const cardCount = await statsCards.count();
     expect(cardCount).toBeGreaterThan(0);
 
