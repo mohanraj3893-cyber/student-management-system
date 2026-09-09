@@ -224,8 +224,8 @@ test.describe('4. New Registrations (new_registrations.html)', () => {
     await page.goto(`${BASE_URL}/new_registrations.html`, { waitUntil: 'networkidle' });
 
     // Check tabs exist
-    const studentTab = page.locator('#tab-students, [data-tab="students"], button:has-text("Students"), a:has-text("Students")').first();
-    const facultyTab = page.locator('#tab-faculty, [data-tab="faculty"], button:has-text("Faculty"), a:has-text("Faculty")').first();
+    const studentTab = page.locator('#btn-tab-students');
+    const facultyTab = page.locator('#btn-tab-faculty');
 
     await expect(studentTab).toBeVisible();
     await expect(facultyTab).toBeVisible();
