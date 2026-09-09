@@ -470,8 +470,6 @@
     <!-- Alert toast container -->
     <div id="toast-message-banner" style="position: fixed; bottom: 24px; right: 24px; z-index: 1100; padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none;"></div>
 
-    <!-- Load Socket.io client script -->
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="module" src="/src/dashboard_global.js"></script>
     <script type="module">
       document.addEventListener('DOMContentLoaded', () => {
@@ -491,24 +489,6 @@
 
         if (navName) navName.id = 'nav-profile-name';
         if (sidebarName) sidebarName.id = 'sidebar-profile-name';
-
-        // Connect WebSocket for real-time changes
-        if (typeof io !== 'undefined') {
-          try {
-            const socket = io('http://localhost:5000');
-            socket.on('connect', () => {
-              console.log('[Socket] Connected to real-time notification socket.');
-            });
-
-            socket.on('attendanceUpdated', (data) => {
-              console.log('[Socket] Attendance updated event received:', data);
-              showToast('Real-time sync: Attendance records updated.', true);
-              reloadActiveRoleView();
-            });
-          } catch(e) {
-            console.error('Socket init error:', e);
-          }
-        }
 
         // Listen for global custom event
         document.addEventListener('sms:realtime_event', (e) => {

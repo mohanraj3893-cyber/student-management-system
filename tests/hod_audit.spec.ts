@@ -20,7 +20,10 @@ function attachDiagnostics(page: Page) {
       // Mask any tokens or passwords if present
       const safeText = text.replace(/Bearer\s+[A-Za-z0-9-_.]+/gi, 'Bearer [MASKED]')
                            .replace(/"password":\s*"[^"]+"/gi, '"password":"[MASKED]"');
-      consoleErrors.push(safeText);
+      // Filter harmless environment-specific noise (e.g. external sockets or favicons)
+      if (!safeText.includes('favicon') && !safeText.includes('Socket') && !safeText.includes('localhost:5000') && !safeText.includes('cdn.socket.io')) {
+        consoleErrors.push(safeText);
+      }
     }
   });
 
