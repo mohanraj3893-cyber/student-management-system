@@ -280,6 +280,9 @@ async function dispatchWebPush(db, env, sub, payload) {
       // Remove stale / expired device subscription
       await db.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?').bind(sub.endpoint).run();
     }
+  } catch (err) {
+    console.warn('[WebPush] Network delivery skipped for endpoint:', err.message);
+  }
 }
 
 async function createAndSendNotification(db, env, { userId, title, message, type, url, relatedId = null }) {
