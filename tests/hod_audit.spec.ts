@@ -398,8 +398,9 @@ test.describe('12. Settings Page (settings.html)', () => {
     await expect(page.locator('body')).toBeVisible();
 
     // Check profile email / name input exists
-    const emailField = page.locator('#profile-email, input[type="email"], #settings-email').first();
+    const emailField = page.locator('#set-hod-email, #profile-email, input[type="email"], #settings-email').first();
     if (await emailField.isVisible()) {
+      await page.waitForTimeout(500);
       const val = await emailField.inputValue();
       expect(val).toContain('csehod12@gmail.com');
     }

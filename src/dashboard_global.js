@@ -744,8 +744,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       
       backBtn.addEventListener('click', () => {
-        localStorage.removeItem('accessToken');
-        sessionStorage.removeItem('sms_user_profile_cache');
+        localStorage.clear();
+        sessionStorage.clear();
       });
       
       navRight.insertBefore(backBtn, navRight.firstChild);
@@ -755,7 +755,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.addEventListener('click', (e) => {
         const logoutLink = e.target.closest('a[href*="role_selection.html"], .logout-item, .btn-back-role');
         if (logoutLink) {
-          localStorage.removeItem('accessToken');
+          localStorage.clear();
+          sessionStorage.clear();
         }
       });
 

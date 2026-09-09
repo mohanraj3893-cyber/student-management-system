@@ -43,7 +43,7 @@ function showToast(message, isSuccess = true) {
   }, 3000);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initSettings() {
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) {
     window.location.href = '/login.html';
@@ -287,4 +287,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load profile on start
   await loadProfile();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSettings);
+} else {
+  initSettings();
+}
