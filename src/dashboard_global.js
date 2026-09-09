@@ -209,7 +209,7 @@ function initDashboardGlobal() {
         <div style="display:flex; align-items:center; gap:0.4rem;">
           <button id="mobile-notif-btn" class="notification-bell-btn" aria-label="Notifications" style="background:#F1F5F9; border:none; color:#1E293B; cursor:pointer; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; font-size:1rem;">
             🔔
-            <span class="bell-badge-count" style="position:absolute; top:-2px; right:-2px; width:16px; height:16px; background:#EF4444; color:white; font-size:10px; font-weight:700; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white;">4</span>
+            <span class="bell-badge-count" style="position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 3px; background:#EF4444; color:white; font-size:10px; font-weight:700; border-radius:8px; display:none; align-items:center; justify-content:center; border:2px solid white;">0</span>
           </button>
           <button id="mobile-theme-btn" aria-label="Toggle Dark Mode" style="background:#F1F5F9; border:none; color:#1E293B; cursor:pointer; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem;">
             🌙
@@ -1127,7 +1127,7 @@ function initDashboardGlobal() {
         const activeToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || authToken;
         try {
           await fetch('/api/notifications/read-all', {
-            method: 'PUT',
+            method: 'POST',
             headers: { 'Authorization': `Bearer ${activeToken}` }
           });
           await loadNotifications();
@@ -1227,6 +1227,20 @@ function initDashboardGlobal() {
         const unreadCount = data.unreadCount || 0;
         const notifications = data.notifications || [];
 
+        // Ensure all bell buttons have a badge element attached
+        document.querySelectorAll('.notification-bell-btn, #nav-notification-btn, #notif-bell, #mobile-notif-btn, #notif-btn, button[aria-label*="Notification"], button[aria-label*="notification"]').forEach(btn => {
+          if (!btn.querySelector('.bell-badge-count')) {
+            const b = document.createElement('span');
+            b.className = 'bell-badge-count';
+            b.style.cssText = 'position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 3px; background:#EF4444; color:white; font-size:10px; font-weight:700; border-radius:8px; display:none; align-items:center; justify-content:center; border:2px solid white;';
+            b.textContent = '0';
+            if (getComputedStyle(btn).position === 'static') {
+              btn.style.position = 'relative';
+            }
+            btn.appendChild(b);
+          }
+        });
+
         // Update all bell badges on current page
         document.querySelectorAll('.bell-badge-count').forEach(badge => {
           badge.textContent = unreadCount;
@@ -1265,13 +1279,20 @@ function initDashboardGlobal() {
           } else if (typeLower.includes('leave') || msgLower.includes('leave')) {
             icon = '📝';
             iconClass = 'notif-icon-leave';
+          } else if (typeLower.includes('attendance') || msgLower.includes('attendance')) {
+            icon = '📅';
+            iconClass = 'notif-icon-system';
+          } else if (typeLower.includes('marks') || msgLower.includes('marks')) {
+            icon = '📊';
+            iconClass = 'notif-icon-faculty';
           }
 
-          const timeStr = formatRelativeTime(item.createdAt);
+          const timeStr = formatRelativeTime(item.createdAt || item.created_at);
 
           div.innerHTML = `
             <div class="notif-icon-badge ${iconClass}">${icon}</div>
             <div class="notif-content-block">
+              ${item.title ? `<div style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:2px;">${item.title}</div>` : ''}
               <p class="notif-msg-text">${item.message}</p>
               <p class="notif-time-stamp">${timeStr}</p>
             </div>
@@ -1282,7 +1303,7 @@ function initDashboardGlobal() {
             if (!item.isRead) {
               try {
                 await fetch(`/api/notifications/${item.id}/read`, {
-                  method: 'PUT',
+                  method: 'POST',
                   headers: { 'Authorization': `Bearer ${activeToken}` }
                 });
                 item.isRead = true;
@@ -1294,6 +1315,11 @@ function initDashboardGlobal() {
                   b.style.display = val > 0 ? 'flex' : 'none';
                 });
               } catch (e) {}
+            }
+
+            if (item.url) {
+              window.location.href = item.url;
+              return;
             }
 
             const role = window.smsUserRole || currentRole || 'student';
@@ -1343,6 +1369,33 @@ function initDashboardGlobal() {
       if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
       return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
+
+    // Live badge sync on tab visibility change & periodic background poll
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        loadNotifications();
+      }
+    });
+
+    setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        const activeToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (activeToken) {
+          fetch('/api/notifications/unread-count', {
+            headers: { 'Authorization': `Bearer ${activeToken}` }
+          })
+          .then(res => res.json())
+          .then(data => {
+            const count = data.unreadCount || 0;
+            document.querySelectorAll('.bell-badge-count').forEach(badge => {
+              badge.textContent = count;
+              badge.style.display = count > 0 ? 'flex' : 'none';
+            });
+          })
+          .catch(() => {});
+        }
+      }
+    }, 30000);
   }
 
   // Initialize notification and push system immediately on page load

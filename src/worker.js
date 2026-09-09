@@ -280,8 +280,29 @@ async function dispatchWebPush(db, env, sub, payload) {
       // Remove stale / expired device subscription
       await db.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?').bind(sub.endpoint).run();
     }
+}
+
+async function createAndSendNotification(db, env, { userId, title, message, type, url, relatedId = null }) {
+  if (!db || !userId) return;
+  try {
+    const finalTitle = title || 'Notification';
+    const finalMsg = message || '';
+    const finalType = type || 'SYSTEM';
+    const finalUrl = url || '';
+
+    await db.prepare(`
+      INSERT INTO notifications (user_id, title, message, type, url, related_id, is_read, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)
+    `).bind(userId, finalTitle, finalMsg, finalType, finalUrl, relatedId).run();
+
+    await sendPushNotificationToUser(db, env, userId, {
+      title: finalTitle,
+      body: finalMsg,
+      url: finalUrl || '/dashboard.html',
+      type: finalType
+    });
   } catch (err) {
-    console.warn('[WebPush] Network delivery skipped for endpoint:', err.message);
+    console.error(`[Notification] Delivery error for user ${userId}:`, err);
   }
 }
 
@@ -310,6 +331,28 @@ async function handleApiRequest(request, env) {
   }
 
   try {
+    // Ensure notifications table exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL DEFAULT '',
+        message TEXT NOT NULL,
+        type TEXT NOT NULL DEFAULT 'SYSTEM',
+        url TEXT DEFAULT '',
+        related_id INTEGER,
+        is_read INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `).run().catch(() => {});
+
+    await db.prepare("ALTER TABLE notifications ADD COLUMN title TEXT DEFAULT ''").run().catch(() => {});
+    await db.prepare("ALTER TABLE notifications ADD COLUMN url TEXT DEFAULT ''").run().catch(() => {});
+    await db.prepare("ALTER TABLE notifications ADD COLUMN related_id INTEGER").run().catch(() => {});
+    await db.prepare("CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id)").run().catch(() => {});
+    await db.prepare("CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, is_read)").run().catch(() => {});
+
     // Ensure push_subscriptions table exists
     await db.prepare(`
       CREATE TABLE IF NOT EXISTS push_subscriptions (
@@ -324,6 +367,7 @@ async function handleApiRequest(request, env) {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `).run().catch(() => {});
+    await db.prepare("CREATE INDEX IF NOT EXISTS idx_push_user ON push_subscriptions(user_id)").run().catch(() => {});
 
     // Ensure class_incharges table exists with strict class unique constraint
     await db.prepare(`
@@ -504,16 +548,13 @@ async function handleApiRequest(request, env) {
             : `A new faculty member (${name || username}) has registered for ${targetDept} and is waiting for approval.`;
           const targetUrl = normalizedRole === 'student' ? '/new_registrations.html?tab=students' : '/new_registrations.html?tab=faculty';
 
-          await db.prepare(`
-            INSERT INTO notifications (user_id, message, is_read, type, related_id)
-            VALUES (?, ?, 0, ?, ?)
-          `).bind(hod.id, notifMessage, notifType, userId).run();
-
-          await sendPushNotificationToUser(db, env, hod.id, {
+          await createAndSendNotification(db, env, {
+            userId: hod.id,
             title: notifTitle,
-            body: notifMessage,
+            message: notifMessage,
+            type: notifType,
             url: targetUrl,
-            type: notifType
+            relatedId: userId
           });
         }
       }
@@ -766,6 +807,15 @@ async function handleApiRequest(request, env) {
       await db.prepare('UPDATE users SET is_approved = 1 WHERE id = ?').bind(targetUserId).run();
       await db.prepare("UPDATE notifications SET is_read = 1 WHERE related_id = ? AND (type = 'NEW_STUDENT_REGISTRATION' OR type = 'NEW_FACULTY_REGISTRATION' OR type = 'NEW_REGISTRATION')")
         .bind(targetUserId).run();
+
+      await createAndSendNotification(db, env, {
+        userId: targetUserId,
+        title: '🎉 Account Approved',
+        message: 'Your registration has been approved by the HOD. You now have full access to the portal.',
+        type: 'ACCOUNT_APPROVED',
+        url: '/dashboard.html'
+      });
+
       return jsonResponse({ success: true, message: 'User approved successfully.' });
     }
 
@@ -1959,11 +2009,13 @@ async function handleApiRequest(request, env) {
 
         const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(sId).first();
         if (sUser?.user_id) {
-          await sendPushNotificationToUser(db, env, sUser.user_id, {
-            title: '📅 Attendance Update',
-            body: `Your attendance for ${date} has been recorded as ${status}.`,
+          await createAndSendNotification(db, env, {
+            userId: sUser.user_id,
+            title: '📅 Attendance Updated',
+            message: `Your attendance for ${date} has been recorded as ${status}.`,
+            type: 'ATTENDANCE_UPDATE',
             url: '/student_attendance.html',
-            type: 'ATTENDANCE_UPDATE'
+            relatedId: sessionId
           });
         }
       }
@@ -1982,10 +2034,14 @@ async function handleApiRequest(request, env) {
 
       if (hod && hod.id) {
         const hodMsg = `Attendance completed for ${department} ${year} Sem ${semester} Sec ${section} (${date}).`;
-        await db.prepare(`
-          INSERT INTO notifications (user_id, message, is_read, type)
-          VALUES (?, ?, 0, 'ATTENDANCE_MARKED')
-        `).bind(hod.id, hodMsg).run().catch(() => {});
+        await createAndSendNotification(db, env, {
+          userId: hod.id,
+          title: '📋 Class Attendance Recorded',
+          message: hodMsg,
+          type: 'ATTENDANCE_MARKED',
+          url: '/attendance.html',
+          relatedId: sessionId
+        });
       }
 
       return jsonResponse({ success: true, message: 'Daily attendance saved successfully!' });
@@ -2209,11 +2265,13 @@ async function handleApiRequest(request, env) {
 
           const sUser = await db.prepare('SELECT user_id FROM students WHERE id = ?').bind(item.studentId).first();
           if (sUser?.user_id) {
-            await sendPushNotificationToUser(db, env, sUser.user_id, {
+            await createAndSendNotification(db, env, {
+              userId: sUser.user_id,
               title: '📝 Internal Marks Published',
-              body: `${subLabel} (${examType}) marks published: ${rawScore}/${maxVal}.`,
+              message: `${subLabel} (${examType}) marks published: ${rawScore}/${maxVal}.`,
+              type: 'MARKS_PUBLISHED',
               url: '/student_marks.html',
-              type: 'MARKS_PUBLISHED'
+              relatedId: subjectId
             });
           }
         }
@@ -2431,14 +2489,13 @@ async function handleApiRequest(request, env) {
       `).bind(student.id, leaveType, fromDate, toDate, numberOfDays, reason, typeof supportingDoc === 'string' ? supportingDoc : '').run();
 
       const notifMsg = `📝 New Leave Request: ${student.name || 'Student'} (${student.register_number || ''}) applied for ${leaveType} (${fromDate} to ${toDate} - ${numberOfDays} ${numberOfDays === 1 ? 'Day' : 'Days'}).`;
-      await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
-        .bind(assignedIncharge.faculty_user_id, notifMsg, 'leave_request', student.id).run();
-
-      await sendPushNotificationToUser(db, env, assignedIncharge.faculty_user_id, {
-        title: '📝 New Leave Application',
-        body: notifMsg,
+      await createAndSendNotification(db, env, {
+        userId: assignedIncharge.faculty_user_id,
+        title: '📝 New Student Leave Request',
+        message: notifMsg,
+        type: 'LEAVE_REQUEST_SUBMITTED',
         url: '/faculty_requests.html',
-        type: 'leave_request'
+        relatedId: student.id
       });
 
       return jsonResponse({ success: true, message: 'Leave application submitted to Class Incharge.' });
@@ -2630,26 +2687,24 @@ async function handleApiRequest(request, env) {
 
           if (hod?.id) {
             const msg = `Class Incharge recommended leave for ${leaveRecord.student_name}. Awaiting your final approval.`;
-            await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
-              .bind(hod.id, msg, 'LEAVE_FORWARDED', leaveId).run();
-
-            await sendPushNotificationToUser(db, env, hod.id, {
-              title: '📑 Leave Pending HOD Approval',
-              body: msg,
+            await createAndSendNotification(db, env, {
+              userId: hod.id,
+              title: '📑 Leave Recommended by Incharge',
+              message: msg,
+              type: 'LEAVE_FORWARDED',
               url: '/leave.html',
-              type: 'LEAVE_FORWARDED'
+              relatedId: leaveId
             });
           }
         } else if (nextStatus === 'APPROVED' && leaveRecord.student_user_id) {
           const msg = `Your leave application (${leaveRecord.from_date} to ${leaveRecord.to_date}) has been approved.`;
-          await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
-            .bind(leaveRecord.student_user_id, msg, 'LEAVE_APPROVED', leaveId).run();
-
-          await sendPushNotificationToUser(db, env, leaveRecord.student_user_id, {
+          await createAndSendNotification(db, env, {
+            userId: leaveRecord.student_user_id,
             title: '✅ Leave Approved',
-            body: msg,
+            message: msg,
+            type: 'LEAVE_APPROVED',
             url: '/student_leave.html',
-            type: 'LEAVE_APPROVED'
+            relatedId: leaveId
           });
         }
       }
@@ -2696,14 +2751,13 @@ async function handleApiRequest(request, env) {
 
       if (leaveRecord?.student_user_id) {
         const msg = `Your leave application was rejected: ${rejectReason}.`;
-        await db.prepare('INSERT INTO notifications (user_id, message, is_read, type, related_id) VALUES (?, ?, 0, ?, ?)')
-          .bind(leaveRecord.student_user_id, msg, 'LEAVE_REJECTED', leaveId).run();
-
-        await sendPushNotificationToUser(db, env, leaveRecord.student_user_id, {
+        await createAndSendNotification(db, env, {
+          userId: leaveRecord.student_user_id,
           title: '❌ Leave Request Rejected',
-          body: msg,
+          message: msg,
+          type: 'LEAVE_REJECTED',
           url: '/student_leave.html',
-          type: 'LEAVE_REJECTED'
+          relatedId: leaveId
         });
       }
 
@@ -2758,11 +2812,13 @@ async function handleApiRequest(request, env) {
 
       const targets = await db.prepare(targetQuery).bind(...targetParams).all();
       for (const t of (targets.results || [])) {
-        await sendPushNotificationToUser(db, env, t.id, {
+        if (t.id === authUser.id) continue;
+        await createAndSendNotification(db, env, {
+          userId: t.id,
           title: `📢 ${body.title}`,
-          body: body.content?.substring(0, 100) || 'New announcement published.',
-          url: '/announcements.html',
-          type: 'ANNOUNCEMENT'
+          message: body.content?.substring(0, 120) || 'New announcement published.',
+          type: 'ANNOUNCEMENT',
+          url: '/announcements.html'
         });
       }
 
@@ -2784,20 +2840,58 @@ async function handleApiRequest(request, env) {
     // =============================================================
     if (path === '/api/notifications' && method === 'GET') {
       const authUser = await getUserFromRequest(request, env);
-      if (!authUser) return jsonResponse({ notifications: [], unreadCount: 0 });
+      if (!authUser) return jsonResponse({ success: true, notifications: [], unreadCount: 0 });
 
-      const results = await db.prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 30')
-        .bind(authUser.id).all();
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10) || 20, 50);
+      const page = Math.max(parseInt(url.searchParams.get('page') || '1', 10) || 1, 1);
+      const offset = (page - 1) * limit;
+
+      const results = await db.prepare(`
+        SELECT id, user_id, COALESCE(title, type) as title, message, type, COALESCE(url, '') as url, related_id, is_read, created_at
+        FROM notifications
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT ? OFFSET ?
+      `).bind(authUser.id, limit, offset).all();
+
+      const countRow = await db.prepare('SELECT COUNT(*) as unread FROM notifications WHERE user_id = ? AND is_read = 0')
+        .bind(authUser.id).first();
+      const unreadCount = countRow?.unread || 0;
 
       const notifs = (results.results || []).map(n => ({
-        ...n,
+        id: n.id,
+        user_id: n.user_id,
+        userId: n.user_id,
+        title: n.title || 'Notification',
+        message: n.message,
+        type: n.type,
+        url: n.url || '',
+        relatedId: n.related_id,
+        related_id: n.related_id,
+        is_read: n.is_read,
         isRead: Boolean(n.is_read),
+        created_at: n.created_at,
         createdAt: n.created_at
       }));
 
-      const unreadCount = notifs.filter(n => !n.isRead).length;
+      return jsonResponse({
+        success: true,
+        notifications: notifs,
+        unreadCount,
+        page,
+        limit
+      });
+    }
 
-      return jsonResponse({ success: true, notifications: notifs, unreadCount });
+    if (path === '/api/notifications/unread-count' && method === 'GET') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ success: true, unreadCount: 0 });
+
+      const countRow = await db.prepare('SELECT COUNT(*) as unread FROM notifications WHERE user_id = ? AND is_read = 0')
+        .bind(authUser.id).first();
+      const unreadCount = countRow?.unread || 0;
+
+      return jsonResponse({ success: true, unreadCount });
     }
 
     if (path === '/api/notifications/read-all' && (method === 'POST' || method === 'PUT')) {
@@ -2817,6 +2911,17 @@ async function handleApiRequest(request, env) {
         .bind(notifReadMatch[1], authUser.id).run();
 
       return jsonResponse({ success: true, message: 'Notification marked as read.' });
+    }
+
+    const notifDeleteMatch = path.match(/^\/api\/notifications\/(\d+)$/);
+    if (notifDeleteMatch && method === 'DELETE') {
+      const authUser = await getUserFromRequest(request, env);
+      if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
+
+      await db.prepare('DELETE FROM notifications WHERE id = ? AND user_id = ?')
+        .bind(notifDeleteMatch[1], authUser.id).run();
+
+      return jsonResponse({ success: true, message: 'Notification deleted.' });
     }
 
     // =============================================================
@@ -2977,9 +3082,11 @@ async function handleApiRequest(request, env) {
       const authUser = await getUserFromRequest(request, env);
       if (!authUser) return jsonResponse({ message: 'Unauthorized' }, 401);
 
-      await sendPushNotificationToUser(db, env, authUser.id, {
-        title: '🔔 SMS Portal Push Notification',
-        body: 'Web Push is working perfectly on this device via Cloudflare Native Edge!',
+      await createAndSendNotification(db, env, {
+        userId: authUser.id,
+        title: '🔔 SMS Push & In-App Notification',
+        message: 'Push and In-App notifications are working seamlessly via Cloudflare Edge & D1 single source of truth!',
+        type: 'PUSH_TEST',
         url: '/dashboard.html'
       });
 
