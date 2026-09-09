@@ -11,6 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
       (function() {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (!token) {
+          window.location.replace('/role_selection.html');
+          return;
+        }
         document.documentElement.classList.add('no-transition');
         if (localStorage.getItem('theme') === 'dark') {
           document.documentElement.classList.add('dark-theme');
