@@ -33,3 +33,4 @@ scratch/
 # Playwright Test Artifacts
 playwright-report/
 test-results/
+test-results*/
