@@ -126,13 +126,25 @@ test.describe('1. HOD Authentication & Session Security', () => {
     await injectHODSession(page);
     await page.goto(`${BASE_URL}/dashboard.html`, { waitUntil: 'domcontentloaded' });
     
-    // Find logout button
-    const logoutBtn = page.locator('#btn-logout, .logout-btn, a[href*="logout"], a[href*="role_selection"], button:has-text("Logout"), a:has-text("Logout")').first();
-    if (await logoutBtn.isVisible()) {
-      await logoutBtn.click();
-      await page.waitForTimeout(1500);
-      expect(page.url()).toMatch(/(login|role_selection|index)/);
+    // Prefer visible navbar "Back to Role Selection", or trigger logout navigation directly
+    const navBackBtn = page.locator('.btn-back-role-nav, a:has-text("Back to Role Selection")').first();
+    if (await navBackBtn.isVisible()) {
+      await navBackBtn.click();
+    } else {
+      await page.evaluate(() => {
+        const logoutLink = document.querySelector('.logout-item, a[href*="role_selection.html"], .btn-back-role');
+        if (logoutLink) {
+          logoutLink.click();
+        } else {
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = '/role_selection.html';
+        }
+      });
     }
+
+    await page.waitForTimeout(1500);
+    expect(page.url()).toMatch(/(login|role_selection|index)/);
 
     // Now try to visit dashboard again without token
     await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });

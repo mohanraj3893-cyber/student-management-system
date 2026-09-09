@@ -39,7 +39,7 @@ if (!document.querySelector('link[rel="manifest"]')) {
   document.head.appendChild(manifestLink);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initDashboardGlobal() {
 
   /* ==========================================
      0. DYNAMIC ACCENT COLOR THEME INJECTION (FACULTY / STUDENT / ADMIN)
@@ -1353,5 +1353,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loadDashboardData();
+}
 
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDashboardGlobal);
+} else {
+  initDashboardGlobal();
+}
