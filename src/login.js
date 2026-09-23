@@ -1,7 +1,6 @@
-import './api_config.js';
 import './style.css';
 
-function initLogin() {
+document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================
      ROLE CONFIGURATIONS (MATCHING MOCKUPS)
      ========================================== */
@@ -282,17 +281,8 @@ function initLogin() {
         // Clear any previous session or cached state completely
         localStorage.clear();
         sessionStorage.clear();
-        const activeToken = data.accessToken || data.token;
-        localStorage.setItem('accessToken', activeToken);
-        localStorage.setItem('token', activeToken);
+        localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('user_role', data.user.role);
-        localStorage.setItem('role', data.user.role);
-        sessionStorage.setItem('accessToken', activeToken);
-        sessionStorage.setItem('token', activeToken);
-        sessionStorage.setItem('user', JSON.stringify(data.user));
-        sessionStorage.setItem('user_role', data.user.role);
-        sessionStorage.setItem('role', data.user.role);
 
         showAlert('Login successful! Redirecting...', 'success');
 
@@ -321,10 +311,4 @@ function initLogin() {
       }
     });
   }
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLogin);
-} else {
-  initLogin();
-}
+});

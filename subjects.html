@@ -255,7 +255,7 @@
                   <tr>
                     <th>Subject Code</th>
                     <th>Subject Name</th>
-                    <th>Department</th>
+                    <th>Credits</th>
                     <th>Semester</th>
                     <th>Assigned Faculty</th>
                     <th class="text-right">Actions</th>
@@ -280,7 +280,7 @@
 
     <!-- Add / Edit Subject Modal -->
     <div id="subject-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
-      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 540px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color, #e2e8f0);">
+      <div style="background: var(--bg-card, #fff); padding: 24px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color, #e2e8f0);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h3 id="modal-title" style="font-size: 18px; font-weight: 600; color: var(--text-primary, #1e293b); margin: 0;">Add New Subject</h3>
           <button id="btn-close-modal" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1;">&times;</button>
@@ -298,56 +298,33 @@
             <input type="text" id="modal-sub-name" required placeholder="e.g. Database Management Systems" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
           </div>
 
-          <div style="margin-bottom: 16px;">
-            <label for="modal-semester" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Semester</label>
-            <input type="text" id="modal-semester" required placeholder="e.g. V" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
-          </div>
-
           <div style="display: flex; gap: 16px; margin-bottom: 16px;">
             <div style="flex: 1;">
-              <label for="modal-year" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Year</label>
-              <select id="modal-year" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
-                <option value="I-Year">1st Year (I-Year)</option>
-                <option value="II-Year">2nd Year (II-Year)</option>
-                <option value="III-Year" selected>3rd Year (III-Year)</option>
-                <option value="IV-Year">4th Year (IV-Year)</option>
+              <label for="modal-credits" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Credits</label>
+              <select id="modal-credits" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+                <option value="1">1 Credit</option>
+                <option value="2">2 Credits</option>
+                <option value="3" selected>3 Credits</option>
+                <option value="4">4 Credits</option>
               </select>
             </div>
             <div style="flex: 1;">
-              <label for="modal-section" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Section</label>
-              <select id="modal-section" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
-                <option value="A" selected>Section A</option>
-                <option value="B">Section B</option>
-                <option value="C">Section C</option>
-                <option value="ALL">All Sections</option>
-              </select>
+              <label for="modal-semester" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Semester</label>
+              <input type="text" id="modal-semester" required placeholder="e.g. V" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
             </div>
           </div>
 
-          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-            <div style="flex: 1;">
-              <label for="modal-department" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Department *</label>
-              <select id="modal-department" disabled required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #f1f5f9); color: var(--text-primary); cursor: not-allowed; outline: none;">
-                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
-                <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
-                <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
-              </select>
-            </div>
-            <div style="flex: 1;">
-              <label for="modal-faculty-id" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Assigned Faculty Advisor</label>
-              <select id="modal-faculty-id" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
-                <option value="">-- Unassigned --</option>
-                <!-- Populated dynamically from approved faculty list -->
-              </select>
-            </div>
+          <div style="margin-bottom: 20px;">
+            <label for="modal-faculty-id" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text-primary);">Assigned Faculty Advisor</label>
+            <select id="modal-faculty-id" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 6px; background: var(--bg-input, #fff); color: var(--text-primary); outline: none;">
+              <option value="">-- Unassigned --</option>
+              <!-- Populated dynamically from approved faculty list -->
+            </select>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 12px;">
           <div style="display: flex; justify-content: flex-end; gap: 12px;">
             <button type="button" id="btn-cancel-modal" class="btn btn-secondary" style="padding: 8px 16px;">Cancel</button>
-            <button type="submit" id="save-subject-btn" class="btn btn-primary" style="padding: 8px 16px;">Save Changes</button>
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Save Changes</button>
           </div>
         </form>
       </div>
@@ -361,11 +338,9 @@
       document.addEventListener('DOMContentLoaded', () => {
         let subjectsList = [];
         let facultyList = [];
-        let currentHodDept = 'Computer Science & Engineering';
 
         function showToast(message, success = true) {
           const toast = document.getElementById('toast-message-banner');
-          if (!toast) return;
           toast.textContent = message;
           toast.style.backgroundColor = success ? '#10B981' : '#EF4444';
           toast.style.transform = 'translateY(0)';
@@ -374,29 +349,6 @@
             toast.style.transform = 'translateY(100px)';
             toast.style.opacity = '0';
           }, 3500);
-        }
-
-        // Load HOD Profile to set read-only department
-        async function fetchHodProfile() {
-          const token = localStorage.getItem('accessToken');
-          if (!token) return;
-          try {
-            const res = await fetch('/api/auth/profile', {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-              const p = await res.json();
-              if (p.department) {
-                currentHodDept = p.department;
-                const deptSelect = document.getElementById('modal-department');
-                if (deptSelect) {
-                  deptSelect.value = currentHodDept;
-                }
-              }
-            }
-          } catch (e) {
-            console.error('Error fetching HOD profile:', e);
-          }
         }
 
         // Fetch subjects
@@ -420,20 +372,12 @@
               throw new Error('Failed to fetch subjects from DB.');
             }
 
-            const result = await res.json().catch(() => ({}));
-            const rawList = Array.isArray(result)
-              ? result
-              : Array.isArray(result?.subjects)
-                ? result.subjects
-                : Array.isArray(result?.data)
-                  ? result.data
-                  : [];
-            subjectsList = rawList;
+            subjectsList = await res.json();
             applyFilters();
 
           } catch (error) {
             console.error('Error fetching subjects:', error);
-            showToast(error.message || 'Failed to fetch subjects.', false);
+            showToast(error.message, false);
           }
         }
 
@@ -460,15 +404,7 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
-              const result = await res.json().catch(() => ({}));
-              const rawList = Array.isArray(result)
-                ? result
-                : Array.isArray(result?.faculty)
-                  ? result.faculty
-                  : Array.isArray(result?.data)
-                    ? result.data
-                    : [];
-              facultyList = rawList;
+              facultyList = await res.json();
               populateFacultyDropdown(facultyList);
             }
           } catch (e) {
@@ -478,13 +414,12 @@
 
         function populateFacultyDropdown(list) {
           const dropdown = document.getElementById('modal-faculty-id');
-          if (!dropdown) return;
+          // keep only first option
           dropdown.innerHTML = '<option value="">-- Unassigned --</option>';
-          const safeList = Array.isArray(list) ? list : [];
-          safeList.forEach(fac => {
+          list.forEach(fac => {
             const opt = document.createElement('option');
-            opt.value = fac.id;
-            opt.textContent = `${fac.name} (${fac.designation || 'Faculty'})`;
+            opt.value = fac.id; // database id
+            opt.textContent = `${fac.name} (${fac.designation})`;
             dropdown.appendChild(opt);
           });
         }
@@ -492,12 +427,9 @@
         // Render catalog table
         function renderSubjectsTable(list, activeSemesterFilter) {
           const tbody = document.getElementById('subject-table-body');
-          if (!tbody) return;
           tbody.innerHTML = '';
 
-          const safeList = Array.isArray(list) ? list : [];
-
-          if (safeList.length === 0) {
+          if (list.length === 0) {
             const semMsg = activeSemesterFilter && activeSemesterFilter !== 'all' ? ` for ${activeSemesterFilter}` : '';
             tbody.innerHTML = `
               <tr>
@@ -511,18 +443,19 @@
             return;
           }
 
-          safeList.forEach(sub => {
+          list.forEach(sub => {
             const tr = document.createElement('tr');
 
-            const facId = sub.facultyId || sub.faculty_id;
-            const facName = sub.assigned_faculty_name || sub.facultyName || sub.faculty_name || sub.assignedFaculty || sub.assigned_faculty;
-
             let facultyColumnMarkup = '<span class="badge-pill bg-red-light">Unassigned</span>';
-            if (facId && facName && facName !== 'Unassigned' && facName !== 'Not Assigned') {
+            if (sub.facultyId && sub.facultyName !== 'Not Assigned') {
+              const facName = sub.facultyName || 'Faculty';
+              const initials = facName.trim().split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2) || 'FA';
+              const colors = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
+              const color = colors[initials.charCodeAt(0) % colors.length];
               const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230056D2'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E"));
 
-              const matchedFac = facultyList.find(f => f.id === facId || f.userId === facId || f.name === facName);
-              const avatarUrl = getAvatar(facName, (matchedFac ? (matchedFac.photoPath || matchedFac.photo_path) : (sub.photoPath || sub.photo_path)));
+              const matchedFac = facultyList.find(f => f.id === sub.facultyId || f.userId === sub.facultyId);
+              const avatarUrl = getAvatar(facName, matchedFac ? matchedFac.photoPath : null);
 
               facultyColumnMarkup = `
                 <div class="table-faculty-badge">
@@ -533,9 +466,9 @@
             }
 
             tr.innerHTML = `
-              <td><strong>${sub.code || sub.subject_code || sub.subjectCode}</strong></td>
-              <td>${sub.name || sub.subject_name || sub.subjectName}</td>
-              <td>${sub.department || currentHodDept}</td>
+              <td><strong>${sub.code}</strong></td>
+              <td>${sub.name}</td>
+              <td>${sub.credits} Credits</td>
               <td>${normalizeSemester(sub.semester)}</td>
               <td>${facultyColumnMarkup}</td>
               <td class="text-right">
@@ -551,7 +484,7 @@
 
             // Delete Action
             tr.querySelector('.btn-delete-subject').addEventListener('click', async () => {
-              if (confirm(`Are you sure you want to delete subject ${sub.code || sub.subject_code}?`)) {
+              if (confirm(`Are you sure you want to delete subject ${sub.code}?`)) {
                 await deleteSubject(sub.id);
               }
             });
@@ -589,124 +522,92 @@
         const pkInput = document.getElementById('subject-pk-id');
         const codeInput = document.getElementById('modal-sub-code');
         const nameInput = document.getElementById('modal-sub-name');
+        const creditsInput = document.getElementById('modal-credits');
         const semInput = document.getElementById('modal-semester');
-        const yearSelect = document.getElementById('modal-year');
-        const sectionSelect = document.getElementById('modal-section');
-        const deptSelect = document.getElementById('modal-department');
         const facDropdown = document.getElementById('modal-faculty-id');
-        const saveSubjectBtn = document.getElementById('save-subject-btn');
 
         function openModal(sub = null) {
-          if (!modal || !subjectForm) return;
           modal.style.display = 'flex';
           subjectForm.reset();
-
-          // Set read-only department
-          if (deptSelect) {
-            deptSelect.value = (sub && sub.department) ? sub.department : currentHodDept;
-            deptSelect.disabled = true;
-          }
 
           if (sub) {
             modalTitle.textContent = 'Edit Subject';
             pkInput.value = sub.id;
-            codeInput.value = sub.code || sub.subject_code || sub.subjectCode || '';
-            codeInput.disabled = true;
-            nameInput.value = sub.name || sub.subject_name || sub.subjectName || '';
-            semInput.value = sub.semester || '';
-            if (yearSelect) yearSelect.value = sub.year || 'III-Year';
-            if (sectionSelect) sectionSelect.value = sub.section || 'A';
-            facDropdown.value = (sub.facultyId || sub.faculty_id || '');
+            codeInput.value = sub.code;
+            codeInput.disabled = true; // code is usually primary constraint
+            nameInput.value = sub.name;
+            creditsInput.value = sub.credits;
+            semInput.value = sub.semester;
+            facDropdown.value = sub.facultyId || '';
           } else {
             modalTitle.textContent = 'Add New Subject';
             pkInput.value = '';
             codeInput.disabled = false;
-            if (yearSelect) yearSelect.value = 'III-Year';
-            if (sectionSelect) sectionSelect.value = 'A';
             facDropdown.value = '';
           }
         }
 
         function closeModal() {
-          if (modal) modal.style.display = 'none';
+          modal.style.display = 'none';
         }
 
-        const closeBtn = document.getElementById('btn-close-modal');
-        if (closeBtn) closeBtn.addEventListener('click', closeModal);
-        const cancelBtn = document.getElementById('btn-cancel-modal');
-        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+        document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
 
         const addBtn = document.getElementById('btn-add-subject-trigger');
         if (addBtn) {
           addBtn.addEventListener('click', () => openModal(null));
         }
 
-        // Form submit listener
-        if (subjectForm) {
-          subjectForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Form submit
+        subjectForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-            const token = localStorage.getItem('accessToken');
-            const id = pkInput.value;
-            const code = codeInput ? codeInput.value.trim() : '';
-            const name = nameInput ? nameInput.value.trim() : '';
-            const credits = 3;
-            const semester = semInput ? semInput.value.trim() : '';
-            const year = yearSelect ? yearSelect.value : 'III-Year';
-            const section = sectionSelect ? sectionSelect.value : 'A';
-            const facultyId = (facDropdown && facDropdown.value) ? parseInt(facDropdown.value, 10) : null;
+          const token = localStorage.getItem('accessToken');
+          const id = pkInput.value;
+          const code = codeInput.value.trim();
+          const name = nameInput.value.trim();
+          const credits = parseInt(creditsInput.value);
+          const semester = semInput.value.trim();
+          const facultyId = facDropdown.value ? parseInt(facDropdown.value) : null;
 
-            const payload = { code, name, credits, semester, year, section, facultyId };
+          const payload = { code, name, credits, semester, facultyId };
 
-            console.log('[Frontend subjects.html] Submitting subject form with payload:', payload);
-
-            if (saveSubjectBtn) {
-              saveSubjectBtn.disabled = true;
-              saveSubjectBtn.textContent = 'Saving...';
+          try {
+            let res;
+            if (id) {
+              res = await fetch(`/api/subjects/${id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+            } else {
+              res = await fetch('/api/subjects', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
             }
 
-            try {
-              let res;
-              if (id) {
-                res = await fetch(`/api/subjects/${id}`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
-                  body: JSON.stringify(payload)
-                });
-              } else {
-                res = await fetch('/api/subjects', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
-                  body: JSON.stringify(payload)
-                });
-              }
-
-              const data = await res.json();
-              if (!res.ok) {
-                throw new Error(data.message || 'Operation failed.');
-              }
-
-              showToast(id ? 'Subject updated successfully!' : 'Subject created successfully!', true);
-              closeModal();
-              fetchSubjects();
-
-            } catch (error) {
-              console.error('[Frontend subjects.html] Error submitting form:', error);
-              showToast(error.message, false);
-            } finally {
-              if (saveSubjectBtn) {
-                saveSubjectBtn.disabled = false;
-                saveSubjectBtn.textContent = 'Save Changes';
-              }
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.message || 'Operation failed.');
             }
-          });
-        }
+
+            showToast(id ? 'Subject updated successfully!' : 'Subject created successfully!', true);
+            closeModal();
+            fetchSubjects();
+
+          } catch (error) {
+            showToast(error.message, false);
+          }
+        });
 
         // Unified Multi-Filter System (Search + Semester Filter)
         function applyFilters() {
@@ -741,7 +642,6 @@
 
         // Load initially
         async function init() {
-          await fetchHodProfile();
           await fetchFacultyOptions();
           await fetchSubjects();
         }

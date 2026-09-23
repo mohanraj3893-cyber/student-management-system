@@ -1,45 +1,7 @@
-import './api_config.js';
 import './style.css';
 import { initPushNotifications } from './push_notifications.js';
 
-// Provide native fallback for realtime events on Cloudflare Edge
-if (typeof window !== 'undefined') {
-  if (!window.io) {
-    window.io = function() {
-      return {
-        on: function() {},
-        emit: function() {},
-        disconnect: function() {}
-      };
-    };
-  }
-
-  // Defensive globals to avoid ReferenceError from legacy snippet copies
-  window.profData = window.profData || {};
-  window.p = window.p || {};
-  window.user = window.user || {};
-
-  window.getAvatarUrl = window.getAvatarUrl || function(name, photoPath) {
-    if (photoPath && typeof photoPath === 'string' && photoPath.trim() !== '' && photoPath !== 'null' && photoPath !== 'undefined') {
-      return photoPath.trim();
-    }
-    const initial = (name && typeof name === 'string' && name.trim() !== '') ? name.trim().charAt(0).toUpperCase() : 'U';
-    const palette = ['#0056D2', '#0F9D58', '#6A1B9A', '#D97706', '#DC2626', '#2563EB', '#7C3AED'];
-    const charCode = initial.charCodeAt(0) || 85;
-    const bg = palette[charCode % palette.length];
-    return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='${encodeURIComponent(bg)}'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3E${initial}%3C/text%3E%3C/svg%3E`;
-  };
-}
-
-// Ensure PWA Manifest link exists in document head
-if (!document.querySelector('link[rel="manifest"]')) {
-  const manifestLink = document.createElement('link');
-  manifestLink.rel = 'manifest';
-  manifestLink.href = '/manifest.webmanifest';
-  document.head.appendChild(manifestLink);
-}
-
-function initDashboardGlobal() {
+document.addEventListener('DOMContentLoaded', () => {
 
   /* ==========================================
      0. DYNAMIC ACCENT COLOR THEME INJECTION (FACULTY / STUDENT / ADMIN)
@@ -209,7 +171,7 @@ function initDashboardGlobal() {
         <div style="display:flex; align-items:center; gap:0.4rem;">
           <button id="mobile-notif-btn" class="notification-bell-btn" aria-label="Notifications" style="background:#F1F5F9; border:none; color:#1E293B; cursor:pointer; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; font-size:1rem;">
             🔔
-            <span class="bell-badge-count" style="position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 3px; background:#EF4444; color:white; font-size:10px; font-weight:700; border-radius:8px; display:none; align-items:center; justify-content:center; border:2px solid white;">0</span>
+            <span class="bell-badge-count" style="position:absolute; top:-2px; right:-2px; width:16px; height:16px; background:#EF4444; color:white; font-size:10px; font-weight:700; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white;">4</span>
           </button>
           <button id="mobile-theme-btn" aria-label="Toggle Dark Mode" style="background:#F1F5F9; border:none; color:#1E293B; cursor:pointer; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem;">
             🌙
@@ -549,8 +511,6 @@ function initDashboardGlobal() {
     if (cachedStr) {
       try {
         const cachedData = JSON.parse(cachedStr);
-        // Mark as from-cache so route guards do NOT redirect based on potentially stale data
-        cachedData._fromCache = true;
         populateDashboardUI(cachedData);
       } catch (e) {}
     }
@@ -665,30 +625,27 @@ function initDashboardGlobal() {
       const isClassIncharge = Boolean(data.user && data.user.isClassIncharge);
       sessionStorage.setItem('sms_is_class_incharge', isClassIncharge ? 'true' : 'false');
 
-      // If not a class incharge, hide the Attendance nav link and dashboard tile.
-      // DO NOT redirect away from faculty_attendance – the page itself shows
-      // a friendly "No class assigned" message for non-class-incharge faculty.
       if (!isClassIncharge) {
-        const isOnAttendancePage = currentPath.includes('faculty_attendance');
-        if (!isOnAttendancePage) {
-          document.querySelectorAll('a[href*="faculty_attendance.html"]').forEach(link => {
-            const item = link.closest('li, .mobile-nav-item, .bottom-nav-item');
-            if (item) {
-              item.style.display = 'none';
-            } else {
-              link.style.display = 'none';
-            }
-          });
-          document.querySelectorAll('[onclick*="faculty_attendance.html"]').forEach(tile => {
-            tile.style.display = 'none';
-          });
+        // Direct URL Protection for faculty_attendance.html
+        if (currentPath.includes('faculty_attendance.html')) {
+          window.location.href = '/faculty_dashboard.html';
+          return;
         }
-      }
 
-      // If on any attendance page, completely bypass all redirects – attendance pages manage their own state
-      if (currentPath.includes('attendance')) {
-        console.log('[DashboardGlobal] On attendance page – all global redirects bypassed.');
-        return;
+        // Hide/Remove Attendance from sidebars across desktop & mobile
+        document.querySelectorAll('a[href*="faculty_attendance.html"]').forEach(link => {
+          const item = link.closest('li, .mobile-nav-item, .bottom-nav-item');
+          if (item) {
+            item.style.display = 'none';
+          } else {
+            link.style.display = 'none';
+          }
+        });
+
+        // Hide/Remove Attendance quick action cards on dashboard
+        document.querySelectorAll('[onclick*="faculty_attendance.html"]').forEach(tile => {
+          tile.style.display = 'none';
+        });
       }
 
       if (
@@ -701,14 +658,10 @@ function initDashboardGlobal() {
         currentPath !== '/' &&
         currentPath !== '/index.html'
       ) {
-        console.warn('[DashboardGlobal] Redirecting faculty to faculty_dashboard.html from', currentPath);
         window.location.href = '/faculty_dashboard.html';
         return;
       }
     } else if (userRole === 'admin') {
-      if (currentPath.includes('attendance')) {
-        return;
-      }
       if (
         (currentPath.includes('student_') || currentPath.includes('faculty_')) &&
         !currentPath.includes('student_profile.html') &&
@@ -744,8 +697,8 @@ function initDashboardGlobal() {
       });
       
       backBtn.addEventListener('click', () => {
-        localStorage.clear();
-        sessionStorage.clear();
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('sms_user_profile_cache');
       });
       
       navRight.insertBefore(backBtn, navRight.firstChild);
@@ -755,8 +708,7 @@ function initDashboardGlobal() {
       document.addEventListener('click', (e) => {
         const logoutLink = e.target.closest('a[href*="role_selection.html"], .logout-item, .btn-back-role');
         if (logoutLink) {
-          localStorage.clear();
-          sessionStorage.clear();
+          localStorage.removeItem('accessToken');
         }
       });
 
@@ -766,53 +718,6 @@ function initDashboardGlobal() {
       const isFacultyRole = roleLower === 'faculty';
 
       const userName = data.user.name || data.user.username || '';
-      const userDept = (data.user && data.user.department) ? data.user.department : 'Computer Science & Engineering';
-
-      const deptShortMap = {
-        'Computer Science & Engineering': 'CSE',
-        'Information Technology': 'IT',
-        'Electronics & Communication Engineering': 'ECE',
-        'Electrical & Electronics Engineering': 'EEE',
-        'Artificial Intelligence & Data Science': 'AI&DS'
-      };
-
-      function getDeptShort(dept) {
-        if (!dept) return 'CSE';
-        const str = String(dept).trim();
-        if (deptShortMap[str]) return deptShortMap[str];
-
-        const lower = str.toLowerCase();
-        if (lower.includes('information') || lower.includes('it')) return 'IT';
-        if (lower.includes('electronics') || lower.includes('ece')) return 'ECE';
-        if (lower.includes('electrical') || lower.includes('eee')) return 'EEE';
-        if (lower.includes('artificial') || lower.includes('aids')) return 'AI&DS';
-        if (lower.includes('computer') || lower.includes('cse')) return 'CSE';
-
-        return str;
-      }
-
-      const deptShort = getDeptShort(userDept);
-
-      // Dynamic Sidebar Logo & Header Titles
-      document.querySelectorAll('.sidebar-logo-block .logo-title, .logo-title').forEach(el => {
-        el.textContent = deptShort;
-      });
-      document.querySelectorAll('.sidebar-logo-block .logo-subtitle, .logo-subtitle').forEach(el => {
-        el.textContent = `Department Portal`;
-      });
-      document.querySelectorAll('.navbar-title-block .navbar-title, .navbar-title').forEach(el => {
-        el.textContent = `${userDept} Department`;
-      });
-      document.querySelectorAll('.mobile-portal-title').forEach(el => {
-        el.textContent = `${deptShort} Portal`;
-      });
-
-      // Dynamic Browser Page Title for All Pages
-      if (document.title) {
-        const rawTitle = document.title;
-        const pageName = rawTitle.split('|')[0].trim() || 'Dashboard';
-        document.title = `${pageName} | ${deptShort} Portal`;
-      }
 
       // 2. Populate global navbar/sidebar profile names and roles across desktop and mobile
       const navNames = document.querySelectorAll('.nav-profile-name, #nav-profile-name');
@@ -826,12 +731,12 @@ function initDashboardGlobal() {
       }
 
       let roleText = 'Student';
-      if (isAdminOrHOD) roleText = `HOD - ${deptShort}`;
-      else if (isFacultyRole) roleText = `Faculty - ${deptShort}`;
+      if (isAdminOrHOD) roleText = 'HOD - CSE';
+      else if (isFacultyRole) roleText = 'Faculty - CSE';
 
       navRoles.forEach(el => el.textContent = roleText);
       sidebarRoles.forEach(el => {
-        el.textContent = isAdminOrHOD ? `HOD – ${userDept} Department` : (data.user.designation || `Faculty - ${deptShort}`);
+        el.textContent = isAdminOrHOD ? 'HOD - CSE Department' : (data.user.designation || 'Faculty - CSE');
       });
 
       // Always update avatar images across desktop & mobile
@@ -872,26 +777,11 @@ function initDashboardGlobal() {
 
       greetingSubtitles.forEach(el => {
         if (isAdminOrHOD) {
-          if (el.id === 'welcome-user-subtitle') {
-            const currentPath = window.location.pathname.toLowerCase();
-            if (currentPath.includes('attendance')) {
-              el.textContent = `Head of Department (HOD) | ${userDept}`;
-            } else {
-              el.textContent = `Here's what's happening in ${userDept} Department today.`;
-            }
-          } else {
-            el.textContent = `Head of Department (HOD) | ${userDept}`;
-          }
+          el.textContent = `Head of Department (HOD) | Computer Science & Engineering`;
         } else if (isFacultyRole) {
-          el.textContent = `${data.user.designation || 'Faculty Member'} | ${userDept}`;
+          el.textContent = `${data.user.designation || 'Faculty Member'} | Computer Science & Engineering`;
         } else {
-          el.textContent = `Student | ${userDept}`;
-        }
-      });
-
-      document.querySelectorAll('.leave-dept-subtitle, .navbar-subtitle').forEach(el => {
-        if (el.textContent && (el.textContent.includes('leave') || el.textContent.includes('requests') || el.textContent.includes('duty'))) {
-          el.textContent = `Approve or reject leave & duty requests from ${userDept} department`;
+          el.textContent = `Student | Computer Science & Engineering`;
         }
       });
 
@@ -990,6 +880,11 @@ function initDashboardGlobal() {
     }
     if (window.smsNotifSystemInitialized) return;
     window.smsNotifSystemInitialized = true;
+
+    // Initialize Cloudflare Native Push Notifications
+    if (typeof initPushNotifications === 'function') {
+      initPushNotifications();
+    }
 
     if (!document.getElementById('notif-system-styles')) {
       const styleEl = document.createElement('style');
@@ -1127,7 +1022,7 @@ function initDashboardGlobal() {
         const activeToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || authToken;
         try {
           await fetch('/api/notifications/read-all', {
-            method: 'POST',
+            method: 'PUT',
             headers: { 'Authorization': `Bearer ${activeToken}` }
           });
           await loadNotifications();
@@ -1227,20 +1122,6 @@ function initDashboardGlobal() {
         const unreadCount = data.unreadCount || 0;
         const notifications = data.notifications || [];
 
-        // Ensure all bell buttons have a badge element attached
-        document.querySelectorAll('.notification-bell-btn, #nav-notification-btn, #notif-bell, #mobile-notif-btn, #notif-btn, button[aria-label*="Notification"], button[aria-label*="notification"]').forEach(btn => {
-          if (!btn.querySelector('.bell-badge-count')) {
-            const b = document.createElement('span');
-            b.className = 'bell-badge-count';
-            b.style.cssText = 'position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 3px; background:#EF4444; color:white; font-size:10px; font-weight:700; border-radius:8px; display:none; align-items:center; justify-content:center; border:2px solid white;';
-            b.textContent = '0';
-            if (getComputedStyle(btn).position === 'static') {
-              btn.style.position = 'relative';
-            }
-            btn.appendChild(b);
-          }
-        });
-
         // Update all bell badges on current page
         document.querySelectorAll('.bell-badge-count').forEach(badge => {
           badge.textContent = unreadCount;
@@ -1279,20 +1160,13 @@ function initDashboardGlobal() {
           } else if (typeLower.includes('leave') || msgLower.includes('leave')) {
             icon = '📝';
             iconClass = 'notif-icon-leave';
-          } else if (typeLower.includes('attendance') || msgLower.includes('attendance')) {
-            icon = '📅';
-            iconClass = 'notif-icon-system';
-          } else if (typeLower.includes('marks') || msgLower.includes('marks')) {
-            icon = '📊';
-            iconClass = 'notif-icon-faculty';
           }
 
-          const timeStr = formatRelativeTime(item.createdAt || item.created_at);
+          const timeStr = formatRelativeTime(item.createdAt);
 
           div.innerHTML = `
             <div class="notif-icon-badge ${iconClass}">${icon}</div>
             <div class="notif-content-block">
-              ${item.title ? `<div style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:2px;">${item.title}</div>` : ''}
               <p class="notif-msg-text">${item.message}</p>
               <p class="notif-time-stamp">${timeStr}</p>
             </div>
@@ -1303,7 +1177,7 @@ function initDashboardGlobal() {
             if (!item.isRead) {
               try {
                 await fetch(`/api/notifications/${item.id}/read`, {
-                  method: 'POST',
+                  method: 'PUT',
                   headers: { 'Authorization': `Bearer ${activeToken}` }
                 });
                 item.isRead = true;
@@ -1315,11 +1189,6 @@ function initDashboardGlobal() {
                   b.style.display = val > 0 ? 'flex' : 'none';
                 });
               } catch (e) {}
-            }
-
-            if (item.url) {
-              window.location.href = item.url;
-              return;
             }
 
             const role = window.smsUserRole || currentRole || 'student';
@@ -1369,47 +1238,14 @@ function initDashboardGlobal() {
       if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
       return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
-
-    // Live badge sync on tab visibility change & periodic background poll
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        loadNotifications();
-      }
-    });
-
-    setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        const activeToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        if (activeToken) {
-          fetch('/api/notifications/unread-count', {
-            headers: { 'Authorization': `Bearer ${activeToken}` }
-          })
-          .then(res => res.json())
-          .then(data => {
-            const count = data.unreadCount || 0;
-            document.querySelectorAll('.bell-badge-count').forEach(badge => {
-              badge.textContent = count;
-              badge.style.display = count > 0 ? 'flex' : 'none';
-            });
-          })
-          .catch(() => {});
-        }
-      }
-    }, 30000);
   }
 
-  // Initialize notification and push system immediately on page load
+  // Initialize notification system immediately on page load
   const initialToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (initialToken) {
     initNotificationSystem(initialToken, 'user');
-    initPushNotifications(initialToken);
   }
 
   loadDashboardData();
-}
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDashboardGlobal);
-} else {
-  initDashboardGlobal();
-}
+});

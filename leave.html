@@ -557,7 +557,7 @@
             </button>
             <div class="navbar-title-block">
               <h2 class="navbar-title">Student Leave Requests</h2>
-              <span class="navbar-subtitle leave-dept-subtitle">Approve or reject leave & duty requests from CSE department</span>
+              <span class="navbar-subtitle">Approve or reject leave & duty requests from CSE department</span>
             </div>
           </div>
 
@@ -600,7 +600,7 @@
             <h2 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0;">
               Student Leave Requests
             </h2>
-            <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;" class="leave-dept-subtitle">
+            <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;">
               Approve or reject leave &amp; duty requests from CSE department
             </p>
           </div>
@@ -963,38 +963,17 @@
             const res = await fetch(`/api/admin/leaves${query}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            const data = await res.json().catch(() => ({}));
-            const requests = Array.isArray(data)
-              ? data
-              : Array.isArray(data.requests)
-                ? data.requests
-                : Array.isArray(data.leaves)
-                  ? data.leaves
-                  : [];
-
-            const stats = data.stats || {
-              total: requests.length,
-              pending: requests.filter(r => String(r.status || '').toUpperCase().includes('PENDING')).length,
-              approved: requests.filter(r => r.status === 'APPROVED').length,
-              rejected: requests.filter(r => r.status === 'REJECTED').length
-            };
+            if (!res.ok) throw new Error('Failed to load leave applications.');
+            const { stats, requests } = await res.json();
 
             // Populate Stats Cards
-            const stTotal = document.getElementById('stats-total');
-            if (stTotal) stTotal.textContent = stats.total || 0;
-
-            const stPending = document.getElementById('stats-pending');
-            if (stPending) stPending.textContent = stats.pending || 0;
-
-            const stApproved = document.getElementById('stats-approved');
-            if (stApproved) stApproved.textContent = stats.approved || 0;
-
-            const stRejected = document.getElementById('stats-rejected');
-            if (stRejected) stRejected.textContent = stats.rejected || 0;
+            document.getElementById('stats-total').textContent = stats.total;
+            document.getElementById('stats-pending').textContent = stats.pending;
+            document.getElementById('stats-approved').textContent = stats.approved;
+            document.getElementById('stats-rejected').textContent = stats.rejected;
 
             // Populate Table
             const tbody = document.getElementById('leaves-requests-tbody');
-            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (requests.length === 0) {
@@ -1026,13 +1005,12 @@
 
               const sName = r.student ? r.student.name : (r.studentName || 'Unknown');
               const regNo = r.student ? r.student.registerNumber : (r.registerNumber || 'N/A');
-              const leaveType = r.leaveType || r.leave_type || r.type || 'Medical Leave';
               const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
               const defaultAvatar = getAvatar(sName, null);
               const photo = getAvatar(sName, r.student ? r.student.photoPath : r.photoPath);
 
-              const fromD = new Date(r.fromDate || r.from_date || r.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-              const toD = new Date(r.toDate || r.to_date || r.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+              const fromD = new Date(r.fromDate || r.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              const toD = new Date(r.toDate || r.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
               const tr = document.createElement('tr');
               tr.innerHTML = `
@@ -1046,9 +1024,9 @@
                   </div>
                 </td>
                 <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #475569;">${regNo}</td>
-                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #0F172A; font-weight: 500;">${leaveType}</td>
+                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #0F172A; font-weight: 500;">${r.leaveType}</td>
                 <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.82rem; color: #475569; white-space: nowrap;">${fromD} - ${toD}</td>
-                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.85rem; font-weight: 700; color: #0F172A;">${(r.numberOfDays || r.number_of_days || r.days || 1)} ${(r.numberOfDays || r.number_of_days || r.days || 1) === 1 ? 'Day' : 'Days'}</td>
+                <td style="vertical-align: middle; padding: 12px 10px; font-size: 0.85rem; font-weight: 700; color: #0F172A;">${(r.numberOfDays || r.days || 1)} ${(r.numberOfDays || r.days || 1) === 1 ? 'Day' : 'Days'}</td>
                 <td style="vertical-align: middle; padding: 12px 10px;"><span class="badge-pill ${badgeClass}">${displayStatus}</span></td>
                 <td style="vertical-align: middle; padding: 12px 10px; white-space: nowrap;" class="text-right">
                   ${isHodActionable ? `
@@ -1123,14 +1101,11 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to fetch request details.');
-            const resData = await res.json();
-            const data = resData.leave || resData.data || resData;
+            const data = await res.json();
 
             // Student profile section
-            const studentObj = data.student || {};
-            const _stName = studentObj.name || data.studentName || data.name || 'Student';
-            const _stPhoto = studentObj.photoPath || studentObj.photo_path || data.photoPath || null;
-            const _stAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_stName, _stPhoto) : (_stPhoto ? _stPhoto : ''));
+            const _stName = data.student ? data.student.name : 'Student';
+            const _stAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_stName, data.student ? data.student.photoPath : null) : (data.student && data.student.photoPath ? data.student.photoPath : ''));
             const modalImg = document.getElementById('modal-student-img');
             if (modalImg) {
               modalImg.src = _stAvatar;
@@ -1138,50 +1113,26 @@
               modalImg.onerror = function() { this.onerror = null; this.src = (window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : ''); };
             }
             const stNameEl = document.getElementById('modal-student-name');
-            if (stNameEl) stNameEl.textContent = _stName;
+            if (stNameEl) stNameEl.textContent = data.student ? data.student.name : 'Unknown';
             const stRegEl = document.getElementById('modal-student-reg');
-            if (stRegEl) stRegEl.textContent = studentObj.registerNumber || studentObj.register_number || data.registerNumber || 'N/A';
+            if (stRegEl) stRegEl.textContent = data.student ? data.student.registerNumber : 'N/A';
             const stYearEl = document.getElementById('modal-student-year-sem');
-            if (stYearEl) {
-              const yVal = studentObj.year || data.year || '';
-              const sVal = studentObj.semester || data.semester || '';
-              let formattedYearSem = '-';
-              if (yVal && sVal) {
-                const normY = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
-                const normS = String(sVal).toLowerCase().includes('sem') ? sVal : `Sem ${sVal}`;
-                formattedYearSem = `${normY} / ${normS}`;
-              } else if (yVal) {
-                formattedYearSem = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
-              }
-              stYearEl.textContent = formattedYearSem;
-            }
+            if (stYearEl) stYearEl.textContent = data.student ? `${data.student.year} Year / Sem ${data.student.semester}` : '-';
 
             // Leave information
-            const lType = data.leaveType || data.leave_type || data.type || 'Medical Leave';
-            document.getElementById('modal-leave-type').textContent = lType;
-            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt || data.created_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-            
-            const fDate = data.fromDate || data.from_date || data.startDate;
-            const tDate = data.toDate || data.to_date || data.endDate;
-            document.getElementById('modal-leave-duration').textContent = `${new Date(fDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(tDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-            let numDaysVal = data.numberOfDays || data.number_of_days || data.days;
-            if (!numDaysVal && fDate && tDate) {
-              const s = new Date(fDate);
-              const e = new Date(tDate);
-              s.setHours(0, 0, 0, 0);
-              e.setHours(0, 0, 0, 0);
-              numDaysVal = Math.floor((e - s) / 86400000) + 1;
-            }
-            numDaysVal = numDaysVal > 0 ? numDaysVal : 1;
+            document.getElementById('modal-leave-type').textContent = data.leaveType;
+            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('modal-leave-duration').textContent = `${new Date(data.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(data.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+            const numDaysVal = data.numberOfDays || data.days || 1;
             document.getElementById('modal-leave-days').textContent = `${numDaysVal} ${numDaysVal === 1 ? 'Day' : 'Days'}`;
-            document.getElementById('modal-leave-reason').textContent = data.reason || 'No specific reason provided.';
+            document.getElementById('modal-leave-reason').textContent = data.reason;
 
             // Supporting document
             const docContainer = document.getElementById('modal-doc-container');
             const docLink = document.getElementById('modal-doc-link');
-            if (data.supportingDocument || data.supporting_document) {
+            if (data.supportingDocument) {
               docContainer.style.display = 'block';
-              docLink.href = `${data.supportingDocument || data.supporting_document}`;
+              docLink.href = `${data.supportingDocument}`;
             } else {
               docContainer.style.display = 'none';
             }
@@ -1318,8 +1269,7 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to load notifications.');
-            const rawNotifs = await res.json();
-            const list = Array.isArray(rawNotifs) ? rawNotifs : (rawNotifs.notifications || rawNotifs.data || []);
+            const list = await res.json();
 
             const unreadList = list.filter(n => !n.isRead);
             notifCountBadge.textContent = unreadList.length;
@@ -1398,6 +1348,5 @@
 
       });
     </script>
-    <script type="module" src="/src/dashboard_global.js"></script>
   </body>
 </html>

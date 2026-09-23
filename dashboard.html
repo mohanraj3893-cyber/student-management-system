@@ -11,11 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
       (function() {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        if (!token) {
-          window.location.replace('/role_selection.html');
-          return;
-        }
         document.documentElement.classList.add('no-transition');
         if (localStorage.getItem('theme') === 'dark') {
           document.documentElement.classList.add('dark-theme');
@@ -237,7 +232,7 @@
             <h2 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 0.4rem;" id="welcome-user-title">
               Welcome back 👋
             </h2>
-            <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;" id="welcome-user-subtitle">
+            <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;">
               Here's what's happening in CSE Department today.
             </p>
           </div>

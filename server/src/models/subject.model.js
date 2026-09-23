@@ -25,11 +25,6 @@ const Subject = sequelize.define('Subject', {
     type: DataTypes.STRING(50),
     allowNull: false
   },
-  year: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-    defaultValue: 'III-Year'
-  },
   section: {
     type: DataTypes.STRING(50),
     allowNull: false,
@@ -38,7 +33,7 @@ const Subject = sequelize.define('Subject', {
   department: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    defaultValue: 'Computer Science & Engineering'
+    defaultValue: 'CSE'
   },
   facultyId: {
     type: DataTypes.INTEGER,

@@ -1,4 +1,3 @@
-import './api_config.js';
 import './style.css';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0 -3 -3.87"></path>
+          <path d="M23 21v-2a4 4 0 0 3-3.87"></path>
           <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
       `,
@@ -380,15 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
   async function initRegisterPage() {
     try {
       const response = await fetch('/api/auth/admin-exists');
-      let data = {};
-      try {
-        data = await response.json();
-      } catch (err) {
-        data = {};
-      }
-      const adminExists = !!data.exists;
+      const data = await response.json();
+      const adminExists = data.exists;
 
-      if (!adminExists && data.exists !== undefined) {
+      if (!adminExists) {
         role = 'admin';
         setupFormWithConfig('admin');
         showAlert('System Setup: Register the initial HOD account to initialize the CSE Portal.', 'success');
@@ -805,15 +799,10 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
 
-        let data = {};
-        try {
-          data = await response.json();
-        } catch (err) {
-          data = {};
-        }
+        const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || `Registration failed (${response.status}). Ensure backend API server is running.`);
+          throw new Error(data.message || 'Registration failed.');
         }
 
         const msg = data.message || 'Registration submitted successfully. Your account is waiting for HOD approval.';

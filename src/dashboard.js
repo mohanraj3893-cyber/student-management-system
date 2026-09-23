@@ -10,17 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageHeading = document.getElementById('page-title-heading');
   const pageSubHeading = document.getElementById('page-title-sub');
 
-  const cachedStr = sessionStorage.getItem('sms_user_profile_cache');
-  let userDept = 'Computer Science & Engineering';
-  if (cachedStr) {
-    try {
-      const c = JSON.parse(cachedStr);
-      if (c.user && c.user.department) userDept = c.user.department;
-    } catch(e) {}
-  }
-
   const routeTitles = {
-    'dashboard': { title: `${userDept} Department`, sub: 'Academic Management Portal' },
+    'dashboard': { title: 'Computer Science & Engineering Department', sub: 'Academic Management Portal' },
     'students': { title: 'Students Management', sub: 'Manage students credentials and academic status' },
     'approval': { title: 'Registration Approvals', sub: 'Review pending registration applications' },
     'student-profile': { title: 'Student Profile Overview', sub: 'Detailed academic record for student' },

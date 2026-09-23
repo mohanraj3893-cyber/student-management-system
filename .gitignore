@@ -1,36 +1,57 @@
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Production build output
+dist/
+dist-ssr/
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+server/logs/
 
-node_modules
-**/node_modules/**
-dist
-dist-ssr
-*.local
-.env
-server/.env
-mysql_data
-.mysql_data*
+# Cloudflare Wrangler state
+.wrangler/
+
+# Database data directories and binaries
+.mysql_data/
+.mysql_data_new/
+mysql_data/
+server/mysql_data/
+server/sms_database.sqlite*
+my_local.ini
+*.local.ini
+start
+query
 scratch/
-*.pid
+
+# Local uploaded files
+server/uploads/*
+!server/uploads/resources/
+
+# Binaries and Executables
+cloudflared.exe
+*.exe
+
+# Environment variables
+.env
+.env.local
+server/.env
+server/.env.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-# Playwright Test Artifacts
-playwright-report/
-test-results/
-test-results*/

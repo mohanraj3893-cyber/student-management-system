@@ -184,30 +184,9 @@
         <div class="workspace-scroll-content">
           <div class="workspace-column-card">
             
-            <div class="table-toolbar-row" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-              <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; width: 100%;">
-                <div style="flex: 1 1 240px; min-width: 200px;">
-                  <input type="text" placeholder="Search by name, reg no, email..." id="roster-search-input" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 8px; font-size: 0.85rem; background: var(--bg-input, #ffffff); color: var(--text-color, #1e293b); outline: none;">
-                </div>
-                <div style="flex: 0 1 160px; min-width: 130px;">
-                  <select id="roster-year-select" aria-label="Filter by Year" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 8px; font-size: 0.85rem; background: var(--bg-input, #ffffff); color: var(--text-color, #1e293b); outline: none; cursor: pointer;">
-                    <option value="">All Years</option>
-                    <option value="I-Year">I-Year</option>
-                    <option value="II-Year">II-Year</option>
-                    <option value="III-Year">III-Year</option>
-                    <option value="IV-Year">IV-Year</option>
-                  </select>
-                </div>
-                <div style="flex: 0 1 260px; min-width: 180px;">
-                  <select id="roster-dept-select" aria-label="Filter by Department" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color, #cbd5e1); border-radius: 8px; font-size: 0.85rem; background: var(--bg-input, #ffffff); color: var(--text-color, #1e293b); outline: none; cursor: pointer;">
-                    <option value="">All Departments</option>
-                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-                    <option value="Information Technology">Information Technology</option>
-                    <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
-                    <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
-                    <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
-                  </select>
-                </div>
+            <div class="table-toolbar-row">
+              <div class="toolbar-left-search">
+                <input type="text" placeholder="Search roster..." id="roster-search-input">
               </div>
             </div>
 
@@ -219,12 +198,32 @@
                     <th>Register Number</th>
                     <th>Name</th>
                     <th>Year / Sem</th>
-                    <th>Section</th>
+                    <th>Email</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Loaded dynamically -->
+                  <tr class="clickable-row" onclick="alert('Viewing Mohanraj profile')">
+                    <td><strong>22CSE015</strong></td>
+                    <td>Mohanraj K</td>
+                    <td>8.65 / 10</td>
+                    <td>mohanraj@sms.com</td>
+                    <td><span class="badge-pill bg-green-light">Active</span></td>
+                  </tr>
+                  <tr class="clickable-row" onclick="alert('Viewing Karthik profile')">
+                    <td><strong>22CSE068</strong></td>
+                    <td>Karthik S</td>
+                    <td>7.90 / 10</td>
+                    <td>karthik@sms.com</td>
+                    <td><span class="badge-pill bg-green-light">Active</span></td>
+                  </tr>
+                  <tr class="clickable-row" onclick="alert('Viewing Priya profile')">
+                    <td><strong>22CSE102</strong></td>
+                    <td>Priya Dharshini</td>
+                    <td>8.20 / 10</td>
+                    <td>priya@sms.com</td>
+                    <td><span class="badge-pill bg-green-light">Active</span></td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -232,7 +231,7 @@
           </div>
 
           <footer class="dashboard-footer-bar">
-            <div class="footer-left"><span>Academic Management Portal • Version 1.0</span></div>
+            <div class="footer-left"><span>Computer Science & Engineering Department Portal • Version 1.0</span></div>
             <div class="footer-right"><span>© 2026 All Rights Reserved.</span></div>
           </footer>
         </div>
@@ -242,164 +241,69 @@
 
     <script type="module" src="/src/dashboard_global.js"></script>
     <script type="module">
-      function normalizeYear(value) {
-        if (!value) return '';
-        const str = String(value).toLowerCase().trim();
-        if (/^1(st)?(\s*year)?$/i.test(str) || /^i(-year)?$/i.test(str) || str === '1') return 'I-Year';
-        if (/^2(nd)?(\s*year)?$/i.test(str) || /^ii(-year)?$/i.test(str) || str === '2') return 'II-Year';
-        if (/^3(rd)?(\s*year)?$/i.test(str) || /^iii(-year)?$/i.test(str) || str === '3') return 'III-Year';
-        if (/^4(th)?(\s*year)?$/i.test(str) || /^iv(-year)?$/i.test(str) || str === '4') return 'IV-Year';
-        return value.trim();
-      }
-
-      function normalizeDepartment(value) {
-        if (!value) return '';
-        const str = String(value).toLowerCase().trim();
-        if (str.includes('computer') || str === 'cse') return 'Computer Science & Engineering';
-        if (str.includes('information') || str === 'it') return 'Information Technology';
-        if (str.includes('electronics') || str === 'ece') return 'Electronics & Communication Engineering';
-        if (str.includes('electrical') || str === 'eee') return 'Electrical & Electronics Engineering';
-        if (str.includes('artificial') || str.includes('data') || str === 'ai&ds' || str === 'aids') return 'Artificial Intelligence & Data Science';
-        return value.trim();
-      }
-
       document.addEventListener('DOMContentLoaded', async () => {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken');
         if (!token) {
           window.location.href = '/login.html?role=faculty';
           return;
         }
 
         const tbody = document.querySelector('#roster-table tbody');
-        const searchInput = document.getElementById('roster-search-input');
-        const yearSelect = document.getElementById('roster-year-select');
-        const deptSelect = document.getElementById('roster-dept-select');
-
-        let allStudents = [];
-
-        function renderRows(students) {
-          if (!tbody) return;
-          tbody.innerHTML = '';
-          const safeList = Array.isArray(students) ? students : [];
-
-          if (safeList.length === 0) {
-            tbody.innerHTML = `
-              <tr>
-                <td colspan="6" style="text-align: center; padding: 2.5rem 1rem; color: #64748b; font-weight: 500;">
-                  <div style="font-size: 1.6rem; margin-bottom: 0.35rem;">👥</div>
-                  <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">No students found</div>
-                  <div>Try selecting a different academic year or adjusting your search query.</div>
-                </td>
-              </tr>
-            `;
-            return;
-          }
-
-          safeList.forEach(s => {
-            const tr = document.createElement('tr');
-            tr.className = 'clickable-row';
-            tr.style.cursor = 'pointer';
-            tr.addEventListener('click', () => {
-              window.location.href = `student_profile.html?id=${s.registerNumber || s.username}`;
-            });
-            const sName = s.name || 'Student';
-            const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
-            const photo = getAvatar(sName, s.photoPath);
-            const yearDisplay = s.year ? normalizeYear(s.year) : 'N/A';
-            const semDisplay = s.semester ? ` / Sem ${s.semester}` : '';
-
-            tr.innerHTML = `
-              <td>
-                <div class="table-avatar-circle">
-                  <img src="${photo}" alt="${sName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
-                </div>
-              </td>
-              <td><strong>${s.registerNumber || s.username}</strong></td>
-              <td>${s.name || '--'}</td>
-              <td>${yearDisplay}${semDisplay}</td>
-              <td><span class="badge-pill" style="font-weight: 700; background: #F1F5F9; color: #334155; padding: 4px 8px; border-radius: 6px;">Sec ${s.section || 'A'}</span></td>
-              <td><span class="badge-pill bg-green-light">Active</span></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        }
-
-        function applyFilters() {
-          const safeStudents = Array.isArray(allStudents) ? allStudents : [];
-          const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-          const selectedYear = (yearSelect ? yearSelect.value : '').trim();
-          const selectedDept = (deptSelect ? deptSelect.value : '').trim();
-
-          const filtered = safeStudents.filter(s => {
-            // Search query filter
-            if (query) {
-              const name = (s.name || '').toLowerCase();
-              const reg = (s.registerNumber || s.username || '').toLowerCase();
-              const email = (s.email || '').toLowerCase();
-              const dept = (s.department || '').toLowerCase();
-              if (!name.includes(query) && !reg.includes(query) && !email.includes(query) && !dept.includes(query)) {
-                return false;
-              }
-            }
-
-            // Year filter
-            if (selectedYear) {
-              const normStudentYear = normalizeYear(s.year);
-              const normSelectedYear = normalizeYear(selectedYear);
-              if (normStudentYear !== normSelectedYear) return false;
-            }
-
-            // Department filter
-            if (selectedDept) {
-              const normStudentDept = normalizeDepartment(s.department);
-              const normSelectedDept = normalizeDepartment(selectedDept);
-              if (normStudentDept !== normSelectedDept) return false;
-            }
-
-            return true;
-          });
-
-          renderRows(filtered);
-        }
+        const input = document.getElementById('roster-search-input');
 
         try {
-          // Fetch from /api/faculty/my-students endpoint
-          let res = await fetch('/api/faculty/my-students', {
+          const res = await fetch('/api/students', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
+          if (!res.ok) throw new Error('Failed to load students roster.');
+          const students = await res.json();
 
-          if (!res.ok) {
-            // Fallback to /api/students if /api/faculty/my-students is unavailable
-            res = await fetch('/api/students', {
-              headers: { 'Authorization': `Bearer ${token}` }
+          tbody.innerHTML = '';
+          if (students.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b;">No registered students found.</td></tr>`;
+          } else {
+            students.forEach(s => {
+              const tr = document.createElement('tr');
+              tr.className = 'clickable-row';
+              tr.style.cursor = 'pointer';
+              tr.addEventListener('click', () => {
+                window.location.href = `student_profile.html?id=${s.registerNumber}`;
+              });
+              const sName = s.name || 'Student';
+              const initials = sName.trim().split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2) || 'ST';
+              const colors = ['#6A1B9A','#0056D2','#0F9D58','#E65100','#B71C1C','#1565C0'];
+              const color = colors[initials.charCodeAt(0) % colors.length];
+              const getAvatar = (name, path) => (window.getAvatarUrl ? window.getAvatarUrl(name, path) : ((path && path.trim()) ? path : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%237C3AED'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"));
+              const photo = getAvatar(sName, s.photoPath);
+              tr.innerHTML = `
+                <td>
+                  <div class="table-avatar-circle">
+                    <img src="${photo}" alt="${sName}" onerror="this.onerror=null; this.src=getAvatar(this.alt, null);">
+                  </div>
+                </td>
+                <td><strong>${s.registerNumber}</strong></td>
+                <td>${s.name}</td>
+                <td>${s.year || 'N/A'} Yr / Sem ${s.semester || 'N/A'}</td>
+                <td>${s.email}</td>
+                <td><span class="badge-pill bg-green-light">Active</span></td>
+              `;
+              tbody.appendChild(tr);
             });
           }
 
-          if (!res.ok) throw new Error('Failed to load authorized students roster.');
-          const json = await res.json().catch(() => ({}));
-          const rawStudents = Array.isArray(json)
-            ? json
-            : Array.isArray(json?.students)
-              ? json.students
-              : Array.isArray(json?.data)
-                ? json.data
-                : [];
-
-          allStudents = rawStudents.map(s => ({
-            ...s,
-            registerNumber: s.registerNumber || s.register_number || s.username || '',
-            photoPath: s.photoPath || s.photo_path || ''
-          }));
-
-          renderRows(allStudents);
-
-          if (searchInput) searchInput.addEventListener('input', applyFilters);
-          if (yearSelect) yearSelect.addEventListener('change', applyFilters);
-          if (deptSelect) deptSelect.addEventListener('change', applyFilters);
+          if (input) {
+            input.addEventListener('input', (e) => {
+              const query = e.target.value.toLowerCase().trim();
+              const rows = tbody.querySelectorAll('tr');
+              rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+              });
+            });
+          }
 
         } catch (err) {
-          console.error('[SMS Faculty Students Error]', err);
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #ef4444;">Failed to load student roster: ${err.message}</td></tr>`;
+          console.error(err);
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444;">Error: ${err.message}</td></tr>`;
         }
       });
     </script>

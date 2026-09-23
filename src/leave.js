@@ -140,69 +140,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await fetch('/api/leaves/requests', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await res.json().catch(() => ({}));
-        const pending = Array.isArray(data?.pending)
-          ? data.pending
-          : Array.isArray(data?.requests)
-            ? data.requests.filter(r => String(r.status || '').toUpperCase().includes('PENDING'))
-            : Array.isArray(data)
-              ? data.filter(r => String(r.status || '').toUpperCase().includes('PENDING'))
-              : [];
-
-        const history = Array.isArray(data?.history)
-          ? data.history
-          : Array.isArray(data?.requests)
-            ? data.requests.filter(r => !String(r.status || '').toUpperCase().includes('PENDING'))
-            : Array.isArray(data)
-              ? data.filter(r => !String(r.status || '').toUpperCase().includes('PENDING'))
-              : [];
+        const data = await res.json();
 
         // 1. Pending list rendering
         const pendingList = document.getElementById('pending-leaves-list');
-        if (pendingList) {
-          pendingList.innerHTML = '';
+        pendingList.innerHTML = '';
 
-          if (pending.length === 0) {
-            pendingList.innerHTML = `<div style="text-align: center; color: #9CA3AF; padding: 2rem;">No pending leave applications.</div>`;
-          } else {
-            pending.forEach(r => {
-              const item = document.createElement('div');
-              item.className = 'approval-card-item';
-              const _rName = r.studentName || (r.student ? r.student.name : 'Student');
-              const regNo = r.registerNumber || (r.student ? r.student.registerNumber : '-');
-              const photoPath = r.photoPath || (r.student ? r.student.photoPath : null);
-              const sDate = r.startDate || r.fromDate || '';
-              const eDate = r.endDate || r.toDate || '';
-              const numDays = r.numberOfDays || r.days || 1;
-              const photo = (window.getAvatarUrl ? window.getAvatarUrl(_rName, photoPath) : (photoPath || ''));
-              item.innerHTML = `
-                <div class="approval-card-avatar">
-                  <img src="${photo}" alt="${_rName}" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
-                </div>
-                <div class="approval-card-info">
-                  <h4 class="student-approval-name">${_rName}</h4>
-                  <p class="student-approval-details">Register No: <strong>${regNo}</strong> | Reason: <strong>${r.reason || '-'}</strong></p>
-                  <p class="student-approval-doc">Date Range: <strong>${sDate} - ${eDate}</strong> (${numDays} ${numDays === 1 ? 'Day' : 'Days'})</p>
-                </div>
-                <div class="approval-card-actions">
-                  <button class="btn btn-sm btn-success action-btn-approve" data-id="${r.id}">Approve</button>
-                  <button class="btn btn-sm btn-danger action-btn-reject" data-id="${r.id}" data-reg="${regNo}">Reject</button>
-                </div>
-              `;
-              pendingList.appendChild(item);
-            });
-          }
+        if (data.pending.length === 0) {
+          pendingList.innerHTML = `<div style="text-align: center; color: #9CA3AF; padding: 2rem;">No pending leave applications.</div>`;
+        } else {
+          data.pending.forEach(r => {
+            const item = document.createElement('div');
+            item.className = 'approval-card-item';
+            const _rName = r.studentName || (r.student ? r.student.name : 'Student');
+            const regNo = r.registerNumber || (r.student ? r.student.registerNumber : '-');
+            const photoPath = r.photoPath || (r.student ? r.student.photoPath : null);
+            const sDate = r.startDate || r.fromDate || '';
+            const eDate = r.endDate || r.toDate || '';
+            const numDays = r.numberOfDays || r.days || 1;
+            const photo = (window.getAvatarUrl ? window.getAvatarUrl(_rName, photoPath) : (photoPath || ''));
+            item.innerHTML = `
+              <div class="approval-card-avatar">
+                <img src="${photo}" alt="${_rName}" onerror="this.onerror=null; this.src=(window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : '');">
+              </div>
+              <div class="approval-card-info">
+                <h4 class="student-approval-name">${_rName}</h4>
+                <p class="student-approval-details">Register No: <strong>${regNo}</strong> | Reason: <strong>${r.reason || '-'}</strong></p>
+                <p class="student-approval-doc">Date Range: <strong>${sDate} - ${eDate}</strong> (${numDays} ${numDays === 1 ? 'Day' : 'Days'})</p>
+              </div>
+              <div class="approval-card-actions">
+                <button class="btn btn-sm btn-success action-btn-approve" data-id="${r.id}">Approve</button>
+                <button class="btn btn-sm btn-danger action-btn-reject" data-id="${r.id}" data-reg="${regNo}">Reject</button>
+              </div>
+            `;
+            pendingList.appendChild(item);
+          });
         }
 
         // 2. History table rendering
         const historyTbody = document.getElementById('history-leaves-tbody');
-        if (historyTbody) {
-          historyTbody.innerHTML = '';
+        historyTbody.innerHTML = '';
 
-          if (history.length === 0) {
-            historyTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9CA3AF;">No processed leave history.</td></tr>`;
-          } else {
-            history.forEach(r => {
+        if (data.history.length === 0) {
+          historyTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9CA3AF;">No processed leave history.</td></tr>`;
+        } else {
+          data.history.forEach(r => {
             const _rName = r.studentName || (r.student ? r.student.name : 'Student');
             const regNo = r.registerNumber || (r.student ? r.student.registerNumber : '-');
             const sDate = r.startDate || r.fromDate || '';
@@ -383,30 +365,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('[SMS Leave SPA Debug] Leave submit started');
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>⏳</span> Submitting...';
-      }
-
-      const reason = document.getElementById('leave-reason')?.value || '';
-      const startDate = document.getElementById('leave-start')?.value || '';
-      const endDate = document.getElementById('leave-end')?.value || startDate;
-      const days = document.getElementById('leave-days')?.value || '1';
-
-      const payload = {
-        reason: reason.trim(),
-        startDate,
-        endDate,
-        fromDate: startDate,
-        toDate: endDate,
-        days: Number(days),
-        numberOfDays: Number(days)
-      };
-
-      console.log('[SMS Leave SPA Debug] Sending payload:', payload);
+      const reason = document.getElementById('leave-reason').value;
+      const startDate = document.getElementById('leave-start').value;
+      const endDate = document.getElementById('leave-end').value;
+      const days = document.getElementById('leave-days').value;
 
       try {
         const res = await fetch('/api/leaves/apply', {
@@ -415,26 +377,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ reason, startDate, endDate, days })
         });
 
-        console.log('[SMS Leave SPA Debug] Response Status:', res.status);
-        const body = await res.json().catch(() => ({}));
-        console.log('[SMS Leave SPA Debug] Response Body:', body);
-
+        const body = await res.json();
         if (!res.ok) throw new Error(body.message || 'Submission failed.');
 
-        showToast(body.message || 'Leave request submitted successfully!', true);
+        showToast('Leave request submitted successfully!', true);
         form.reset();
-        await loadStudentLeaves();
+        loadStudentLeaves();
       } catch (err) {
-        console.error('[SMS Leave SPA Debug] Error:', err);
         showToast(err.message, false);
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>🚀</span> Submit Request';
-        }
       }
     });
 

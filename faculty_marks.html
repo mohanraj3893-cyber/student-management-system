@@ -304,7 +304,8 @@
             const mobGreet = document.getElementById('mobile-greeting-name');
             if (mobGreet) mobGreet.textContent = fName;
             
-            const photoUrl = p?.photoPath || user?.photoPath || '';
+            const defaultAvatar = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
+            const photoUrl = (window.getAvatarUrl ? window.getAvatarUrl(typeof sName !== 'undefined' ? sName : (typeof fName !== 'undefined' ? fName : (p?.name || 'User')), profData?.photoPath || p?.photoPath || user?.photoPath) : (profData?.photoPath || p?.photoPath || user?.photoPath || ''));
             const navAv = document.getElementById('nav-faculty-avatar');
             if (navAv) navAv.src = photoUrl;
             const sideAv = document.getElementById('sidebar-faculty-avatar');
@@ -319,8 +320,8 @@
           const subjectsRes = await fetch('/api/attendance/subjects', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          const resJson = await subjectsRes.json();
-          const subjects = Array.isArray(resJson) ? resJson : (resJson.subjects || []);
+          if (!subjectsRes.ok) throw new Error('Failed to load assigned subjects.');
+          const subjects = await subjectsRes.json();
 
           subjectSelect.innerHTML = '';
           if (subjects.length === 0) {
@@ -360,21 +361,15 @@
               throw new Error(errJson.message || 'Failed to load marks roster.');
             }
             const data = await res.json();
-            const studentsList = Array.isArray(data.students) ? data.students : (Array.isArray(data.roster) ? data.roster.map(r => ({
-              id: r.student_id,
-              name: r.name,
-              registerNumber: r.register_number,
-              marksObtained: r.marks_obtained !== '' ? r.marks_obtained : null
-            })) : []);
 
             tbody.innerHTML = '';
-            if (studentsList.length === 0) {
+            if (data.students.length === 0) {
               tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">No students found enrolled in this subject.</td></tr>';
               updateStats();
               return;
             }
 
-            studentsList.forEach(s => {
+            data.students.forEach(s => {
               const tr = document.createElement('tr');
               const currentScore = s.marksObtained !== null ? s.marksObtained : '';
               tr.innerHTML = `

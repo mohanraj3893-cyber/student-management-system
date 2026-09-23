@@ -679,7 +679,7 @@
               <!-- Form Buttons -->
               <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; justify-content: flex-end;">
                 <button type="reset" class="btn btn-secondary" id="reset-form-btn" style="background: #F1F5F9; color: #475569; border: none; font-weight: 600; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem;">Reset</button>
-                <button type="submit" class="btn btn-primary" id="submit-leave-btn" style="background: #1D4ED8; color: white; border: none; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                <button type="submit" class="btn btn-primary" style="background: #1D4ED8; color: white; border: none; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
                   <span>🚀</span> Submit Leave Request
                 </button>
               </div>
@@ -881,30 +881,16 @@
             studentProfile = data;
 
             // Form static displays
-            const stName = document.getElementById('student-name');
-            if (stName) stName.textContent = data.name || 'N/A';
+            document.getElementById('student-name').textContent = data.name || 'N/A';
+            document.getElementById('student-reg').textContent = data.registerNumber || 'N/A';
+            document.getElementById('student-dept').textContent = data.department || 'Computer Science & Engineering';
+            document.getElementById('student-year').textContent = data.year || 'N/A';
+            document.getElementById('student-semester').textContent = data.semester || 'N/A';
 
-            const stReg = document.getElementById('student-reg');
-            if (stReg) stReg.textContent = data.registerNumber || 'N/A';
-
-            const stDept = document.getElementById('student-dept');
-            if (stDept) stDept.textContent = data.department || 'Computer Science & Engineering';
-
-            const stYear = document.getElementById('student-year');
-            if (stYear) stYear.textContent = data.year || 'N/A';
-
-            const stSem = document.getElementById('student-semester');
-            if (stSem) stSem.textContent = data.semester || 'N/A';
-
-            // Sidebar and Navbar displays (Safely handle any ID variation)
-            const sbName = document.getElementById('sidebar-profile-name') || document.getElementById('sidebar-profile-student-name');
-            if (sbName) sbName.textContent = data.name || 'N/A';
-
-            const sbRole = document.getElementById('sidebar-profile-role') || document.getElementById('sidebar-profile-student-reg');
-            if (sbRole) sbRole.textContent = data.registerNumber || 'Student';
-
-            const navName = document.getElementById('nav-profile-student-name') || document.getElementById('nav-profile-name');
-            if (navName) navName.textContent = data.name || 'N/A';
+            // Sidebar and Navbar displays
+            document.getElementById('sidebar-profile-student-name').textContent = data.name || 'N/A';
+            document.getElementById('sidebar-profile-student-reg').textContent = data.registerNumber || 'N/A';
+            document.getElementById('nav-profile-student-name').textContent = data.name || 'N/A';
 
             let avatarSrc;
             if (data.photoPath) {
@@ -915,14 +901,11 @@
               const color = colors[initials.charCodeAt(0) % colors.length];
               avatarSrc = "data:image/svg+xml,%3Csvg xmlns=\"64\" height=\"64\" viewBox=\"0 0 64 64\"%3E%3Crect width=\"64\" height=\"64\" rx=\"32\" fill=\"%2364748B\"/ %3E%3Ctext x=\"32\" y=\"38\" font-family=\"Inter,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"white\" text-anchor=\"middle\"%3E👤%3C/text%3E%3C/svg%3E";
             }
-            const sbImg = document.getElementById('sidebar-profile-img');
-            if (sbImg) sbImg.src = avatarSrc;
-
-            const navImg = document.getElementById('nav-profile-img');
-            if (navImg) navImg.src = avatarSrc;
+            document.getElementById('sidebar-profile-img').src = avatarSrc;
+            document.getElementById('nav-profile-img').src = avatarSrc;
 
           } catch (err) {
-            console.error('[SMS Leave] Profile fetch error:', err);
+            console.error('Profile fetch error:', err);
             showToast('Failed to load profile details.', false);
           }
         }
@@ -933,20 +916,16 @@
         const fileInput = document.getElementById('supporting-document-file');
         const dropzoneText = document.getElementById('dropzone-text');
 
-        if (dropzone && fileInput) {
-          dropzone.addEventListener('click', () => fileInput.click());
-          
-          fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-              const file = e.target.files[0];
-              if (dropzoneText) {
-                dropzoneText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color: #2E7D32;"></i> <strong>Attached:</strong> ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-              }
-              dropzone.style.borderColor = '#2E7D32';
-              dropzone.style.backgroundColor = 'rgba(46, 125, 50, 0.05)';
-            }
-          });
-        }
+        dropzone.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            dropzoneText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color: #2E7D32;"></i> <strong>Attached:</strong> ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+            dropzone.style.borderColor = '#2E7D32';
+            dropzone.style.backgroundColor = 'rgba(46, 125, 50, 0.05)';
+          }
+        });
 
         // 3. Dynamic leave days calculation
         const fromDateInput = document.getElementById('leave-from-date');
@@ -954,7 +933,6 @@
         const calculatedDaysDiv = document.getElementById('calculated-days');
 
         function updateCalculatedDays() {
-          if (!fromDateInput || !toDateInput || !calculatedDaysDiv) return;
           const fromVal = fromDateInput.value;
           const toVal = toDateInput.value;
           
@@ -977,121 +955,63 @@
           }
         }
 
-        if (fromDateInput) fromDateInput.addEventListener('change', updateCalculatedDays);
-        if (toDateInput) toDateInput.addEventListener('change', updateCalculatedDays);
+        fromDateInput.addEventListener('change', updateCalculatedDays);
+        toDateInput.addEventListener('change', updateCalculatedDays);
 
         // Reset form functionality
-        const resetBtn = document.getElementById('reset-form-btn');
-        if (resetBtn) {
-          resetBtn.addEventListener('click', () => {
-            setTimeout(() => {
-              updateCalculatedDays();
-              if (dropzoneText) dropzoneText.textContent = 'Click or drag files here to upload certificate';
-              if (dropzone) {
-                dropzone.style.borderColor = 'var(--primary-red)';
-                dropzone.style.backgroundColor = 'var(--white)';
-              }
-              if (fileInput) fileInput.value = '';
-            }, 10);
-          });
-        }
+        document.getElementById('reset-form-btn').addEventListener('click', () => {
+          setTimeout(() => {
+            updateCalculatedDays();
+            dropzoneText.textContent = 'Click or drag files here to upload certificate';
+            dropzone.style.borderColor = 'var(--primary-red)';
+            dropzone.style.backgroundColor = 'var(--white)';
+            fileInput.value = '';
+          }, 10);
+        });
 
         // 4. Submit leave application
         const leaveForm = document.getElementById('leave-request-form');
-        const submitBtn = document.getElementById('submit-leave-btn') || (leaveForm ? leaveForm.querySelector('button[type="submit"]') : null);
+        leaveForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-        if (leaveForm) {
-          leaveForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            console.log('[SMS Leave Debug] Leave submit started');
+          const fromVal = fromDateInput.value;
+          const toVal = toDateInput.value;
 
-            const fromVal = fromDateInput ? fromDateInput.value : '';
-            const toVal = toDateInput ? toDateInput.value : '';
+          if (new Date(toVal) < new Date(fromVal)) {
+            showToast('From Date cannot be after To Date.', false);
+            return;
+          }
 
-            if (!fromVal || !toVal) {
-              showToast('Please select both From Date and To Date.', false);
-              return;
-            }
+          const formData = new FormData(leaveForm);
+          // Multer checks file size & file extensions on backend
 
-            if (new Date(toVal) < new Date(fromVal)) {
-              showToast('From Date cannot be after To Date.', false);
-              return;
-            }
+          try {
+            const res = await fetch('/api/leaves', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              body: formData
+            });
 
-            const leaveTypeEl = document.getElementById('leave-type');
-            const leaveType = leaveTypeEl ? leaveTypeEl.value : 'Casual Leave';
-            if (!leaveType) {
-              showToast('Please select a leave type.', false);
-              return;
-            }
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.message || 'Submission failed.');
 
-            const reasonEl = document.getElementById('leave-reason');
-            const reason = reasonEl ? reasonEl.value : '';
-            if (!reason || reason.trim() === '') {
-              showToast('Please provide a reason for the leave.', false);
-              return;
-            }
+            showToast('Leave request submitted successfully!', true);
+            leaveForm.reset();
+            // Reset uploader display
+            dropzoneText.textContent = 'Click or drag files here to upload certificate';
+            dropzone.style.borderColor = 'var(--primary-red)';
+            dropzone.style.backgroundColor = 'var(--white)';
+            fileInput.value = '';
+            updateCalculatedDays();
 
-            // UI Feedback: Loading state & disable button
-            if (submitBtn) {
-              submitBtn.disabled = true;
-              submitBtn.innerHTML = '<span>⏳</span> Submitting...';
-            }
-
-            const payload = {
-              leaveType,
-              fromDate: fromVal,
-              toDate: toVal,
-              reason: reason.trim(),
-              startDate: fromVal,
-              endDate: toVal
-            };
-
-            console.log('[SMS Leave Debug] Sending Payload:', payload);
-
-            try {
-              const res = await fetch('/api/leaves/apply', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-              });
-
-              console.log('[SMS Leave Debug] Response Status:', res.status);
-              const body = await res.json().catch(() => ({}));
-              console.log('[SMS Leave Debug] Response Body:', body);
-
-              if (!res.ok) {
-                throw new Error(body.message || 'Submission failed.');
-              }
-
-              showToast(body.message || 'Leave request submitted successfully!', true);
-              leaveForm.reset();
-
-              // Reset dropzone display
-              if (dropzoneText) dropzoneText.textContent = 'Click or drag files here to upload certificate';
-              if (dropzone) {
-                dropzone.style.borderColor = 'var(--primary-red)';
-                dropzone.style.backgroundColor = 'var(--white)';
-              }
-              if (fileInput) fileInput.value = '';
-              updateCalculatedDays();
-
-              // Refresh leave history
-              await loadLeaveHistory();
-            } catch (err) {
-              console.error('[SMS Leave Debug] Submission Error:', err);
-              showToast(err.message || 'Failed to submit leave request.', false);
-            } finally {
-              if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>🚀</span> Submit Leave Request';
-              }
-            }
-          });
-        }
+            // Refresh logs
+            await loadLeaveHistory();
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        });
 
         // 5. Fetch and Render Student's Leave History
         async function loadLeaveHistory() {
@@ -1100,11 +1020,11 @@
             const res = await fetch('/api/leaves/my', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            const raw = await res.json();
-            const list = Array.isArray(raw) ? raw : (raw.leaves || []);
+            if (!res.ok) throw new Error('Failed to load leave history.');
+            const list = await res.json();
 
             tbody.innerHTML = '';
-            if (!list || list.length === 0) {
+            if (list.length === 0) {
               tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #78909C; padding: 2rem;">No leave requests submitted yet.</td></tr>`;
               return;
             }
@@ -1131,31 +1051,17 @@
                 displayStatus = 'Rejected by HOD';
               }
 
-              const submitDate = new Date(item.submittedAt || item.createdAt || item.created_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-              const fDateStr = item.fromDate || item.from_date || item.startDate;
-              const tDateStr = item.toDate || item.to_date || item.endDate;
-              const fromD = new Date(fDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-              const toD = new Date(tDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-
-              let numDays = item.numberOfDays || item.number_of_days || item.days;
-              if (!numDays && fDateStr && tDateStr) {
-                const s = new Date(fDateStr);
-                const e = new Date(tDateStr);
-                s.setHours(0, 0, 0, 0);
-                e.setHours(0, 0, 0, 0);
-                numDays = Math.floor((e - s) / 86400000) + 1;
-              }
-              numDays = numDays > 0 ? numDays : 1;
-
-              const lType = item.leaveType || item.leave_type || item.type || 'General Leave';
+              const submitDate = new Date(item.submittedAt || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+              const fromD = new Date(item.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              const toD = new Date(item.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
               const tr = document.createElement('tr');
               tr.innerHTML = `
                 <td><strong>LREQ-${item.id}</strong></td>
-                <td>${lType}</td>
+                <td>${item.leaveType}</td>
                 <td>${fromD}</td>
                 <td>${toD}</td>
-                <td><strong>${numDays} ${numDays === 1 ? 'Day' : 'Days'}</strong></td>
+                <td><strong>${item.numberOfDays || 1} ${(item.numberOfDays || 1) === 1 ? 'Day' : 'Days'}</strong></td>
                 <td>${submitDate}</td>
                 <td><span class="badge-pill ${badgeClass}">${displayStatus}</span></td>
                 <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -1228,65 +1134,36 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to load leave details.');
-            const resData = await res.json();
-            const data = resData.leave || resData.data || resData;
+            const data = await res.json();
 
             // Populate Modal details
-            const studentObj = data.student || {};
-            const _slName = studentObj.name || data.studentName || data.name || 'Student';
-            const _slPhoto = studentObj.photoPath || studentObj.photo_path || data.photoPath || null;
-            const _slAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_slName, _slPhoto) : (_slPhoto ? _slPhoto : ''));
+            const _slName = data.student ? data.student.name : 'Student';
+            const _slAvatar = (window.getAvatarUrl ? window.getAvatarUrl(_slName, data.student ? data.student.photoPath : null) : (data.student && data.student.photoPath ? data.student.photoPath : ''));
             const modalImg = document.getElementById('modal-student-img');
             modalImg.src = _slAvatar;
             modalImg.alt = _slName;
             modalImg.onerror = function() { this.onerror = null; this.src = (window.getAvatarUrl ? window.getAvatarUrl(this.alt, null) : ''); };
-            document.getElementById('modal-student-name').textContent = _slName;
-            document.getElementById('modal-student-reg').textContent = studentObj.registerNumber || studentObj.register_number || data.registerNumber || 'N/A';
-            
-            const yVal = studentObj.year || data.year || '';
-            const sVal = studentObj.semester || data.semester || '';
-            let formattedYearSem = '-';
-            if (yVal && sVal) {
-              const normY = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
-              const normS = String(sVal).toLowerCase().includes('sem') ? sVal : `Sem ${sVal}`;
-              formattedYearSem = `${normY} / ${normS}`;
-            } else if (yVal) {
-              formattedYearSem = String(yVal).toLowerCase().includes('year') ? yVal : `${yVal} Year`;
-            }
-            document.getElementById('modal-student-year-sem').textContent = formattedYearSem;
+            document.getElementById('modal-student-name').textContent = data.student ? data.student.name : 'Unknown';
+            document.getElementById('modal-student-reg').textContent = data.student ? data.student.registerNumber : 'N/A';
+            document.getElementById('modal-student-year-sem').textContent = data.student ? `${data.student.year} Year / Sem ${data.student.semester}` : '-';
 
-            const modalLeaveType = data.leaveType || data.leave_type || data.type || 'General Leave';
-            document.getElementById('modal-leave-type').textContent = modalLeaveType;
-
-            const fD = data.fromDate || data.from_date || data.startDate;
-            const tD = data.toDate || data.to_date || data.endDate;
-            let numDaysVal = data.numberOfDays || data.number_of_days || data.days;
-            if (!numDaysVal && fD && tD) {
-              const s = new Date(fD);
-              const e = new Date(tD);
-              s.setHours(0, 0, 0, 0);
-              e.setHours(0, 0, 0, 0);
-              numDaysVal = Math.floor((e - s) / 86400000) + 1;
-            }
-            numDaysVal = numDaysVal > 0 ? numDaysVal : 1;
-
-            document.getElementById('modal-leave-days').textContent = `${numDaysVal} ${numDaysVal === 1 ? 'Day' : 'Days'}`;
-            document.getElementById('modal-leave-reason').textContent = data.reason || 'No specific reason provided.';
-            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt || data.created_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('modal-leave-duration').textContent = `${new Date(fD).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(tD).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+            document.getElementById('modal-leave-type').textContent = data.leaveType;
+            document.getElementById('modal-leave-days').textContent = `${data.numberOfDays} ${data.numberOfDays === 1 ? 'Day' : 'Days'}`;
+            document.getElementById('modal-leave-reason').textContent = data.reason;
+            document.getElementById('modal-leave-submitted').textContent = new Date(data.submittedAt || data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('modal-leave-duration').textContent = `${new Date(data.fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(data.toDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
 
             // Document link
             const docContainer = document.getElementById('modal-doc-container');
             const docLink = document.getElementById('modal-doc-link');
-            if (data.supportingDocument || data.supporting_document) {
+            if (data.supportingDocument) {
               docContainer.style.display = 'block';
-              docLink.href = `${data.supportingDocument || data.supporting_document}`;
+              docLink.href = `${data.supportingDocument}`;
             } else {
               docContainer.style.display = 'none';
             }
 
             // Stepper and Feedback section
-            const stepApplied = document.getElementById('step-applied');
             const stepPending = document.getElementById('step-pending');
             const stepFinal = document.getElementById('step-final');
             const line1 = document.getElementById('line-1');
@@ -1295,107 +1172,51 @@
             const finalLabel = document.getElementById('step-final-label');
 
             const remarksBox = document.getElementById('modal-remarks-box');
-            const remarksTitle = document.getElementById('modal-remarks-title');
             const remarksLabel = document.getElementById('modal-remarks-label');
             const remarksValue = document.getElementById('modal-remarks-value');
 
             // Reset stepper styles
-            if (stepApplied) stepApplied.className = 'step done';
-            if (stepPending) stepPending.className = 'step';
-            if (stepFinal) stepFinal.className = 'step';
-            if (line1) line1.className = 'line';
-            if (line2) line2.className = 'line';
-            if (finalNode) {
-              finalNode.className = 'node';
-              finalNode.innerHTML = '<i class="fa-solid fa-clock"></i>';
-            }
-            if (finalLabel) finalLabel.textContent = 'Decision';
+            stepPending.className = 'step';
+            stepFinal.className = 'step';
+            line1.className = 'line';
+            line2.className = 'line';
+            finalNode.className = 'node';
+            finalLabel.textContent = 'Decided';
 
-            const rawStatus = String(data.status || '').toUpperCase().trim();
+            if (data.status === 'Pending') {
+              stepPending.className = 'step done';
+              line1.className = 'line done';
+              
+              remarksBox.style.backgroundColor = '#ECEFF1';
+              remarksLabel.textContent = 'HOD Processing State';
+              remarksValue.textContent = 'Awaiting department head review.';
+              remarksValue.style.color = '#546E7A';
+            } else {
+              stepPending.className = 'step done';
+              line1.className = 'line done';
+              
+              line2.className = 'line done';
 
-            if (rawStatus === 'APPROVED') {
-              // 1. Approved State
-              if (stepPending) stepPending.className = 'step done approved';
-              if (line1) line1.className = 'line done';
-              if (line2) line2.className = 'line done';
-              if (stepFinal) stepFinal.className = 'step done approved';
-              if (finalNode) {
+              if (data.status === 'Approved') {
+                stepFinal.className = 'step done approved';
                 finalNode.className = 'node';
                 finalNode.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-              }
-              if (finalLabel) finalLabel.textContent = 'Approved';
-
-              if (remarksTitle) remarksTitle.textContent = 'Approval Details';
-              if (remarksBox) remarksBox.style.backgroundColor = '#E8F5E9';
-              if (remarksLabel) remarksLabel.textContent = 'HOD Remarks (Approved)';
-              if (remarksValue) {
-                remarksValue.textContent = data.hodRemarks || 'Approved by Department HOD.';
+                finalLabel.textContent = 'Approved';
+                
+                remarksBox.style.backgroundColor = '#E8F5E9';
+                remarksLabel.textContent = 'HOD Remarks (Approved)';
+                remarksValue.textContent = data.hodRemarks || 'Approved without additional remarks.';
                 remarksValue.style.color = '#1B5E20';
-              }
-            } else if (rawStatus === 'REJECTED_BY_CLASS_INCHARGE') {
-              // 2. Rejected by Class Incharge
-              if (line1) line1.className = 'line done';
-              if (stepPending) stepPending.className = 'step done rejected';
-              if (stepFinal) stepFinal.className = 'step';
-              if (finalLabel) finalLabel.textContent = 'Not Forwarded';
-
-              if (remarksTitle) remarksTitle.textContent = 'Rejection Feedback';
-              if (remarksBox) remarksBox.style.backgroundColor = '#FFEBEE';
-              if (remarksLabel) remarksLabel.textContent = 'Rejection Reason (Class Incharge)';
-              if (remarksValue) {
-                remarksValue.textContent = data.rejectionReason || 'Rejected by Class Incharge.';
-                remarksValue.style.color = '#C62828';
-              }
-            } else if (rawStatus === 'REJECTED_BY_HOD' || rawStatus === 'REJECTED') {
-              // 3. Rejected by HOD
-              if (stepPending) stepPending.className = 'step done approved';
-              if (line1) line1.className = 'line done';
-              if (line2) line2.className = 'line done';
-              if (stepFinal) stepFinal.className = 'step done rejected';
-              if (finalNode) {
+              } else {
+                stepFinal.className = 'step done rejected';
                 finalNode.className = 'node';
                 finalNode.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-              }
-              if (finalLabel) finalLabel.textContent = 'Rejected';
+                finalLabel.textContent = 'Rejected';
 
-              if (remarksTitle) remarksTitle.textContent = 'Rejection Feedback';
-              if (remarksBox) remarksBox.style.backgroundColor = '#FFEBEE';
-              if (remarksLabel) remarksLabel.textContent = 'Rejection Reason (HOD)';
-              if (remarksValue) {
-                remarksValue.textContent = data.rejectionReason || 'Rejected by Department HOD.';
+                remarksBox.style.backgroundColor = '#FFEBEE';
+                remarksLabel.textContent = 'Rejection Reason (Rejected)';
+                remarksValue.textContent = data.rejectionReason || 'No specific reason provided.';
                 remarksValue.style.color = '#C62828';
-              }
-            } else if (rawStatus === 'PENDING_HOD') {
-              // 4. Pending HOD Approval
-              if (stepPending) stepPending.className = 'step done approved';
-              if (line1) line1.className = 'line done';
-              if (line2) line2.className = 'line';
-              if (stepFinal) stepFinal.className = 'step';
-              if (finalNode) {
-                finalNode.className = 'node';
-                finalNode.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
-              }
-              if (finalLabel) finalLabel.textContent = 'HOD Review';
-
-              if (remarksTitle) remarksTitle.textContent = 'Processing Progress';
-              if (remarksBox) remarksBox.style.backgroundColor = '#FFF7ED';
-              if (remarksLabel) remarksLabel.textContent = 'Current Progress';
-              if (remarksValue) {
-                remarksValue.textContent = 'Class Incharge verified. Awaiting final HOD approval.';
-                remarksValue.style.color = '#C2410C';
-              }
-            } else {
-              // 5. Default / PENDING_CLASS_INCHARGE / Pending
-              if (line1) line1.className = 'line';
-              if (stepPending) stepPending.className = 'step';
-              if (finalLabel) finalLabel.textContent = 'Decision';
-
-              if (remarksTitle) remarksTitle.textContent = 'Processing Progress';
-              if (remarksBox) remarksBox.style.backgroundColor = '#F0F9FF';
-              if (remarksLabel) remarksLabel.textContent = 'Current Progress';
-              if (remarksValue) {
-                remarksValue.textContent = 'Application submitted. Awaiting Class Incharge review.';
-                remarksValue.style.color = '#0284C7';
               }
             }
 
@@ -1427,8 +1248,7 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to load notifications.');
-            const rawNotifs = await res.json();
-            const list = Array.isArray(rawNotifs) ? rawNotifs : (rawNotifs.notifications || rawNotifs.data || []);
+            const list = await res.json();
 
             const unreadList = list.filter(n => !n.isRead);
             notifCountBadge.textContent = unreadList.length;

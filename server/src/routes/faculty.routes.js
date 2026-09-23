@@ -6,7 +6,6 @@ const facultyController = require('../controllers/faculty.controller');
 router.use(verifyToken);
 
 router.get('/', restrictTo('admin'), facultyController.getAllFaculty);
-router.get('/my-students', restrictTo('admin', 'hod', 'faculty'), facultyController.getMyStudents);
 router.get('/:id', allowSelfOrRole('faculty'), facultyController.getFacultyById);
 router.post('/', restrictTo('admin'), facultyController.createFaculty);
 router.put('/:id', allowSelfOrRole('faculty'), facultyController.updateFaculty);

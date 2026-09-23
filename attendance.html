@@ -235,7 +235,7 @@
               <h2 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 0.4rem;" id="welcome-user-title">
                 Welcome back 👏
               </h2>
-              <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;" id="welcome-user-subtitle">
+              <p style="font-size: 0.78rem; color: #64748B; margin: 0.35rem 0 0 0;">
                 Head of Department (HOD) | Computer Science &amp; Engineering
               </p>
             </div>
@@ -377,6 +377,151 @@
             </div>
           </div>
 
+          <!-- Faculty View Container -->
+          <div id="faculty-attendance-container" style="display: none;">
+            <div class="workspace-column-card">
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary);">Faculty Attendance Entry Portal</h3>
+
+              <div class="attendance-filter-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div class="attendance-filter-item">
+                  <label for="fac-select-subject">Select Subject & Section</label>
+                  <select id="fac-select-subject" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-input); color: var(--text-primary);">
+                    <option value="">-- Choose Subject --</option>
+                  </select>
+                </div>
+                <div class="attendance-filter-item">
+                  <label for="fac-select-date">Select Date</label>
+                  <input type="date" id="fac-select-date" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-input); color: var(--text-primary);">
+                </div>
+
+              </div>
+
+              <!-- Action buttons to bulk select -->
+              <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <button id="btn-mark-all-present" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">Mark All Present</button>
+                <button id="btn-mark-all-absent" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px; background-color: #fee2e2; color: #ef4444; border-color: #fca5a5;">Mark All Absent</button>
+              </div>
+
+              <!-- Student Checklist Table -->
+              <div class="sms-table-responsive">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Register Number</th>
+                      <th>Student Name</th>
+                      <th class="text-center">Present</th>
+                      <th class="text-center">Absent</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fac-student-checklist-body">
+                    <tr>
+                      <td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">
+                        Please select a subject to load students.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button id="btn-save-attendance" class="btn btn-primary" style="padding: 10px 20px;">Save Attendance Records</button>
+              </div>
+            </div>
+
+            <!-- Faculty Log Table -->
+            <div class="workspace-column-card" style="margin-top: 24px;">
+              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Your Recorded Sessions History & Corrections</h3>
+              <div class="sms-table-responsive">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Period</th>
+                      <th>Subject</th>
+                      <th>Sem/Sec</th>
+                      <th>Present / Absent</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fac-history-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student View Container -->
+          <div id="student-attendance-container" style="display: none;">
+            <div class="workspace-column-card">
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary);">Your Attendance Reports</h3>
+
+              <!-- Stats summary cards -->
+              <div class="dashboard-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="dashboard-stat-card theme-blue" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Overall Percentage</span>
+                  <h3 id="stud-stats-pct" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0%</h3>
+                  <span style="font-size: 0.68rem; color: #10B981; font-weight: 600;">Target: Min 75%</span>
+                </div>
+                <div class="dashboard-stat-card theme-green" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Total Classes Conducted</span>
+                  <h3 id="stud-stats-total" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0</h3>
+                  <span style="font-size: 0.68rem; color: #9CA3AF;">Across all curriculum subjects</span>
+                </div>
+                <div class="dashboard-stat-card theme-purple" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Classes Attended</span>
+                  <h3 id="stud-stats-present" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0</h3>
+                  <span style="font-size: 0.68rem; color: #9CA3AF;">Days marked present</span>
+                </div>
+                <div class="dashboard-stat-card theme-red" style="height: auto; padding: 20px;">
+                  <span style="font-size: 0.72rem; color: #9CA3AF; text-transform: uppercase; font-weight: 600;">Classes Absent</span>
+                  <h3 id="stud-stats-absent" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0; color: var(--text-primary);">0</h3>
+                  <span style="font-size: 0.68rem; color: #EF4444; font-weight: 600;">Absent count</span>
+                </div>
+              </div>
+
+              <!-- Subject Wise table -->
+              <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Subject-wise Attendance Breakdown</h4>
+              <div class="sms-table-responsive" style="margin-bottom: 24px;">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Subject Code</th>
+                      <th>Subject Name</th>
+                      <th>Faculty Advisor</th>
+                      <th class="text-center">Total Classes</th>
+                      <th class="text-center">Present</th>
+                      <th class="text-center">Absent</th>
+                      <th class="text-center">Attendance %</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stud-subject-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Daily Logs list -->
+              <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Detailed Attendance Log History</h4>
+              <div class="sms-table-responsive">
+                <table class="sms-data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Period</th>
+                      <th>Subject Name</th>
+                      <th>Faculty Advisor</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stud-logs-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <footer class="dashboard-footer-bar">
             <div class="footer-left"><span>© 2026 CSE Department Portal. All rights reserved.</span></div>
             <div class="footer-right"><span>Developed by <strong>MohanRaj</strong> | 3rd Year CSE</span></div>
@@ -470,11 +615,13 @@
     <!-- Alert toast container -->
     <div id="toast-message-banner" style="position: fixed; bottom: 24px; right: 24px; z-index: 1100; padding: 16px 24px; border-radius: 8px; color: #fff; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none;"></div>
 
+    <!-- Load Socket.io client script -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="module" src="/src/dashboard_global.js"></script>
     <script type="module">
       document.addEventListener('DOMContentLoaded', () => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
         if (!token) {
           window.location.href = '/login.html';
@@ -489,6 +636,24 @@
 
         if (navName) navName.id = 'nav-profile-name';
         if (sidebarName) sidebarName.id = 'sidebar-profile-name';
+
+        // Connect WebSocket for real-time changes
+        if (typeof io !== 'undefined') {
+          try {
+            const socket = io('http://localhost:5000');
+            socket.on('connect', () => {
+              console.log('[Socket] Connected to real-time notification socket.');
+            });
+
+            socket.on('attendanceUpdated', (data) => {
+              console.log('[Socket] Attendance updated event received:', data);
+              showToast('Real-time sync: Attendance records updated.', true);
+              reloadActiveRoleView();
+            });
+          } catch(e) {
+            console.error('Socket init error:', e);
+          }
+        }
 
         // Listen for global custom event
         document.addEventListener('sms:realtime_event', (e) => {
@@ -532,11 +697,13 @@
           if (hodContainer) hodContainer.style.display = 'block';
           initHODView();
         } else if (roleLower.includes('faculty')) {
-          window.location.href = '/faculty_attendance.html';
-          return;
+          const facContainer = document.getElementById('faculty-attendance-container');
+          if (facContainer) facContainer.style.display = 'block';
+          initFacultyView();
         } else if (roleLower.includes('student')) {
-          window.location.href = '/student_attendance.html';
-          return;
+          const studContainer = document.getElementById('student-attendance-container');
+          if (studContainer) studContainer.style.display = 'block';
+          loadStudentAttendance();
         }
 
         /* ==========================================
@@ -554,24 +721,14 @@
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (facRes.ok) {
-              const result = await facRes.json();
-              const rawList = Array.isArray(result)
-                ? result
-                : Array.isArray(result.faculty)
-                  ? result.faculty
-                  : Array.isArray(result.data)
-                    ? result.data
-                    : [];
-              facultyList = rawList;
+              facultyList = await facRes.json();
               const facSelect = document.getElementById('hod-filter-faculty');
-              if (facSelect) {
-                facultyList.forEach(f => {
-                  const opt = document.createElement('option');
-                  opt.value = f.id;
-                  opt.textContent = f.name;
-                  facSelect.appendChild(opt);
-                });
-              }
+              facultyList.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.textContent = f.name;
+                facSelect.appendChild(opt);
+              });
             }
 
             // Load Class Incharge Assignments Table
@@ -581,10 +738,7 @@
             console.error('Error seeding HOD filters:', err);
           }
 
-          const hodFilterBtn = document.getElementById('btn-hod-filter');
-          if (hodFilterBtn) {
-            hodFilterBtn.addEventListener('click', loadHODAttendance);
-          }
+          document.getElementById('btn-hod-filter').addEventListener('click', loadHODAttendance);
           
           // Initial load
           loadHODAttendance();
@@ -598,14 +752,8 @@
             const res = await fetch('/api/admin/class-incharges', {
               headers: { 'Authorization': `Bearer ${token}` }
             });
-            const result = await res.json().catch(() => ({}));
-            const assignments = Array.isArray(result)
-              ? result
-              : Array.isArray(result.classIncharges)
-                ? result.classIncharges
-                : Array.isArray(result.assignments)
-                  ? result.assignments
-                  : [];
+            if (!res.ok) throw new Error('Failed to load class incharges.');
+            const assignments = await res.json();
 
             const defaultClasses = [
               { year: '1st Year', semester: 'I', section: 'A' },
@@ -616,21 +764,15 @@
 
               tbody.innerHTML = '';
               defaultClasses.forEach(c => {
-                const normYear = (y) => String(y || '').toLowerCase().replace(/[^0-9a-z]/g, '');
-                const current = assignments.find(a => 
-                  (normYear(a.year) === normYear(c.year) || normYear(a.year) === normYear(c.year.split(' ')[0])) &&
-                  normYear(a.semester) === normYear(c.semester) &&
-                  String(a.section || 'A').toUpperCase() === String(c.section || 'A').toUpperCase()
-                );
-                const currentFacId = current ? (current.facultyId || current.faculty_id) : '';
+                const current = assignments.find(a => a.year === c.year && a.section === c.section);
+                const currentFacId = current ? current.facultyId : '';
                 const isAssigned = !!current;
 
                 const tr = document.createElement('tr');
                 let optionsHtml = '<option value="">-- No Class Incharge Assigned --</option>';
-                const safeFacList = Array.isArray(facultyList) ? facultyList : [];
-                safeFacList.forEach(f => {
+                facultyList.forEach(f => {
                   const isSelected = String(f.id) === String(currentFacId) || String(f.facultyId) === String(currentFacId);
-                  optionsHtml += `<option value="${f.id}" ${isSelected ? 'selected' : ''}>${f.name} (${f.employeeId || f.employee_id || 'FAC'})</option>`;
+                  optionsHtml += `<option value="${f.id}" ${isSelected ? 'selected' : ''}>${f.name} (${f.employeeId || 'FAC'})</option>`;
                 });
 
                 tr.innerHTML = `
@@ -652,63 +794,42 @@
                 `;
 
                 // Assign / Reassign Handler
-                const saveBtn = tr.querySelector('.btn-save-incharge');
-                const removeBtn = tr.querySelector('.btn-remove-incharge');
-                const facSelect = tr.querySelector('.incharge-fac-select');
-
-                saveBtn.addEventListener('click', async () => {
-                  const facId = facSelect.value;
+                tr.querySelector('.btn-save-incharge').addEventListener('click', async () => {
+                  const facId = tr.querySelector('.incharge-fac-select').value;
                   if (!facId) {
-                    showToast('Please select a faculty member to assign.', false);
+                    alert('Please select a faculty member to assign.');
                     return;
                   }
 
-                  saveBtn.disabled = true;
-                  saveBtn.innerHTML = '<span>⏳</span> Assigning...';
-
                   try {
-                    const payload = {
-                      year: c.year,
-                      semester: c.semester,
-                      section: c.section,
-                      facultyId: parseInt(facId)
-                    };
-                    console.log('[SMS Class Incharge Assigning]', payload);
-
                     const assignRes = await fetch('/api/admin/class-incharges/assign', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                       },
-                      body: JSON.stringify(payload)
+                      body: JSON.stringify({
+                        year: c.year,
+                        semester: c.semester,
+                        section: c.section,
+                        facultyId: parseInt(facId)
+                      })
                     });
-                    const assignData = await assignRes.json().catch(() => ({}));
-                    console.log('[SMS Class Incharge Assign Result]', assignRes.status, assignData);
+                    const assignData = await assignRes.json();
+                    if (!assignRes.ok) throw new Error(assignData.message || 'Failed to assign class incharge.');
 
-                    if (!assignRes.ok) {
-                      throw new Error(assignData.message || `Assignment failed with HTTP ${assignRes.status}`);
-                    }
-
-                    showToast(assignData.message || 'Class Incharge assigned successfully!', true);
+                    showToast(assignData.message, true);
                     await loadClassInchargeAssignments();
                   } catch (err) {
-                    console.error('[SMS Class Incharge Assign Error]', err);
-                    showToast(err.message || 'Failed to assign class incharge.', false);
-                  } finally {
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = isAssigned ? 'Reassign / Save' : 'Assign';
+                    alert(err.message);
                   }
                 });
 
                 // Remove Incharge Handler
-                removeBtn.addEventListener('click', async () => {
-                  if (!confirm(`Are you sure you want to remove the Class Incharge for ${c.year} (Sem ${c.semester} - Sec ${c.section})?`)) {
+                tr.querySelector('.btn-remove-incharge').addEventListener('click', async () => {
+                  if (!confirm(`Are you sure you want to remove the Class Incharge for ${c.year} (Sem ${c.semester} - Sec ${c.section})? Attendance entry will be disabled for this class.`)) {
                     return;
                   }
-
-                  removeBtn.disabled = true;
-                  removeBtn.innerHTML = '<span>⏳</span> Removing...';
 
                   try {
                     const removeRes = await fetch('/api/admin/class-incharges/remove', {
@@ -723,17 +844,13 @@
                         section: c.section
                       })
                     });
-                    const removeData = await removeRes.json().catch(() => ({}));
+                    const removeData = await removeRes.json();
                     if (!removeRes.ok) throw new Error(removeData.message || 'Failed to remove class incharge.');
 
-                    showToast(removeData.message || 'Class Incharge removed successfully.', true);
+                    showToast(removeData.message, true);
                     await loadClassInchargeAssignments();
                   } catch (err) {
-                    console.error('[SMS Class Incharge Remove Error]', err);
-                    showToast(err.message || 'Failed to remove class incharge.', false);
-                  } finally {
-                    removeBtn.disabled = false;
-                    removeBtn.innerHTML = '🗑 Remove';
+                    alert(err.message);
                   }
                 });
 
@@ -921,10 +1038,344 @@
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+          showToast('CSV Report downloaded successfully!', true);
+        }
+
+
+        /* ==========================================
+           2. FACULTY ATTENDANCE IMPLEMENTATION
+           ========================================== */
+        let activeChecklistStudents = [];
+        let facultySubjects = [];
+
+        async function initFacultyView() {
+          // Set Date input default to today
+          const dateInput = document.getElementById('fac-select-date');
+          dateInput.value = new Date().toISOString().split('T')[0];
+
+          // Load Assigned Subjects
+          try {
+            const res = await fetch('/api/attendance/subjects', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Could not load assigned subjects.');
+
+            facultySubjects = await res.json();
+            const select = document.getElementById('fac-select-subject');
+            select.innerHTML = '<option value="">-- Choose Subject --</option>';
+            
+            facultySubjects.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.id;
+              opt.textContent = `${s.code} - ${s.name} (Sem ${s.semester} / Sec ${s.section})`;
+              select.appendChild(opt);
+            });
+
+            select.addEventListener('change', loadStudentChecklist);
+            
+            // Mark all buttons
+            document.getElementById('btn-mark-all-present').addEventListener('click', () => toggleChecklistStatus('Present'));
+            document.getElementById('btn-mark-all-absent').addEventListener('click', () => toggleChecklistStatus('Absent'));
+
+            // Save attendance
+            document.getElementById('btn-save-attendance').addEventListener('click', submitFacultyAttendance);
+
+            // Modal closers
+            document.getElementById('btn-close-fac-modal').addEventListener('click', () => {
+              document.getElementById('faculty-edit-modal').style.display = 'none';
+            });
+            document.getElementById('btn-cancel-edit').addEventListener('click', () => {
+              document.getElementById('faculty-edit-modal').style.display = 'none';
+            });
+            document.getElementById('faculty-edit-form').addEventListener('submit', submitFacultyAttendanceEdits);
+
+            // Load historical logs
+            loadFacultyHistoryLogs();
+
+          } catch (err) {
+            showToast(err.message, false);
           }
+        }
+
+        async function loadStudentChecklist() {
+          const subjectId = document.getElementById('fac-select-subject').value;
+          const tbody = document.getElementById('fac-student-checklist-body');
+          tbody.innerHTML = '';
+
+          if (!subjectId) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">Please select a subject to load students.</td></tr>`;
+            return;
+          }
+
+          try {
+            const res = await fetch(`/api/attendance/students?subjectId=${subjectId}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load class roster.');
+
+            activeChecklistStudents = await res.json();
+
+            if (activeChecklistStudents.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: #64748b;">No active students found in this subject's Semester & Section.</td></tr>`;
+              return;
+            }
+
+            activeChecklistStudents.forEach(st => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>${st.registerNumber}</strong></td>
+                <td>${st.name}</td>
+                <td class="text-center">
+                  <label class="attendance-radio-wrap text-success">
+                    <input type="radio" name="status-${st.id}" value="Present" checked style="accent-color: #10b981;">
+                  </label>
+                </td>
+                <td class="text-center">
+                  <label class="attendance-radio-wrap text-danger">
+                    <input type="radio" name="status-${st.id}" value="Absent" style="accent-color: #ef4444;">
+                  </label>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        function toggleChecklistStatus(status) {
+          activeChecklistStudents.forEach(st => {
+            const radio = document.querySelector(`input[name="status-${st.id}"][value="${status}"]`);
+            if (radio) radio.checked = true;
+          });
+        }
+
+        async function submitFacultyAttendance() {
+          const subjectId = document.getElementById('fac-select-subject').value;
+          const date = document.getElementById('fac-select-date').value;
+          const period = document.getElementById('fac-select-period').value;
+
+          if (!subjectId) {
+            showToast('Please select a subject.', false);
+            return;
+          }
+
+          const records = activeChecklistStudents.map(st => {
+            const status = document.querySelector(`input[name="status-${st.id}"]:checked`).value;
+            return { studentId: st.id, status };
+          });
+
+          try {
+            const res = await fetch('/api/attendance/save', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ subjectId, date, period, records })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error saving attendance.');
+
+            showToast('Attendance recorded successfully!', true);
+            loadFacultyHistoryLogs();
+            
+            // reset subject input to trigger clean layout
+            document.getElementById('fac-select-subject').value = '';
+            loadStudentChecklist();
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        async function loadFacultyHistoryLogs() {
+          try {
+            const res = await fetch('/api/attendance/history', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load faculty history logs.');
+
+            const sessions = await res.json();
+            const tbody = document.getElementById('fac-history-table-body');
+            tbody.innerHTML = '';
+
+            if (sessions.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">No recorded attendance sessions found.</td></tr>`;
+              return;
+            }
+
+            sessions.forEach(s => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>${s.date}</strong></td>
+                <td>${s.period}</td>
+                <td><strong>${s.subjectCode}</strong> - ${s.subjectName}</td>
+                <td>Sem ${s.semester} - Sec ${s.section}</td>
+                <td><span class="badge-pill bg-green-light">${s.presentCount} Present</span> / <span class="badge-pill bg-red-light">${s.absentCount} Absent</span></td>
+                <td class="text-right">
+                  <button class="action-tbl-btn bg-green-light btn-edit-session" style="padding:4px 8px; border:none; border-radius:4px; cursor:pointer;">Correct / Edit</button>
+                </td>
+              `;
+
+              tr.querySelector('.btn-edit-session').addEventListener('click', () => {
+                openFacultyCorrectionModal(s);
+              });
+
+              tbody.appendChild(tr);
+            });
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+        function openFacultyCorrectionModal(session) {
+          const modal = document.getElementById('faculty-edit-modal');
+          modal.style.display = 'flex';
+
+          document.getElementById('edit-session-id').value = session.id;
+          document.getElementById('fac-edit-meta').innerHTML = `
+            <strong>Date:</strong> ${session.date} | <strong>Period:</strong> ${session.period}<br>
+            <strong>Subject:</strong> ${session.subjectCode} - ${session.subjectName} (Sec ${session.section})
+          `;
+
+          const tbody = document.getElementById('fac-edit-students-body');
+          tbody.innerHTML = '';
+
+          session.records.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><strong>${r.registerNumber}</strong></td>
+              <td>${r.studentName}</td>
+              <td class="text-center">
+                <input type="radio" name="edit-status-${r.studentId}" value="Present" ${r.status === 'Present' ? 'checked' : ''} style="accent-color: #10b981;">
+              </td>
+              <td class="text-center">
+                <input type="radio" name="edit-status-${r.studentId}" value="Absent" ${r.status === 'Absent' ? 'checked' : ''} style="accent-color: #ef4444;">
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        async function submitFacultyAttendanceEdits(e) {
+          e.preventDefault();
+          const sessionId = document.getElementById('edit-session-id').value;
+          const rows = document.querySelectorAll('#fac-edit-students-body tr');
+
+          const records = [];
+          rows.forEach(row => {
+            const radioPresent = row.querySelector('input[value="Present"]');
+            const studentId = radioPresent.name.replace('edit-status-', '');
+            const status = row.querySelector(`input[name="edit-status-${studentId}"]:checked`).value;
+            records.push({ studentId: parseInt(studentId), status });
+          });
+
+          try {
+            const res = await fetch(`/api/attendance/session/${sessionId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ records })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error updating attendance.');
+
+            showToast('Attendance correction saved successfully!', true);
+            document.getElementById('faculty-edit-modal').style.display = 'none';
+            loadFacultyHistoryLogs();
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
+
+
+        /* ==========================================
+           3. STUDENT ATTENDANCE IMPLEMENTATION
+           ========================================== */
+        async function loadStudentAttendance() {
+          try {
+            const res = await fetch('/api/attendance/history', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to load student reports.');
+
+            const data = await res.json();
+            
+            // Calculate and bind analytics totals
+            let total = 0;
+            let present = 0;
+            let absent = 0;
+
+            data.subjectStats.forEach(s => {
+              total += s.totalClasses;
+              present += s.present;
+              absent += s.absent;
+            });
+
+            const percentage = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('stud-stats-pct').textContent = `${percentage}%`;
+            document.getElementById('stud-stats-total').textContent = total;
+            document.getElementById('stud-stats-present').textContent = present;
+            document.getElementById('stud-stats-absent').textContent = absent;
+
+            // Render subject stats breakdown
+            const subTbody = document.getElementById('stud-subject-table-body');
+            subTbody.innerHTML = '';
+            
+            if (data.subjectStats.length === 0) {
+              subTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">No logged subject records.</td></tr>`;
+            } else {
+              data.subjectStats.forEach(s => {
+                const pctVal = parseFloat(s.percentage);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td><strong>${s.subjectCode}</strong></td>
+                  <td>${s.subjectName}</td>
+                  <td>${s.facultyName}</td>
+                  <td class="text-center">${s.totalClasses}</td>
+                  <td class="text-center">${s.present}</td>
+                  <td class="text-center">${s.absent}</td>
+                  <td class="text-center"><span class="badge-pill ${pctVal >= 75 ? 'bg-green-light' : 'bg-red-light'}">${s.percentage}</span></td>
+                `;
+                subTbody.appendChild(tr);
+              });
+            }
+
+            // Render detailed log rows
+            const logTbody = document.getElementById('stud-logs-table-body');
+            logTbody.innerHTML = '';
+
+            if (data.records.length === 0) {
+              logTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">No attendance history logged.</td></tr>`;
+            } else {
+              data.records.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td><strong>${r.date}</strong></td>
+                  <td>${r.period}</td>
+                  <td><strong>${r.subjectCode}</strong> - ${r.subjectName}</td>
+                  <td>${r.facultyName}</td>
+                  <td><span class="badge-pill ${r.status === 'Present' ? 'bg-green-light' : 'bg-red-light'}">${r.status}</span></td>
+                `;
+                logTbody.appendChild(tr);
+              });
+            }
+
+          } catch (err) {
+            showToast(err.message, false);
+          }
+        }
 
       });
     </script>
-    <script type="module" src="/src/dashboard_global.js"></script>
   </body>
 </html>

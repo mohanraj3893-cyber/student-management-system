@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [],
   build: {
     rollupOptions: {
       input: {
@@ -54,6 +53,10 @@ export default defineConfig({
       '/uploads': {
         target: 'http://localhost:5000',
         changeOrigin: true
+      },
+      '/ws': {
+        target: 'ws://localhost:5000',
+        ws: true
       }
     }
   }

@@ -3,83 +3,22 @@ const { Op } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
 
-function getSemNum(sem) {
-  if (sem === null || sem === undefined) return 0;
-  const str = String(sem).trim().toUpperCase();
-  if (str === '8' || str === 'VIII' || str.includes('SEM 8') || str.includes('SEMESTER 8') || str.includes('SEMESTER VIII')) return 8;
-  if (str === '7' || str === 'VII' || str.includes('SEM 7') || str.includes('SEMESTER 7') || str.includes('SEMESTER VII')) return 7;
-  if (str === '6' || str === 'VI' || str.includes('SEM 6') || str.includes('SEMESTER 6') || str.includes('SEMESTER VI')) return 6;
-  if (str === '5' || str === 'V' || str.includes('SEM 5') || str.includes('SEMESTER 5') || str.includes('SEMESTER V')) return 5;
-  if (str === '4' || str === 'IV' || str.includes('SEM 4') || str.includes('SEMESTER 4') || str.includes('SEMESTER IV')) return 4;
-  if (str === '3' || str === 'III' || str.includes('SEM 3') || str.includes('SEMESTER 3') || str.includes('SEMESTER III')) return 3;
-  if (str === '2' || str === 'II' || str.includes('SEM 2') || str.includes('SEMESTER 2') || str.includes('SEMESTER II')) return 2;
-  if (str === '1' || str === 'I' || str.includes('SEM 1') || str.includes('SEMESTER 1') || str.includes('SEMESTER I')) return 1;
-  const match = str.match(/\d+/);
-  return match ? parseInt(match[0], 10) : 0;
-}
+// Helper to normalize semester variations (e.g. 'V', '5', 'V Semester')
+const getSemVariants = (sem) => {
+  if (!sem) return ['V', '5', 'V Semester'];
+  const s = String(sem).trim().toUpperCase();
+  if (s === '1' || s === 'I' || s.includes('I SEM')) return ['1', 'I', 'I Semester', 'Semester I', '1st Semester'];
+  if (s === '2' || s === 'II' || s.includes('II SEM')) return ['2', 'II', 'II Semester', 'Semester II', '2nd Semester'];
+  if (s === '3' || s === 'III' || s.includes('III SEM')) return ['3', 'III', 'III Semester', 'Semester III', '3rd Semester'];
+  if (s === '4' || s === 'IV' || s.includes('IV SEM')) return ['4', 'IV', 'IV Semester', 'Semester IV', '4th Semester'];
+  if (s === '5' || s === 'V' || s.includes('V SEM')) return ['5', 'V', 'V Semester', 'Semester V', '5th Semester'];
+  if (s === '6' || s === 'VI' || s.includes('VI SEM')) return ['6', 'VI', 'VI Semester', 'Semester VI', '6th Semester'];
+  if (s === '7' || s === 'VII' || s.includes('VII SEM')) return ['7', 'VII', 'VII Semester', 'Semester VII', '7th Semester'];
+  if (s === '8' || s === 'VIII' || s.includes('VIII SEM')) return ['8', 'VIII', 'VIII Semester', 'Semester VIII', '8th Semester'];
+  return [sem];
+};
 
-function getYearNum(yr) {
-  if (yr === null || yr === undefined) return 0;
-  const str = String(yr).trim().toUpperCase();
-  if (str.includes('4TH') || str.includes('IV') || str === '4') return 4;
-  if (str.includes('3RD') || str.includes('III') || str === '3') return 3;
-  if (str.includes('2ND') || str.includes('II') || str === '2') return 2;
-  if (str.includes('1ST') || str.includes('I') || str === '1') return 1;
-  const match = str.match(/\d+/);
-  return match ? parseInt(match[0], 10) : 0;
-}
-
-function getYearNumFromSemNum(semNum) {
-  if (semNum === 1 || semNum === 2) return 1;
-  if (semNum === 3 || semNum === 4) return 2;
-  if (semNum === 5 || semNum === 6) return 3;
-  if (semNum === 7 || semNum === 8) return 4;
-  return 0;
-}
-
-function isYearMatch(yrA, yrB, semA = null, semB = null) {
-  if (!yrA && semA) {
-    const sNum = getSemNum(semA);
-    const yNum = getYearNumFromSemNum(sNum);
-    if (yNum > 0) yrA = String(yNum);
-  }
-  if (!yrB && semB) {
-    const sNum = getSemNum(semB);
-    const yNum = getYearNumFromSemNum(sNum);
-    if (yNum > 0) yrB = String(yNum);
-  }
-  if (!yrA || !yrB) return true;
-  const numA = getYearNum(yrA);
-  const numB = getYearNum(yrB);
-  if (numA > 0 && numB > 0) return numA === numB;
-  return String(yrA).trim().toLowerCase() === String(yrB).trim().toLowerCase();
-}
-
-function isSemesterMatch(semA, semB) {
-  if (!semA || !semB) return false;
-  const numA = getSemNum(semA);
-  const numB = getSemNum(semB);
-  if (numA > 0 && numB > 0) return numA === numB;
-  return String(semA).trim().toLowerCase() === String(semB).trim().toLowerCase();
-}
-
-function isSectionMatch(secA, secB) {
-  if (!secA || !secB) return true;
-  const cleanA = String(secA).trim().toUpperCase();
-  const cleanB = String(secB).trim().toUpperCase();
-  if (cleanA === 'ALL' || cleanB === 'ALL' || cleanA === '' || cleanB === '') return true;
-  return cleanA === cleanB;
-}
-
-function isDepartmentMatch(deptA, deptB) {
-  if (!deptA || !deptB) return false;
-  const cleanA = String(deptA).trim().toLowerCase();
-  const cleanB = String(deptB).trim().toLowerCase();
-  if (cleanA === cleanB) return true;
-  if (cleanA.replace(/[^a-z0-9]/g, '') === cleanB.replace(/[^a-z0-9]/g, '')) return true;
-  return false;
-}
-
+// Helper to format file size
 const formatBytes = (bytes) => {
   if (!bytes || bytes === 0) return '0 B';
   const k = 1024;
@@ -88,6 +27,7 @@ const formatBytes = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 };
 
+// Faculty: Upload new course material for assigned subject
 exports.uploadResource = async (req, res) => {
   try {
     if (!req.file) {
@@ -100,18 +40,14 @@ exports.uploadResource = async (req, res) => {
       return res.status(400).json({ message: 'Assigned subject selection is required.' });
     }
 
+    // Resolve Faculty Profile
     const faculty = await Faculty.findOne({ where: { userId: req.user.id } });
     if (!faculty) {
       return res.status(403).json({ message: 'Access denied. Faculty profile not found.' });
     }
 
-    const subject = await Subject.findOne({
-      where: {
-        id: parseInt(subjectId),
-        [Op.or]: [{ facultyId: faculty.id }, { facultyId: faculty.userId }]
-      }
-    });
-
+    // Verify Subject allocation strictly to this faculty
+    const subject = await Subject.findOne({ where: { id: parseInt(subjectId), facultyId: faculty.id } });
     if (!subject) {
       return res.status(403).json({ message: 'Access denied. You can only upload materials for your assigned subjects.' });
     }
@@ -150,6 +86,7 @@ exports.uploadResource = async (req, res) => {
   }
 };
 
+// Faculty: Get resources uploaded by logged-in faculty member
 exports.getFacultyResources = async (req, res) => {
   try {
     const faculty = await Faculty.findOne({ where: { userId: req.user.id } });
@@ -183,6 +120,7 @@ exports.getFacultyResources = async (req, res) => {
   }
 };
 
+// Student: Get course materials uploaded by faculty for student's semester
 exports.getStudentResources = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { userId: req.user.id } });
@@ -190,9 +128,13 @@ exports.getStudentResources = async (req, res) => {
       return res.status(404).json({ message: 'Student profile not found.' });
     }
 
-    const allDeptSubjects = await Subject.findAll({
+    const semVariants = getSemVariants(student.semester);
+
+    // Fetch subjects matching student's department & semester
+    const subjects = await Subject.findAll({
       where: {
-        department: student.department || 'Computer Science & Engineering'
+        department: student.department || 'Computer Science & Engineering',
+        semester: { [Op.in]: semVariants }
       },
       include: [
         { model: Faculty, as: 'faculty' },
@@ -200,13 +142,6 @@ exports.getStudentResources = async (req, res) => {
       ],
       order: [['code', 'ASC']]
     });
-
-    const subjects = allDeptSubjects.filter(sub => 
-      isDepartmentMatch(sub.department, student.department) &&
-      isYearMatch(sub.year, student.year, sub.semester, student.semester) &&
-      isSemesterMatch(sub.semester, student.semester) &&
-      isSectionMatch(sub.section, student.section)
-    );
 
     const result = subjects.map(sub => {
       const materials = (sub.resources || []).map(r => ({
@@ -237,6 +172,7 @@ exports.getStudentResources = async (req, res) => {
   }
 };
 
+// Faculty: Delete an uploaded course material
 exports.deleteResource = async (req, res) => {
   try {
     const { id } = req.params;
@@ -254,6 +190,7 @@ exports.deleteResource = async (req, res) => {
       return res.status(403).json({ message: 'Access denied. You can only delete your own uploaded materials.' });
     }
 
+    // Try deleting physical file from disk
     const diskPath = path.join(__dirname, '../../', resource.filePath);
     if (fs.existsSync(diskPath)) {
       try {

@@ -1,102 +1,19 @@
 const { User, Student, Subject, InternalMark, Faculty, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
-function getSemNum(sem) {
-  if (sem === null || sem === undefined) return 0;
-  const str = String(sem).trim().toUpperCase();
-  if (str === '8' || str === 'VIII' || str.includes('SEM 8') || str.includes('SEMESTER 8') || str.includes('SEMESTER VIII')) return 8;
-  if (str === '7' || str === 'VII' || str.includes('SEM 7') || str.includes('SEMESTER 7') || str.includes('SEMESTER VII')) return 7;
-  if (str === '6' || str === 'VI' || str.includes('SEM 6') || str.includes('SEMESTER 6') || str.includes('SEMESTER VI')) return 6;
-  if (str === '5' || str === 'V' || str.includes('SEM 5') || str.includes('SEMESTER 5') || str.includes('SEMESTER V')) return 5;
-  if (str === '4' || str === 'IV' || str.includes('SEM 4') || str.includes('SEMESTER 4') || str.includes('SEMESTER IV')) return 4;
-  if (str === '3' || str === 'III' || str.includes('SEM 3') || str.includes('SEMESTER 3') || str.includes('SEMESTER III')) return 3;
-  if (str === '2' || str === 'II' || str.includes('SEM 2') || str.includes('SEMESTER 2') || str.includes('SEMESTER II')) return 2;
-  if (str === '1' || str === 'I' || str.includes('SEM 1') || str.includes('SEMESTER 1') || str.includes('SEMESTER I')) return 1;
-  const match = str.match(/\d+/);
-  return match ? parseInt(match[0], 10) : 0;
-}
-
-function getYearNum(yr) {
-  if (yr === null || yr === undefined) return 0;
-  const str = String(yr).trim().toUpperCase();
-  if (str.includes('4TH') || str.includes('IV') || str === '4') return 4;
-  if (str.includes('3RD') || str.includes('III') || str === '3') return 3;
-  if (str.includes('2ND') || str.includes('II') || str === '2') return 2;
-  if (str.includes('1ST') || str.includes('I') || str === '1') return 1;
-  const match = str.match(/\d+/);
-  return match ? parseInt(match[0], 10) : 0;
-}
-
-function getYearNumFromSemNum(semNum) {
-  if (semNum === 1 || semNum === 2) return 1;
-  if (semNum === 3 || semNum === 4) return 2;
-  if (semNum === 5 || semNum === 6) return 3;
-  if (semNum === 7 || semNum === 8) return 4;
-  return 0;
-}
-
-function isYearMatch(yrA, yrB, semA = null, semB = null) {
-  if (!yrA && semA) {
-    const sNum = getSemNum(semA);
-    const yNum = getYearNumFromSemNum(sNum);
-    if (yNum > 0) yrA = String(yNum);
-  }
-  if (!yrB && semB) {
-    const sNum = getSemNum(semB);
-    const yNum = getYearNumFromSemNum(sNum);
-    if (yNum > 0) yrB = String(yNum);
-  }
-  if (!yrA || !yrB) return true;
-  const numA = getYearNum(yrA);
-  const numB = getYearNum(yrB);
-  if (numA > 0 && numB > 0) return numA === numB;
-  return String(yrA).trim().toLowerCase() === String(yrB).trim().toLowerCase();
-}
-
-function isSemesterMatch(semA, semB) {
-  if (!semA || !semB) return false;
-  const numA = getSemNum(semA);
-  const numB = getSemNum(semB);
-  if (numA > 0 && numB > 0) return numA === numB;
-  return String(semA).trim().toLowerCase() === String(semB).trim().toLowerCase();
-}
-
-function isSectionMatch(secA, secB) {
-  if (!secA || !secB) return true;
-  const cleanA = String(secA).trim().toUpperCase();
-  const cleanB = String(secB).trim().toUpperCase();
-  if (cleanA === 'ALL' || cleanB === 'ALL' || cleanA === '' || cleanB === '') return true;
-  return cleanA === cleanB;
-}
-
-function isDepartmentMatch(deptA, deptB) {
-  if (!deptA || !deptB) return true;
-  const cleanA = String(deptA).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-  const cleanB = String(deptB).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (cleanA === cleanB) return true;
-
-  const isCseA = cleanA.includes('cse') || cleanA.includes('computerscience');
-  const isCseB = cleanB.includes('cse') || cleanB.includes('computerscience');
-  if (isCseA && isCseB) return true;
-
-  const isItA = cleanA.includes('it') || cleanA.includes('informationtechnology');
-  const isItB = cleanB.includes('it') || cleanB.includes('informationtechnology');
-  if (isItA && isItB) return true;
-
-  const isEceA = cleanA.includes('ece') || cleanA.includes('electronics');
-  const isEceB = cleanB.includes('ece') || cleanB.includes('electronics');
-  if (isEceA && isEceB) return true;
-
-  const isEeeA = cleanA.includes('eee') || cleanA.includes('electrical');
-  const isEeeB = cleanB.includes('eee') || cleanB.includes('electrical');
-  if (isEeeA && isEeeB) return true;
-
-  const isAidsA = cleanA.includes('aids') || cleanA.includes('artificialintelligence');
-  const isAidsB = cleanB.includes('aids') || cleanB.includes('artificialintelligence');
-  if (isAidsA && isAidsB) return true;
-
-  return false;
-}
+const getSemVariants = (sem) => {
+  if (!sem) return ['V', '5', 'V Semester'];
+  const s = String(sem).trim().toUpperCase();
+  if (s === '1' || s === 'I' || s.includes('I SEM')) return ['1', 'I', 'I Semester', 'Semester I', '1st Semester'];
+  if (s === '2' || s === 'II' || s.includes('II SEM')) return ['2', 'II', 'II Semester', 'Semester II', '2nd Semester'];
+  if (s === '3' || s === 'III' || s.includes('III SEM')) return ['3', 'III', 'III Semester', 'Semester III', '3rd Semester'];
+  if (s === '4' || s === 'IV' || s.includes('IV SEM')) return ['4', 'IV', 'IV Semester', 'Semester IV', '4th Semester'];
+  if (s === '5' || s === 'V' || s.includes('V SEM')) return ['5', 'V', 'V Semester', 'Semester V', '5th Semester'];
+  if (s === '6' || s === 'VI' || s.includes('VI SEM')) return ['6', 'VI', 'VI Semester', 'Semester VI', '6th Semester'];
+  if (s === '7' || s === 'VII' || s.includes('VII SEM')) return ['7', 'VII', 'VII Semester', 'Semester VII', '7th Semester'];
+  if (s === '8' || s === 'VIII' || s.includes('VIII SEM')) return ['8', 'VIII', 'VIII Semester', 'Semester VIII', '8th Semester'];
+  return [sem];
+};
 
 exports.getRosterForFaculty = async (req, res) => {
   try {
@@ -111,27 +28,19 @@ exports.getRosterForFaculty = async (req, res) => {
       return res.status(403).json({ message: 'Access denied. Faculty profile not found.' });
     }
 
-    const subject = await Subject.findOne({
-      where: {
-        id: subjectId,
-        [Op.or]: [{ facultyId: faculty.id }, { facultyId: faculty.userId }]
-      }
-    });
-
+    const subject = await Subject.findOne({ where: { id: subjectId, facultyId: faculty.id } });
     if (!subject) {
       return res.status(403).json({ message: 'Access denied. You are not the assigned faculty for this subject.' });
     }
 
-    const allStudents = await Student.findAll({
+    const semVariants = getSemVariants(subject.semester);
+    const roster = await Student.findAll({
+      where: {
+        department: subject.department || faculty.department || 'Computer Science & Engineering',
+        semester: { [Op.in]: semVariants }
+      },
       order: [['registerNumber', 'ASC']]
     });
-
-    const roster = allStudents.filter(s => 
-      isDepartmentMatch(s.department, subject.department) &&
-      isYearMatch(s.year, subject.year, s.semester, subject.semester) &&
-      isSemesterMatch(s.semester, subject.semester) &&
-      isSectionMatch(s.section, subject.section)
-    );
 
     const existingMarks = await InternalMark.findAll({
       where: { subjectId, examType }
@@ -182,14 +91,7 @@ exports.saveMarks = async (req, res) => {
       return res.status(403).json({ message: 'Access denied. Faculty profile not found.' });
     }
 
-    const subject = await Subject.findOne({
-      where: {
-        id: subjectId,
-        [Op.or]: [{ facultyId: faculty.id }, { facultyId: faculty.userId }]
-      },
-      transaction: t
-    });
-
+    const subject = await Subject.findOne({ where: { id: subjectId, facultyId: faculty.id }, transaction: t });
     if (!subject) {
       await t.rollback();
       return res.status(403).json({ message: 'Access denied. You are not the assigned faculty for this subject.' });
@@ -229,9 +131,9 @@ exports.saveMarks = async (req, res) => {
 
     await t.commit();
 
-    const socketManager = req.app.get('socketManager');
-    if (socketManager) {
-      socketManager.broadcastToAll('MARKS_UPDATED', { subjectId, examType });
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('marksUpdated', { subjectId, examType });
     }
 
     return res.status(200).json({ message: 'Internal marks saved successfully in database.' });
@@ -253,35 +155,16 @@ exports.getStudentGrades = async (req, res) => {
       return res.status(404).json({ message: 'Student profile not found.' });
     }
 
-    console.log('[DEBUG GET /api/marks/my-marks] Authenticated student fetched from MySQL:', {
-      department: student.department,
-      year: student.year,
-      semester: student.semester,
-      section: student.section
-    });
-
-    console.log('[DEBUG GET /api/marks/my-marks] Executing assigned subjects lookup filter for class:', {
-      department: student.department,
-      year: student.year,
-      semester: student.semester,
-      section: student.section
-    });
-
-    // Step 1: Fetch all subjects in database to perform strict LEFT JOIN mapping
-    const allSubjects = await Subject.findAll({
+    const semVariants = getSemVariants(student.semester);
+    const subjects = await Subject.findAll({
+      where: {
+        department: student.department || 'Computer Science & Engineering',
+        semester: { [Op.in]: semVariants }
+      },
       include: [{ model: Faculty, as: 'faculty' }],
       order: [['code', 'ASC']]
     });
 
-    // Filter subjects matching student's Department + Year + Semester + Section
-    const assignedSubjects = allSubjects.filter(sub => 
-      isDepartmentMatch(sub.department, student.department) &&
-      isYearMatch(sub.year, student.year, sub.semester, student.semester) &&
-      isSemesterMatch(sub.semester, student.semester) &&
-      isSectionMatch(sub.section, student.section)
-    );
-
-    // Step 2: Fetch existing marks for this student (LEFT JOIN logic)
     const existingMarks = await InternalMark.findAll({
       where: { studentId: student.id }
     });
@@ -295,25 +178,7 @@ exports.getStudentGrades = async (req, res) => {
     const examTypes = ['IA-1', 'IA-2', 'Model Exam'];
     const responseList = [];
 
-    assignedSubjects.forEach(sub => {
-      let iat1Val = null;
-      let iat2Val = null;
-      let modelVal = null;
-
-      // Extract scores per exam type for summary
-      for (const [k, v] of Object.entries(marksMap)) {
-        const [sId, eType] = k.split('_');
-        if (parseInt(sId) === sub.id) {
-          if (eType.includes('IA1') || eType.includes('IA-1') || eType.includes('IA-I') || eType.includes('IA 1')) {
-            iat1Val = v.marksObtained;
-          } else if (eType.includes('IA2') || eType.includes('IA-2') || eType.includes('IA-II') || eType.includes('IA 2')) {
-            iat2Val = v.marksObtained;
-          } else if (eType.includes('MODEL')) {
-            modelVal = v.marksObtained;
-          }
-        }
-      }
-
+    subjects.forEach(sub => {
       examTypes.forEach(exam => {
         let markRec = null;
         for (const [k, v] of Object.entries(marksMap)) {
@@ -344,13 +209,9 @@ exports.getStudentGrades = async (req, res) => {
             percentage: `${pct}%`,
             isPass: markRec.marksObtained >= (markRec.maxMarks * 0.5),
             isUpdated: true,
-            statusText: 'Published',
-            iat1: iat1Val,
-            iat2: iat2Val,
-            model: modelVal
+            statusText: 'Published'
           });
         } else {
-          // LEFT JOIN placeholder for unposted exam marks
           responseList.push({
             id: null,
             subjectId: sub.id,
@@ -363,10 +224,7 @@ exports.getStudentGrades = async (req, res) => {
             percentage: null,
             isPass: null,
             isUpdated: false,
-            statusText: 'Not Yet Updated',
-            iat1: iat1Val,
-            iat2: iat2Val,
-            model: modelVal
+            statusText: 'Marks Not Updated'
           });
         }
       });
@@ -380,6 +238,7 @@ exports.getStudentGrades = async (req, res) => {
   }
 };
 
+// HOD: load department-wide marks logs & audit reports scoped by HOD department
 exports.getDepartmentMarksLogs = async (req, res) => {
   try {
     const studentWhere = {};
