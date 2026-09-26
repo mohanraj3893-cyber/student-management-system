@@ -589,6 +589,16 @@ export default {
 
       const department = user.student_dept || user.faculty_dept || 'Computer Science & Engineering';
       const displayName = user.student_name || user.faculty_name || user.username;
+      let designation = user.role === 'admin' ? 'Head of Department' : (user.role === 'faculty' ? 'Assistant Professor' : 'Student');
+      let photoPath = null;
+      if (user.role === 'student') {
+        const s = await env.DB.prepare('SELECT photo_path FROM students WHERE user_id = ?').bind(user.id).first();
+        photoPath = s?.photo_path || null;
+      } else {
+        const f = await env.DB.prepare('SELECT designation, photo_path FROM faculty WHERE user_id = ?').bind(user.id).first();
+        if (f?.designation) designation = f.designation;
+        photoPath = f?.photo_path || null;
+      }
 
       const secret = env.JWT_SECRET || 'super_secret_access_jwt_key_2026_cse_dept';
       const token = await signJwt({
@@ -598,16 +608,21 @@ export default {
         department: department
       }, secret, 86400);
 
+      const userObj = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        name: displayName,
+        department: department,
+        designation: designation,
+        photoPath: photoPath
+      };
+
       return jsonResponse({
         token,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          name: displayName,
-          department: department
-        }
+        accessToken: token,
+        user: userObj
       }, 200, request);
     }
 
@@ -623,7 +638,32 @@ export default {
         } else {
           details = await env.DB.prepare('SELECT * FROM faculty WHERE user_id = ?').bind(user.id).first();
         }
-        return jsonResponse({ user, profile: details }, 200, request);
+
+        const merged = {
+          user: user,
+          profile: details,
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          name: details?.name || user.name || user.username,
+          department: details?.department || user.department,
+          phone: details?.phone || '',
+          photoPath: details?.photo_path || null,
+          designation: details?.designation || (user.role === 'admin' ? 'Head of Department' : (user.role === 'faculty' ? 'Assistant Professor' : 'Student')),
+          employeeId: details?.employee_id || user.username,
+          registerNumber: details?.register_number || user.username,
+          qualification: details?.qualification || '',
+          researchArea: details?.research_area || '',
+          publications: details?.publications || '',
+          address: details?.address || '',
+          course: details?.course || 'B.E',
+          branch: details?.branch || 'Computer Science & Engineering',
+          year: details?.year || '',
+          semester: details?.semester || '',
+          section: details?.section || 'A'
+        };
+        return jsonResponse(merged, 200, request);
       }
 
       if (method === 'PUT') {
@@ -1463,66 +1503,138 @@ export default {
       const user = await getAuthenticatedUser(request, env);
       if (!user) return errorResponse('Unauthorized', 401, request);
 
+      const dept = user.department || 'Computer Science & Engineering';
+
+      // 1. Department-isolated total student count (approved)
+      const studentCount = await env.DB.prepare(`
+        SELECT COUNT(*) as c FROM students s
+        JOIN users u ON s.user_id = u.id
+        WHERE u.is_approved = 1 AND s.department = ?
+      `).bind(dept).first();
+
+      // 2. Department-isolated total faculty count (approved)
+      const facultyCount = await env.DB.prepare(`
+        SELECT COUNT(*) as c FROM faculty f
+        JOIN users u ON f.user_id = u.id
+        WHERE u.is_approved = 1 AND f.department = ?
+      `).bind(dept).first();
+
+      // 3. Department-isolated subject count
+      const subjectCount = await env.DB.prepare('SELECT COUNT(*) as c FROM subjects WHERE department = ?').bind(dept).first();
+
+      // 4. Department-isolated pending leaves count
+      const pendingLeavesCount = await env.DB.prepare(`
+        SELECT COUNT(*) as c FROM leave_requests lr
+        JOIN students s ON lr.student_id = s.id
+        WHERE (lr.status = 'Pending' OR lr.status = 'PENDING_HOD' OR lr.status = 'PENDING_CLASS_INCHARGE')
+          AND s.department = ?
+      `).bind(dept).first();
+
+      // 5. Department-isolated pending registrations count
+      const pendingRegCount = await env.DB.prepare(`
+        SELECT COUNT(*) as c FROM users u
+        LEFT JOIN students s ON s.user_id = u.id
+        LEFT JOIN faculty f ON f.user_id = u.id
+        WHERE u.is_approved = 0 AND (s.department = ? OR f.department = ? OR (s.department IS NULL AND f.department IS NULL))
+      `).bind(dept, dept).first();
+
+      // 6. Department-isolated attendance percentage
+      const attStats = await env.DB.prepare(`
+        SELECT COUNT(*) as total, SUM(CASE WHEN ar.status = 'Present' THEN 1 ELSE 0 END) as present
+        FROM attendance_records ar
+        JOIN students s ON ar.student_id = s.id
+        WHERE s.department = ?
+      `).bind(dept).first();
+
+      const attTotal = attStats?.total || 0;
+      const attPresent = attStats?.present || 0;
+      const attendancePercentage = attTotal > 0 ? Math.round((attPresent / attTotal) * 100) : 0;
+
+      // Role-specific stats & metadata
+      let isClassIncharge = false;
+      let inchargeAssignments = [];
+      let userRoleStats = {};
+      let photoPath = null;
+      let designation = user.role === 'admin' ? 'Head of Department' : (user.role === 'faculty' ? 'Assistant Professor' : 'Student');
+
       if (user.role === 'admin') {
-        const totalStudents = await env.DB.prepare('SELECT COUNT(*) as c FROM students WHERE department = ?').bind(user.department).first();
-        const totalFaculty = await env.DB.prepare('SELECT COUNT(*) as c FROM faculty WHERE department = ?').bind(user.department).first();
-        const totalSubjects = await env.DB.prepare('SELECT COUNT(*) as c FROM subjects WHERE department = ?').bind(user.department).first();
-        const pendingApprovals = await env.DB.prepare(`
-          SELECT COUNT(*) as c FROM users u
-          LEFT JOIN students s ON s.user_id = u.id
-          LEFT JOIN faculty f ON f.user_id = u.id
-          WHERE u.is_approved = 0 AND (s.department = ? OR f.department = ?)
-        `).bind(user.department, user.department).first();
-
-        return jsonResponse({
-          totalStudents: totalStudents?.c || 0,
-          totalFaculty: totalFaculty?.c || 0,
-          totalSubjects: totalSubjects?.c || 0,
-          pendingApprovals: pendingApprovals?.c || 0,
-          department: user.department
-        }, 200, request);
+        const f = await env.DB.prepare('SELECT designation, photo_path FROM faculty WHERE user_id = ?').bind(user.id).first();
+        if (f) {
+          designation = f.designation || 'Head of Department';
+          photoPath = f.photo_path || null;
+        }
+      } else if (user.role === 'faculty') {
+        const f = await env.DB.prepare('SELECT id, designation, photo_path FROM faculty WHERE user_id = ?').bind(user.id).first();
+        if (f) {
+          designation = f.designation || 'Assistant Professor';
+          photoPath = f.photo_path || null;
+          const assigned = await env.DB.prepare('SELECT * FROM class_incharges WHERE faculty_id = ?').bind(f.id).all();
+          inchargeAssignments = assigned.results || [];
+          isClassIncharge = inchargeAssignments.length > 0;
+          userRoleStats.assignedClasses = inchargeAssignments.length;
+        }
+        const mySubCount = await env.DB.prepare('SELECT COUNT(*) as c FROM subjects WHERE faculty_id = ?').bind(user.faculty_id || 0).first();
+        userRoleStats.assignedSubjects = mySubCount?.c || 0;
+      } else if (user.role === 'student') {
+        const s = await env.DB.prepare('SELECT id, photo_path FROM students WHERE user_id = ?').bind(user.id).first();
+        if (s) {
+          photoPath = s.photo_path || null;
+          const studAtt = await env.DB.prepare(`
+            SELECT COUNT(*) as total, SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present
+            FROM attendance_records WHERE student_id = ?
+          `).bind(s.id).first();
+          const sTot = studAtt?.total || 0;
+          const sPres = studAtt?.present || 0;
+          userRoleStats.studentAttendance = sTot > 0 ? `${Math.round((sPres / sTot) * 100)}%` : 'N/A';
+          userRoleStats.totalDays = sTot;
+          userRoleStats.presentDays = sPres;
+        }
       }
 
-      if (user.role === 'faculty') {
-        const myClasses = await env.DB.prepare(`
-          SELECT COUNT(*) as c FROM class_incharges ci
-          JOIN faculty f ON ci.faculty_id = f.id
-          WHERE f.user_id = ?
-        `).bind(user.id).first();
+      const totalStudents = studentCount?.c || 0;
+      const totalFaculty = facultyCount?.c || 0;
+      const totalSubjects = subjectCount?.c || 0;
+      const pendingLeaves = pendingLeavesCount?.c || 0;
+      const pendingRegistrations = pendingRegCount?.c || 0;
 
-        const mySubjects = await env.DB.prepare(`
-          SELECT COUNT(*) as c FROM subjects s
-          JOIN faculty f ON s.faculty_id = f.id
-          WHERE f.user_id = ?
-        `).bind(user.id).first();
+      const userPayload = {
+        id: user.id,
+        username: user.username,
+        name: user.name || user.username,
+        role: user.role,
+        designation: designation,
+        department: dept,
+        photoPath: photoPath,
+        lastLogin: new Date().toISOString(),
+        isClassIncharge: isClassIncharge,
+        classInchargeAssignments: inchargeAssignments
+      };
 
-        return jsonResponse({
-          assignedClasses: myClasses?.c || 0,
-          assignedSubjects: mySubjects?.c || 0,
-          department: user.department
-        }, 200, request);
-      }
+      const statsPayload = {
+        totalStudents,
+        totalFaculty,
+        totalSubjects,
+        pendingLeaves,
+        pendingRegistrations,
+        pendingApprovals: pendingRegistrations,
+        attendancePercentage,
+        ...userRoleStats
+      };
 
-      if (user.role === 'student') {
-        const student = await env.DB.prepare('SELECT id FROM students WHERE user_id = ?').bind(user.id).first();
-        const attStats = await env.DB.prepare(`
-          SELECT
-            COUNT(*) as total_days,
-            SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present_days
-          FROM attendance_records WHERE student_id = ?
-        `).bind(student?.id || 0).first();
-
-        const total = attStats?.total_days || 0;
-        const present = attStats?.present_days || 0;
-        const percentage = total > 0 ? Math.round((present / total) * 100) : 100;
-
-        return jsonResponse({
-          attendancePercentage: percentage,
-          totalDays: total,
-          presentDays: present,
-          department: user.department
-        }, 200, request);
-      }
+      return jsonResponse({
+        user: userPayload,
+        stats: statsPayload,
+        // Flat aliases for backwards compatibility
+        totalStudents,
+        totalFaculty,
+        totalSubjects,
+        pendingLeaves,
+        pendingApprovals: pendingRegistrations,
+        pendingRegistrations,
+        attendancePercentage,
+        department: dept,
+        ...userRoleStats
+      }, 200, request);
     }
 
     if (path === '/api/dashboard/timetable' && method === 'GET') {

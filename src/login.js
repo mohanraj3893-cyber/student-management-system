@@ -281,8 +281,27 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear any previous session or cached state completely
         localStorage.clear();
         sessionStorage.clear();
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        const token = data.accessToken || data.token;
+        if (!token) {
+          throw new Error('Authentication token not received from server.');
+        }
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('token', token);
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          // Seed profile cache so dashboard renders immediately upon landing
+          sessionStorage.setItem('sms_user_profile_cache', JSON.stringify({
+            user: data.user,
+            stats: {
+              totalStudents: 0,
+              totalFaculty: 0,
+              totalSubjects: 0,
+              attendancePercentage: 0,
+              pendingLeaves: 0,
+              pendingRegistrations: 0
+            }
+          }));
+        }
 
         showAlert('Login successful! Redirecting...', 'success');
 
@@ -295,9 +314,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         setTimeout(() => {
-          if (role === 'student') {
+          const actualRole = (data.user && data.user.role ? data.user.role.toLowerCase() : role);
+          if (actualRole === 'student') {
             window.location.href = '/student_dashboard.html';
-          } else if (role === 'faculty') {
+          } else if (actualRole === 'faculty') {
             window.location.href = '/faculty_dashboard.html';
           } else {
             window.location.href = '/dashboard.html';

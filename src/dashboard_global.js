@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
      4. DYNAMIC DATA & PROFILE LOADER WITH FAST CACHING
      ========================================== */
   async function loadDashboardData() {
-    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || sessionStorage.getItem('accessToken');
     if (!token) {
       window.location.href = '/login.html';
       return;
@@ -524,11 +524,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('token');
           sessionStorage.removeItem('sms_user_profile_cache');
           window.location.href = '/login.html';
           return;
         }
-        throw new Error('Failed to fetch dashboard stats.');
+        throw new Error(`Failed to fetch dashboard stats (${res.status}).`);
       }
 
       const data = await res.json();
@@ -536,13 +538,18 @@ document.addEventListener('DOMContentLoaded', () => {
       populateDashboardUI(data);
 
       // Enable notification system for all roles (Admin, Faculty, Student)
-      initNotificationSystem(token, data.user.role);
+      const userRole = (data.user && data.user.role) || data.role || 'admin';
+      initNotificationSystem(token, userRole);
 
       // Initialize Real-Time WebSocket connection
-      initRealtimeClient(token, data.user.role);
+      initRealtimeClient(token, userRole);
 
     } catch (error) {
       console.error('Error loading dashboard data:', error);
+      const fallbackUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (fallbackUser.role) {
+        populateDashboardUI({ user: fallbackUser, stats: { totalStudents: 0, totalFaculty: 0, totalSubjects: 0, attendancePercentage: 0, pendingLeaves: 0, pendingRegistrations: 0 } });
+      }
     }
   }
 
@@ -602,8 +609,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function populateDashboardUI(data) {
+    if (!data) return;
     const currentPath = window.location.pathname.toLowerCase();
-    const userRole = data.user.role; // 'admin', 'faculty', 'student'
+    const user = data.user || data;
+    const stats = data.stats || data;
+    const userRole = user.role || 'admin'; // 'admin', 'faculty', 'student'
 
     document.body.classList.remove('theme-student', 'theme-faculty', 'theme-admin');
     document.body.classList.add(`theme-${userRole}`);
@@ -713,11 +723,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // 1. Role normalization & fallback handling
-      const roleLower = String(data.user.role || '').toLowerCase().trim();
+      const roleLower = String(user.role || '').toLowerCase().trim();
       const isAdminOrHOD = roleLower === 'admin' || roleLower === 'hod';
       const isFacultyRole = roleLower === 'faculty';
 
-      const userName = data.user.name || data.user.username || '';
+      const userName = user.name || user.username || '';
 
       // 2. Populate global navbar/sidebar profile names and roles across desktop and mobile
       const navNames = document.querySelectorAll('.nav-profile-name, #nav-profile-name');
@@ -736,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       navRoles.forEach(el => el.textContent = roleText);
       sidebarRoles.forEach(el => {
-        el.textContent = isAdminOrHOD ? 'HOD - CSE Department' : (data.user.designation || 'Faculty - CSE');
+        el.textContent = isAdminOrHOD ? 'HOD - CSE Department' : (user.designation || 'Faculty - CSE');
       });
 
       // Always update avatar images across desktop & mobile
@@ -755,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='${encodeURIComponent(bg)}'/%3E%3Ctext x='32' y='41' font-family='Inter, sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3E${initial}%3C/text%3E%3C/svg%3E`;
       };
 
-      const _avatarSrc = window.getAvatarUrl(userName, data.user.photoPath);
+      const _avatarSrc = window.getAvatarUrl(userName, user.photoPath);
       document.querySelectorAll('img.nav-profile-avatar, .nav-profile-avatar img, .nav-profile-block img, img.profile-widget-avatar, .profile-widget-avatar img, img.mobile-avatar-img, .mobile-avatar-img img, #nav-student-avatar, #sidebar-student-avatar, #nav-faculty-avatar, #sidebar-faculty-avatar, #nav-profile-avatar, #sidebar-profile-avatar').forEach(img => {
         img.src = _avatarSrc;
         img.alt = userName;
@@ -779,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isAdminOrHOD) {
           el.textContent = `Head of Department (HOD) | Computer Science & Engineering`;
         } else if (isFacultyRole) {
-          el.textContent = `${data.user.designation || 'Faculty Member'} | Computer Science & Engineering`;
+          el.textContent = `${user.designation || 'Faculty Member'} | Computer Science & Engineering`;
         } else {
           el.textContent = `Student | Computer Science & Engineering`;
         }
@@ -791,11 +801,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const attendanceRate = document.getElementById('stats-attendance-rate');
       const pendingLeaves = document.getElementById('stats-pending-leaves');
 
-      if (totalStudents) totalStudents.textContent = data.stats.totalStudents;
-      if (totalFaculty) totalFaculty.textContent = data.stats.totalFaculty;
-      if (totalSubjects) totalSubjects.textContent = data.stats.totalSubjects;
-      if (attendanceRate) attendanceRate.textContent = (data.stats.attendancePercentage !== null && data.stats.attendancePercentage !== undefined && data.stats.attendancePercentage > 0) ? `${data.stats.attendancePercentage}%` : 'N/A';
-      if (pendingLeaves) pendingLeaves.textContent = data.stats.pendingLeaves;
+      if (totalStudents) totalStudents.textContent = (stats.totalStudents !== undefined && stats.totalStudents !== null) ? stats.totalStudents : 0;
+      if (totalFaculty) totalFaculty.textContent = (stats.totalFaculty !== undefined && stats.totalFaculty !== null) ? stats.totalFaculty : 0;
+      if (totalSubjects) totalSubjects.textContent = (stats.totalSubjects !== undefined && stats.totalSubjects !== null) ? stats.totalSubjects : 0;
+      if (attendanceRate) attendanceRate.textContent = (stats.attendancePercentage !== null && stats.attendancePercentage !== undefined && stats.attendancePercentage > 0) ? `${stats.attendancePercentage}%` : 'N/A';
+      if (pendingLeaves) pendingLeaves.textContent = (stats.pendingLeaves !== undefined && stats.pendingLeaves !== null) ? stats.pendingLeaves : 0;
+
+      // Pending registrations badge update
+      const pendingRegCount = parseInt(stats.pendingRegistrations || 0);
+      document.querySelectorAll('.pending-reg-badge').forEach(badge => {
+        badge.textContent = pendingRegCount;
+        badge.style.display = pendingRegCount > 0 ? 'inline-block' : 'none';
+      });
 
       // Populate Top Banner Academic Card (Semester, Department, Dynamic Last Login)
       const semesterBanner = document.getElementById('dashboard-banner-semester');
@@ -803,10 +820,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const lastLoginBanner = document.getElementById('dashboard-banner-last-login');
 
       if (semesterBanner) semesterBanner.textContent = 'Odd Semester';
-      if (departmentBanner) departmentBanner.textContent = data.user.department || 'Computer Science & Engineering';
+      if (departmentBanner) departmentBanner.textContent = user.department || 'Computer Science & Engineering';
       
       if (lastLoginBanner) {
-        const rawTime = data.user.lastLogin || localStorage.getItem('sms_last_login');
+        const rawTime = user.lastLogin || localStorage.getItem('sms_last_login');
         if (rawTime) {
           const d = new Date(rawTime);
           if (!isNaN(d.getTime())) {
