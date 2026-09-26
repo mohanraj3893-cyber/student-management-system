@@ -1617,7 +1617,10 @@ export default {
       return jsonResponse({ message: 'Requested resource could not be located.' }, 404, request);
     }
 
-    // Fallback for non-API routes
+    // Fallback for non-API routes (serve static frontend if ASSETS binding exists)
+    if (env.ASSETS) {
+      return env.ASSETS.fetch(request);
+    }
     return new Response('Cloudflare Worker SMS Backend Active', {
       headers: { 'Content-Type': 'text/plain', ...corsHeaders(request) }
     });
