@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "student-management-system",
+  "account_id": "a45fdf9c6b7eda00255719d40ac5226d",
   "main": "src/worker.js",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": [
@@ -13,31 +14,9 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "sms-db",
-      "database_id": "sms-db-d1-instance",
+      "database_name": "sbcec-sms",
+      "database_id": "554e5e4b-faf0-426b-aa6d-b7d500e3edb3",
       "migrations_dir": "migrations"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "UPLOADS_BUCKET",
-      "bucket_name": "sms-uploads"
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "REALTIME_HUB",
-        "class_name": "RealtimeHub"
-      }
-    ]
-  },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_classes": [
-        "RealtimeHub"
-      ]
     }
   ],
   "vars": {
