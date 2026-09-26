@@ -25,7 +25,12 @@ jobs:
       - name: Build Frontend with Vite
         run: npm run build
 
+      - name: Verify Cloudflare Secrets Configuration
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN == '' }}
+        run: echo "::notice title=Cloudflare Credentials::CLOUDFLARE_API_TOKEN secret is not set in GitHub repository secrets. Deployment steps skipped. If you use Cloudflare's direct Git integration, Cloudflare builds and deploys directly from GitHub without needing GitHub Actions."
+
       - name: Deploy Frontend to Cloudflare Pages
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -33,6 +38,7 @@ jobs:
           command: pages deploy dist --project-name=sms-portal
 
       - name: Apply Cloudflare D1 Database Migrations
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -40,6 +46,7 @@ jobs:
           command: d1 migrations apply sms-db --remote
 
       - name: Deploy Cloudflare Worker Backend
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
