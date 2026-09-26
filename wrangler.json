@@ -1,0 +1,49 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "student-management-system",
+  "main": "src/worker.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sms-db",
+      "database_id": "sms-db-d1-instance",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS_BUCKET",
+      "bucket_name": "sms-uploads"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "REALTIME_HUB",
+        "class_name": "RealtimeHub"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "RealtimeHub"
+      ]
+    }
+  ],
+  "vars": {
+    "JWT_SECRET": "super_secret_access_jwt_key_2026_cse_dept",
+    "JWT_REFRESH_SECRET": "super_secret_refresh_jwt_key_2026_cse_dept",
+    "VAPID_PUBLIC_KEY": "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzk5T_Wc0r96WCETrEN3egAfKzv0cg_aapkVBQNIv58=",
+    "VAPID_PRIVATE_KEY": "UUx6Fk-3KkH2fGqQk5cZ61xO5bWcR_L-v_oI0j3sVw0="
+  }
+}
